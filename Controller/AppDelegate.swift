@@ -1,10 +1,8 @@
-//
+
 //  AppDelegate.swift
-//  Controller
-//
 //  Created by Tony Smith on 1/16/18.
 //  Copyright © 2018 Black Pyramid. All rights reserved.
-//
+
 
 import UIKit
 
@@ -12,10 +10,33 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var myDevices:DeviceList!
+    let docsDir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+
+        // Set universal window tint for views that delegate this property to this object
+        self.window!.tintColor = UIColor.init(red: 0.71, green: 0.00, blue: 0.02, alpha: 1.0)
+
+        // Point 'myDevices' at the device list singleton
+        self.myDevices = DeviceList.sharedDevices
+
+        // Load in default device list if the file has already been saved
+        let docsPath = self.docsDir[0] + "/devices"
+        if FileManager.default.fileExists(atPath: docsPath) {
+            // Devices file is present on the iDevice, so load it in
+            let load = NSKeyedUnarchiver.unarchiveObject(withFile:docsPath)
+
+            if load != nil {
+                let devices1 = load as! DeviceList
+                let devices2 = devices1.devices as Array
+                self.myDevices.devices.removeAll()
+                self.myDevices.devices.append(contentsOf:devices2)
+                self.myDevices.currentDevice = devices1.currentDevice
+                NSLog("Device list loaded (%@)", docsPath);
+            }
+        }
+
         return true
     }
 
@@ -25,8 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
+        saveDevices()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -38,9 +59,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+
+        saveDevices()
+        NotificationCenter.default.post(name:NSNotification.Name("com.bps.controller.will.quit"), object:self)
     }
 
+    func saveDevices() {
 
+        if self.myDevices.devices.count > 0 {
+            // The app is going into the background or closing, so save the list of devices
+            let docsPath = self.docsDir[0] + "/devices"
+            let success = NSKeyedArchiver.archiveRootObject(self.myDevices, toFile:docsPath)
+            if success {
+                NSLog("Device list saved (%@)", docsPath)
+            } else {
+                NSLog("Device list save failed")
+            }
+        } else {
+            NSLog("No devices to save")
+        }
+    }
 }
 
