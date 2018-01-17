@@ -9,7 +9,7 @@ class Device: NSObject, NSCoding {
 
     var name: String = ""
     var code: String = ""
-    var app: Int = 99
+    var app: String = ""
     var watchSupported: Bool = false
     var changed: Bool = false
 
@@ -19,7 +19,7 @@ class Device: NSObject, NSCoding {
 
         self.name = ""
         self.code = ""
-        self.app = 99
+        self.app = ""
         self.watchSupported = false
     }
 
@@ -30,13 +30,13 @@ class Device: NSObject, NSCoding {
 
         self.name = ""
         self.code = ""
-        self.app = 99
+        self.app = ""
         self.watchSupported = false
 
         if let n = decoder.decodeObject(forKey: "device.name") { self.name = n as! String }
         if let c = decoder.decodeObject(forKey: "device.code") { self.code = c as! String }
+        if let a = decoder.decodeObject(forKey: "device.app") { self.app = a as! String }
 
-        self.app = decoder.decodeInteger(forKey: "device.app")
         self.watchSupported = decoder.decodeBool(forKey: "device.watch")
     }
 

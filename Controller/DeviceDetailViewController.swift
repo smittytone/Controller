@@ -11,6 +11,7 @@ class DeviceDetailViewController: UIViewController,
     URLSessionDelegate,
     URLSessionDataDelegate {
 
+
     @IBOutlet weak var codeField: UITextField!
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var appTypeField: UITextField!
@@ -23,14 +24,10 @@ class DeviceDetailViewController: UIViewController,
     var myDevices: DeviceList!
     var currentDevice: Device!
     var receivedData: NSMutableData! = nil
-    var devSession: URLSession?
+    var serverSession: URLSession?
 
-    override func viewDidLoad() {
 
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view, typically from a nib.
-    }
+    // MARK: - Lifecycle Functions
 
     override func viewDidAppear(_ animated: Bool) {
 
@@ -45,16 +42,11 @@ class DeviceDetailViewController: UIViewController,
             // New items have a 'code' property that is an empty string
             if currentDevice.code.count > 0 {
                 self.codeField.text = self.currentDevice.code
-                self.appTypeField.text = getAppTypeFromInt(self.currentDevice.app)
+                self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
                 self.nameField.text = self.currentDevice.name
+                self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
             }
         }
-    }
-
-    override func didReceiveMemoryWarning() {
-
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
     @objc func appWillQuit(note:NSNotification) {
@@ -112,15 +104,16 @@ class DeviceDetailViewController: UIViewController,
         }
     }
 
+
+    // MARK: - Connection Functions
+
     func getDeviceInfo() {
 
         if let code = self.codeField.text {
             let url:URL? = URL(string: "https://agent.electricimp.com/" + code + "/info")
 
             if url == nil {
-                reportError("DeviceDetailViewController.getDeviceInfo() generated a malformed URL string")
-                self.errorLabel.isHidden = false
-                self.errorLabel.text = "Error contacting the device"
+                reportError("DeviceDetailViewController.getDeviceInfo() generated a malformed URL string", "Could not connect to the device")
                 return
             }
 
@@ -129,22 +122,21 @@ class DeviceDetailViewController: UIViewController,
             var request:URLRequest = URLRequest(url:url!,
                                                 cachePolicy:URLRequest.CachePolicy.reloadIgnoringLocalCacheData,
                                                 timeoutInterval:60.0)
-
             request.httpMethod = "GET"
 
-            if self.devSession == nil {
-                self.devSession = URLSession(configuration:URLSessionConfiguration.default,
-                                         delegate:self,
-                                         delegateQueue:OperationQueue.main)
+            if self.serverSession == nil {
+                self.serverSession = URLSession(configuration:URLSessionConfiguration.default,
+                                                delegate:self,
+                                                delegateQueue:OperationQueue.main)
             }
 
-            let task:URLSessionDataTask = devSession!.dataTask(with:request)
+            let task:URLSessionDataTask = serverSession!.dataTask(with:request)
             task.resume()
         }
     }
 
 
-    // MARK: - URLSession Methods
+    // MARK: - URLSession Delegate Functions
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
 
@@ -169,26 +161,22 @@ class DeviceDetailViewController: UIViewController,
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 
         if error != nil {
-            reportError("Could not connect to the Electric Imp impCloud")
-            self.errorLabel.isHidden = false
-            self.errorLabel.text = "Could not connect to the device"
+            reportError("DeviceDetailViewController.didCompleteWithError() could not connect to the impCloud", "Could not connect to the device")
         } else {
             if self.receivedData.length > 0 {
-                let dataString:String? = String(data:self.receivedData as Data, encoding:String.Encoding.ascii)
-
+                // let dataString:String? = String(data:self.receivedData as Data, encoding:String.Encoding.ascii)
                 var appData: [String:String]
 
                 do {
                     appData = try JSONSerialization.jsonObject(with: self.receivedData as Data, options: JSONSerialization.ReadingOptions.allowFragments) as! [String:String]
                     let code = appData["app"]
                     self.appTypeField.text = getAppTypeAsString(code!)
-                    self.currentDevice.app = getAppTypeAsInt(code!)
+                    self.currentDevice.app = code!
                     self.currentDevice.watchSupported = appData["watchsupported"] == "true" ? true : false
                     self.supportLabel.text = "Watch control" + (appData["watchsupported"] == "false" ? " not" : "") + " supported"
                     self.currentDevice.changed = true
                 } catch {
-                    self.errorLabel.isHidden = false
-                    self.errorLabel.text = "Could not connect to the device"
+                    reportError("DeviceDetailViewController.didCompleteWithError() send malformed JSON" , "Could not connect to the device")
                 }
             }
         }
@@ -198,8 +186,15 @@ class DeviceDetailViewController: UIViewController,
         self.receivedData = nil
     }
 
-    func reportError(_ message:String) {
-        NSLog(message)
+    func reportError(_ logMessage:String, _ reportMessage:String) {
+
+        // Log the detailed message
+        NSLog(logMessage)
+
+        // Report the basic message to the user via an alert
+        let alert = UIAlertController.init(title: "Error", message: reportMessage, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true)
     }
 
     func getAppTypeAsString(_ code:String) -> String {
@@ -210,25 +205,6 @@ class DeviceDetailViewController: UIViewController,
 
         return "Unknown"
     }
-
-    func getAppTypeAsInt(_ code:String) -> Int {
-
-        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return 0 }
-        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return 1 }
-        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return 2 }
-
-        return 99
-    }
-
-    func getAppTypeFromInt(_ code:Int) -> String {
-
-        if code == 0 { return "Weather" }
-        if code == 1 { return "HomeWeather" }
-        if code == 2 { return "MatrixClock" }
-
-        return "Unknown"
-    }
-
 
 }
 

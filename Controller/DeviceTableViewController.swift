@@ -8,7 +8,7 @@ import WatchKit
 import WatchConnectivity
 
 
-class DeviceTableViewController: UITableViewController {
+class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     @IBOutlet weak var deviceTable:UITableView!
 
@@ -21,7 +21,6 @@ class DeviceTableViewController: UITableViewController {
     var currentDevice: Int = -1
     var tableEditingFlag: Bool = false
     var tableOrderingFlag: Bool = false
-    var showIDFlag: Bool = true
 
     
     override func viewDidLoad() {
@@ -37,10 +36,10 @@ class DeviceTableViewController: UITableViewController {
         self.navigationItem.rightBarButtonItem!.action = #selector(self.editTouched)
 
         // Set up the Actions button
-        actionButton = UIBarButtonItem.init(title:"Actions",
-                                           style:UIBarButtonItemStyle.plain,
-                                           target:self,
-                                           action:#selector(self.actionsTouched))
+        actionButton = UIBarButtonItem.init(title: "Actions",
+                                           style: UIBarButtonItemStyle.plain,
+                                           target: self,
+                                           action: #selector(self.actionsTouched))
         self.navigationItem.leftBarButtonItem = actionButton
         self.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
 
@@ -51,9 +50,9 @@ class DeviceTableViewController: UITableViewController {
 
         // Watch for app returning to foreground with DeviceDetailViewController active
         NotificationCenter.default.addObserver(self,
-                                               selector:#selector(self.viewWillAppear),
-                                               name:NSNotification.Name.UIApplicationWillEnterForeground,
-                                               object:nil)
+                                               selector: #selector(self.viewWillAppear),
+                                               name: NSNotification.Name.UIApplicationWillEnterForeground,
+                                               object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -69,12 +68,9 @@ class DeviceTableViewController: UITableViewController {
             device.name = self.editingDevice.name
             device.code = self.editingDevice.code
             device.app = self.editingDevice.app
+            device.watchSupported = self.editingDevice.watchSupported
             self.editingDevice = nil
         }
-
-        // Check for show/hide Clock IDs preference
-        let settings = UserDefaults.standard
-        settings.synchronize()
 
         // Update table to show any changes made
         self.deviceTable.reloadData()
@@ -111,6 +107,7 @@ class DeviceTableViewController: UITableViewController {
             self.navigationItem.leftBarButtonItem!.isEnabled = true
         }
 
+        // Re-display the table to add/remove the editing/moving widgets
         self.deviceTable.reloadData()
     }
 
@@ -120,14 +117,12 @@ class DeviceTableViewController: UITableViewController {
         let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         var action: UIAlertAction!
 
-        // Add the 'start scan' or 'cancel scan' action button
         action = UIAlertAction.init(title: "Update Watch", style: UIAlertActionStyle.default) { (alertAction) in
             self.updateWatch()
         }
 
         actionMenu.addAction(action)
 
-        // Construct and add the other buttons
         action = UIAlertAction.init(title: "Show App Info", style: UIAlertActionStyle.default) { (alertAction) in
             self.showInfo()
         }
@@ -158,13 +153,24 @@ class DeviceTableViewController: UITableViewController {
         self.present(actionMenu, animated: true, completion: nil)
     }
 
-    func updateWatch() {
+    @objc func updateWatch() {
 
+        if WCSession.isSupported() {
+            let session = WCSession.default
+            session.delegate = self
+
+            if session.activationState != WCSessionActivationState.activated {
+                session.activate()
+            } else {
+                sendDeviceList(session)
+            }
+        }
     }
 
     @objc func showInfo() {
 
-        let alert = UIAlertController.init(title: "Controller\nInformation", message: "This sample app can be used to activate Bluetooth-enabled Electric Imp devices, such as the imp004m. Tap ‘Scan’ to find local devices (these must be running the accompanying Squirrel device code) and then select a device to set its WiFi credentials. The selected device will automatically provide a list of compatible networks — just select one from the list and enter its password (or leave the field blank if it has no password). Tap ‘Send BlinkUp’ to configure the device. The app will inform you when the device has successfully connected to the Electric Imp impCloud™", preferredStyle: UIAlertControllerStyle.alert)
+        // Show application info
+        let alert = UIAlertController.init(title: "Controller\nInformation", message: "This app...", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: UIAlertActionStyle.default, handler: nil))
         self.present(alert, animated: true)
     }
@@ -198,7 +204,7 @@ class DeviceTableViewController: UITableViewController {
             cell.textLabel?.text = "Add New Device"
             cell.detailTextLabel?.text = ""
         } else {
-            let device = self.myDevices.devices[indexPath.row]
+            let device: Device = self.myDevices.devices[indexPath.row]
             cell.textLabel?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
             cell.detailTextLabel?.text = device.code.count > 0 ? device.code : "Code not yet set"
             cell.imageView?.image = getAppImage(device.app)
@@ -214,13 +220,13 @@ class DeviceTableViewController: UITableViewController {
 
         // Instantiate the device detail view controller as required - ie. every time
         if self.ddvc == nil {
-            let storyboard = UIStoryboard.init(name:"Main", bundle:nil)
-            self.ddvc = storyboard.instantiateViewController(withIdentifier:"device.detail.view") as! DeviceDetailViewController
+            let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+            self.ddvc = storyboard.instantiateViewController(withIdentifier: "device.detail.view") as! DeviceDetailViewController
             self.ddvc.navigationItem.title = "Device Info"
-            self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(title:"Devices",
-                                                                         style:UIBarButtonItemStyle.plain,
-                                                                         target:self.ddvc,
-                                                                         action:#selector(self.ddvc.changeDetails))
+            self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Devices",
+                                                                              style: UIBarButtonItemStyle.plain,
+                                                                              target: self.ddvc,
+                                                                              action: #selector(self.ddvc.changeDetails))
             self.ddvc.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
         }
 
@@ -229,10 +235,11 @@ class DeviceTableViewController: UITableViewController {
         // Create a new device if necessary
         if editingDevice == nil { editingDevice = Device() }
 
-        let device = self.myDevices.devices[indexPath.row]
+        let device: Device = self.myDevices.devices[indexPath.row]
         self.editingDevice.name = device.name
         self.editingDevice.code = device.code
         self.editingDevice.app = device.app
+        self.editingDevice.watchSupported = device.watchSupported
         self.deviceRow = indexPath.row
 
         // Set the LED colour graphic
@@ -244,13 +251,13 @@ class DeviceTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 
-        // All table rows are editable, including the 'Add New Device' row
+        // NOTE All table rows are editable, including the 'Add New Device' row
         return true
     }
 
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) ->UITableViewCellEditingStyle {
 
-        if !tableOrderingFlag {
+        if !self.tableOrderingFlag {
             return (indexPath.row == self.myDevices.devices.count ? UITableViewCellEditingStyle.insert : UITableViewCellEditingStyle.delete)
         } else {
             return UITableViewCellEditingStyle.none
@@ -261,61 +268,92 @@ class DeviceTableViewController: UITableViewController {
 
         if editingStyle == .delete {
             // Remove the deleted row's imp from the data source FIRST
-            self.myDevices.devices.remove(at:indexPath.row)
+            self.myDevices.devices.remove(at: indexPath.row)
 
             // Now delete the table row itself then update the table
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new imp with default name and code values
-            let device = Device()
+            let device:Device = Device()
 
             // Add new imp to the list
             self.myDevices.devices.append(device)
 
             // And add it to the table
-            tableView.insertRows(at:[indexPath], with:UITableViewRowAnimation.none)
+            tableView.insertRows(at: [indexPath], with: UITableViewRowAnimation.none)
             self.deviceTable.reloadData()
         }
     }
 
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
 
-        if indexPath.row == myDevices.devices.count { return false }
-        return self.tableOrderingFlag
+        // NOTE Can move all rows except a the last line if it's 'Add New Device'
+        return (indexPath.row == self.myDevices.devices.count ? false : self.tableOrderingFlag)
     }
 
 
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
-        let start = fromIndexPath.row
-        let end = to.row
-        let aDevice = self.myDevices.devices[start]
-        self.myDevices.devices.remove(at:start)
-        self.myDevices.devices.insert(aDevice, at:end)
+        let start: Int = fromIndexPath.row
+        let end: Int = to.row
+        let aDevice: Device = self.myDevices.devices[start]
+        self.myDevices.devices.remove(at: start)
+        self.myDevices.devices.insert(aDevice, at: end)
         tableView.reloadData()
     }
 
-    func getAppImage(_ type:Int) -> UIImage? {
+    func getAppImage(_ type:String) -> UIImage? {
 
-        switch type {
-        case 0:
-            return UIImage(named: "weather")
-        case 1:
-            return UIImage(named: "homeweather")
-        default:
-            return UIImage(named: "matrixclock")
+        let imageName: String = getAppTypeAsString(type)
+        return UIImage(named: imageName)
+    }
+
+    func getAppTypeAsString(_ code:String) -> String {
+
+        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "weather" }
+        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "homeWeather" }
+        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "matrixclock" }
+
+        return "unknown"
+    }
+
+
+    // MARK: - WCSessionDelegate Functions
+
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+
+        sendDeviceList(session)
+    }
+
+    func sessionDidBecomeInactive(_ session: WCSession) {
+
+        // NOP - Function required by delegate but not used
+    }
+
+    func sessionDidDeactivate(_ session: WCSession) {
+
+        // NOP - Function required by delegate but not used
+    }
+
+    func sendDeviceList(_ session: WCSession) {
+
+        // Construct a list of devices with watch support
+        var updateableDevices: [[String:String]] = []
+
+        for i in 0..<self.myDevices.devices.count {
+            let aDevice: Device = self.myDevices.devices[i]
+            if aDevice.watchSupported {
+                updateableDevices.append(["code" : aDevice.code,
+                                          "name" : aDevice.name,
+                                          "app"  : aDevice.app])
+            }
+        }
+
+        if updateableDevices.count != 0 {
+            // Try sending the data as a message
+            session.sendMessage(["devices" : updateableDevices], replyHandler: nil, errorHandler: nil)
+            NSLog("Message Sent")
         }
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
