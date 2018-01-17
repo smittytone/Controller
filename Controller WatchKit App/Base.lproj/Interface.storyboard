@@ -34,7 +34,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="17" y="68"/>
+            <point key="canvasLocation" x="15" y="58"/>
         </scene>
         <!--weather.ui-->
         <scene sceneID="WbA-ZR-aoD">
@@ -107,7 +107,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="510" y="68"/>
+            <point key="canvasLocation" x="508" y="58"/>
         </scene>
     </scenes>
 </document>
