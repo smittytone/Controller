@@ -5,11 +5,12 @@
 
 import Foundation
 
+
 class Connexion: NSObject {
 
-    var task:URLSessionTask?
-    var data:NSMutableData?
-    var actionCode:Int = -1
-    var errorCode:Int = -1
+    var task: URLSessionTask?
+    var data: NSMutableData?
+    var actionCode: Int = -1
+    var errorCode: Int = -1
 
 }
