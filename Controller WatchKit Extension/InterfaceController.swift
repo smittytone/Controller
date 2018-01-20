@@ -14,8 +14,11 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
 
     @IBOutlet weak var deviceTable: WKInterfaceTable!
 
-    var myDevices: DeviceList! = nil
+    let watchSession: WCSession = WCSession.default
     let docsDir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
+    
+    var myDevices: DeviceList! = nil
+    var listChanged: Bool = false
     
 
     // MARK: - Lifecycle Functions
@@ -24,7 +27,9 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
 
         super.awake(withContext: context)
 
-        myDevices = DeviceList()
+        self.myDevices = DeviceList()
+        self.watchSession.delegate = self
+        self.watchSession.activate()
     }
     
     override func willActivate() {
@@ -44,24 +49,8 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 self.myDevices.devices.append(contentsOf: devices)
                 self.myDevices.currentDevice = devicesList.currentDevice
             }
-        } else {
-            let session = WCSession.default
-            session.delegate = self
-
-            if session.receivedApplicationContext["devices"] != nil {
-                let devices = session.receivedApplicationContext["devices"] as! [[String:String]]
-                for i in 0..<devices.count {
-                    let anEntry = devices[i]
-                    let device = Device()
-                    device.name = anEntry["name"]!
-                    device.code = anEntry["code"]!
-                    device.app = anEntry["app"]!
-                }
-                saveDevices()
-                initializeUI()
-            }
         }
-
+        
         initializeUI()
     }
     
@@ -71,7 +60,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         super.didDeactivate()
 
         // Save the device list
-        saveDevices()
+        if listChanged { saveDevices() }
     }
 
     func saveDevices() {
@@ -79,7 +68,8 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         if self.myDevices.devices.count > 0 {
             // The app is going into the background or closing, so save the list of devices
             let docsPath = self.docsDir[0] + "/devices"
-            let _ = NSKeyedArchiver.archiveRootObject(self.myDevices, toFile:docsPath)
+            let success = NSKeyedArchiver.archiveRootObject(self.myDevices, toFile:docsPath)
+            listChanged = !success
         }
     }
 
@@ -106,7 +96,15 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
 
         if self.myDevices.devices.count == 0 {
-            // NOP
+            // Tell the user to sync data from the iPhone
+            let waa: WKAlertAction = WKAlertAction.init(title: "OK", style: WKAlertActionStyle.default, handler: {
+                // NOP
+            })
+            
+            presentAlert(withTitle: "I neet setup info",
+                         message: "Please run the Controller app on your iPhone, add some devices, and click ‘Activate’",
+                         preferredStyle: WKAlertControllerStyle.alert,
+                         actions: [waa])
         } else {
             let aDevice: Device = self.myDevices.devices[rowIndex]
 
@@ -117,6 +115,12 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             if aDevice.app == "0028C36B-444A-408D-B862-F8E4C17CB6D6" {
                 self.pushController(withName: "matrixclock.ui", context: aDevice)
             }
+            
+            /*
+            if aDevice.app == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" {
+                self.pushController(withName: "homeweather.ui", context: aDevice)
+            }
+            */
         }
     }
 
@@ -135,6 +139,12 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
 
         WKInterfaceDevice.current().play(.click)
+        
+        DispatchQueue.main.async() {
+            self.processContext()
+        }
+        
+        /*
         if applicationContext["devices"] != nil {
             let devices = applicationContext["devices"] as! [[String:String]]
             for i in 0..<devices.count {
@@ -147,22 +157,52 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             saveDevices()
             initializeUI()
         }
+        */
     }
 
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
 
         NSLog("Received Message")
+        /*
         if message["devices"] != nil {
             self.myDevices.devices = message["devices"] as! [Device]
             saveDevices()
             initializeUI()
         }
+        */
     }
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 
         // NOP
     }
-
+    
+    func processContext() {
+        
+        // Get the latest received context and use it to reconstruct the
+        // device list
+        if let context = watchSession.receivedApplicationContext as? [String : String] {
+            if let dataString = context["info"] {
+                let ds = dataString as NSString
+                let devices = ds.components(separatedBy: "\n\n")
+                if devices.count > 1 {
+                    self.myDevices.devices.removeAll()
+                    for i in 0..<devices.count - 1 {
+                        let d = devices[i] as NSString
+                        let device = d.components(separatedBy: "\n")
+                        let aDevice: Device = Device()
+                        aDevice.name = device[0]
+                        aDevice.code = device[1]
+                        aDevice.app = device[2]
+                        
+                        self.myDevices.devices.append(aDevice)
+                    }
+                }
+                
+                saveDevices()
+                initializeUI()
+            }
+        }
+    }
 
 }
