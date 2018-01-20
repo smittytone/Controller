@@ -16,6 +16,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     var editingDevice: Device!
     var actionButton: UIBarButtonItem!
     var ddvc: DeviceDetailViewController!
+    var phoneSession: WCSession? = nil
 
     var deviceRow: Int = -1
     var currentDevice: Int = -1
@@ -47,12 +48,36 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.tableOrderingFlag = false
         self.tableEditingFlag = false
         self.editingDevice = nil
-
+        
         // Watch for app returning to foreground with DeviceDetailViewController active
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(self.viewWillAppear),
                                                name: NSNotification.Name.UIApplicationWillEnterForeground,
                                                object: nil)
+    
+        // Prepare the session
+        if WCSession.isSupported() {
+            // Only proceed on an iPhone
+            // NOTE This is NOT a universal app
+            self.phoneSession = WCSession.default
+            if let session = self.phoneSession {
+                if session.isPaired {
+                    if session.isWatchAppInstalled {
+                        // All good
+                        session.delegate = self
+                        session.activate()
+                    } else {
+                        // Watch app not installed, so warn user
+                        self.phoneSession = nil
+                        showAlert("This app needs a companion Watch app", "Please install the companion app on your Watch")"
+                    }
+                } else {
+                    // iPhone is not paired with a watch, so warn user
+                    self.phoneSession = nil
+                    showAlert("This app requires an Apple Watch", "Please pair your Apple Watch with this iPhone")
+                }
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -155,15 +180,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     @objc func updateWatch() {
 
-        if WCSession.isSupported() {
-            let session = WCSession.default
-            session.delegate = self
-
-            if session.activationState != WCSessionActivationState.activated {
-                session.activate()
-            } else {
-                sendDeviceList(session)
-            }
+        if let session = self.phoneSession {
+            sendDeviceList(session)
         }
     }
 
@@ -292,7 +310,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         return (indexPath.row == self.myDevices.devices.count ? false : self.tableOrderingFlag)
     }
 
-
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
         let start: Int = fromIndexPath.row
@@ -323,7 +340,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 
-        sendDeviceList(session)
+        if activationState == WCSessionActivationState.activated {
+            // sendDeviceList(session)
+        }
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -339,21 +358,42 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     func sendDeviceList(_ session: WCSession) {
 
         // Construct a list of devices with watch support
-        var updateableDevices: [[String:String]] = []
-
-        for i in 0..<self.myDevices.devices.count {
-            let aDevice: Device = self.myDevices.devices[i]
-            if aDevice.watchSupported {
-                updateableDevices.append(["code" : aDevice.code,
-                                          "name" : aDevice.name,
-                                          "app"  : aDevice.app])
+        // var updateableDevices: [[String:String]] = []
+        var dataString: String = ""
+        
+        if self.myDevices.devices.count > 0 {
+            for i in 0..<self.myDevices.devices.count {
+                let aDevice: Device = self.myDevices.devices[i]
+                if aDevice.watchSupported {
+                    dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
+                }
             }
         }
-
-        if updateableDevices.count != 0 {
+        
+        if dataString.count > 0 {
             // Try sending the data as a message
-            session.sendMessage(["devices" : updateableDevices], replyHandler: nil, errorHandler: nil)
-            NSLog("Message Sent")
+            // session.sendMessage(["devices" : updateableDevices], replyHandler: nil, errorHandler: nil)
+            
+            if let session = self.phoneSession {
+                do {
+                    try session.updateApplicationContext(["info" : dataString])
+                    print("Message Sent")
+                } catch {
+                    print("Message not sent")
+                }
+            }
         }
     }
+    
+    
+    // MARK: Utility Functions
+    
+    func showAlert(_ title: String, _ message: String) {
+        
+        let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .`default`, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
 }
