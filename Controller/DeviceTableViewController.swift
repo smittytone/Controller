@@ -61,21 +61,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             // NOTE This is NOT a universal app
             self.phoneSession = WCSession.default
             if let session = self.phoneSession {
-                if session.isPaired {
-                    if session.isWatchAppInstalled {
-                        // All good
-                        session.delegate = self
-                        session.activate()
-                    } else {
-                        // Watch app not installed, so warn user
-                        self.phoneSession = nil
-                        showAlert("This app needs a companion Watch app", "Please install the companion app on your Watch")"
-                    }
-                } else {
-                    // iPhone is not paired with a watch, so warn user
-                    self.phoneSession = nil
-                    showAlert("This app requires an Apple Watch", "Please pair your Apple Watch with this iPhone")
-                }
+                session.delegate = self
+                session.activate()
             }
         }
     }
@@ -342,6 +329,20 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         if activationState == WCSessionActivationState.activated {
             // sendDeviceList(session)
+            
+            if session.isPaired {
+                if session.isWatchAppInstalled {
+                    print("All good")
+                } else {
+                    // Watch app not installed, so warn user
+                    self.phoneSession = nil
+                    showAlert("This app needs a companion Watch app", "Please install the companion app on your Watch")
+                }
+            } else {
+                // iPhone is not paired with a watch, so warn user
+                self.phoneSession = nil
+                showAlert("This app requires an Apple Watch", "Please pair your Apple Watch with this iPhone")
+            }
         }
     }
 
