@@ -1,6 +1,28 @@
+
 //  DeviceTableViewController.swift
 //  Created by Tony Smith on 1/16/18.
-//  Copyright © 2018 Black Pyramid. All rights reserved.
+//
+//  Copyright 2017-18 Tony Smith
+//
+//  SPDX-License-Identifier: MIT
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be
+//  included in all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+//  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+//  EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+//  OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+//  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+//  OTHER DEALINGS IN THE SOFTWARE.
 
 
 import UIKit
@@ -22,6 +44,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     var currentDevice: Int = -1
     var tableEditingFlag: Bool = false
     var tableOrderingFlag: Bool = false
+    var tableShowIDsFlag: Bool = true
 
     
     override func viewDidLoad() {
@@ -83,7 +106,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             device.watchSupported = self.editingDevice.watchSupported
             self.editingDevice = nil
         }
-
+        
+        // Read the default for whether we show or hide Agent IDs
+        let ud: UserDefaults = UserDefaults.standard
+        let udsi: NSNumber? = ud.value(forKey: "com.bps.contoller.show.agentids") as? NSNumber
+        if let showIDs = udsi {
+            self.tableShowIDsFlag = showIDs.boolValue
+        }
+        
         // Update table to show any changes made
         self.deviceTable.reloadData()
     }
@@ -129,36 +159,37 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         var action: UIAlertAction!
 
-        action = UIAlertAction.init(title: "Update Watch", style: UIAlertActionStyle.default) { (alertAction) in
+        action = UIAlertAction.init(title: "Update Watch",
+                                    style: UIAlertActionStyle.default) { (alertAction) in
             self.updateWatch()
         }
 
         actionMenu.addAction(action)
 
-        action = UIAlertAction.init(title: "Show App Info", style: UIAlertActionStyle.default) { (alertAction) in
+        action = UIAlertAction.init(title: "Show App Info",
+                                    style: UIAlertActionStyle.default) { (alertAction) in
             self.showInfo()
         }
 
         actionMenu.addAction(action)
 
-        action = UIAlertAction.init(title: "Re-order Device List", style: UIAlertActionStyle.default) { (alertAction) in
-            // Switch off editing if it is on
-            self.deviceTable.setEditing(true, animated:true)
-
-            // Set the reordering flag
-            self.tableOrderingFlag = !self.tableOrderingFlag
-            self.tableEditingFlag = true
-
-            // But use the editing flag to manage the right-hand button
-            self.navigationItem.rightBarButtonItem!.title = "Done"
-            self.navigationItem.leftBarButtonItem!.isEnabled = false
-
-            self.deviceTable.reloadData()
+        action = UIAlertAction.init(title: "Re-order Device List",
+                                    style: UIAlertActionStyle.default) { (alertAction) in
+            self.reorderDevicelist()
         }
 
         actionMenu.addAction(action)
-
-        action = UIAlertAction.init(title: "Cancel", style: UIAlertActionStyle.cancel, handler:nil)
+        
+        
+        action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs",
+                                    style: UIAlertActionStyle.default) { (alertAction) in
+              self.showAgentIDs()
+        }
+        
+        actionMenu.addAction(action)
+        
+        action = UIAlertAction.init(title: "Cancel",
+                                    style: UIAlertActionStyle.cancel, handler:nil)
 
         actionMenu.addAction(action)
 
@@ -175,9 +206,37 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     @objc func showInfo() {
 
         // Show application info
-        let alert = UIAlertController.init(title: "Controller\nInformation", message: "This app...", preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController.init(title: "Controller\nInformation", message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: UIAlertActionStyle.default, handler: nil))
         self.present(alert, animated: true)
+    }
+    
+    @objc func showAgentIDs() {
+        
+        // Switch the show/hide flag and update the table
+        self.tableShowIDsFlag = !self.tableShowIDsFlag
+        deviceTable.reloadData()
+        
+        // Save the new setting to preferences
+        let ud: UserDefaults = UserDefaults.standard
+        ud.set(self.tableShowIDsFlag, forKey: "com.bps.contoller.show.agentids")
+    }
+    
+    @objc func reorderDevicelist() {
+        
+        // Switch off table editing if it is on
+        self.deviceTable.setEditing(true, animated:true)
+        
+        // Set the reordering flag
+        self.tableOrderingFlag = !self.tableOrderingFlag
+        self.tableEditingFlag = true
+        
+        // But use the editing flag to manage the right-hand button
+        self.navigationItem.rightBarButtonItem!.title = "Done"
+        self.navigationItem.leftBarButtonItem!.isEnabled = false
+        
+        // Re-display the table
+        self.deviceTable.reloadData()
     }
 
 
@@ -211,9 +270,22 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         } else {
             let device: Device = self.myDevices.devices[indexPath.row]
             cell.textLabel?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
-            cell.detailTextLabel?.text = device.code.count > 0 ? device.code : "Code not yet set"
             cell.imageView?.image = getAppImage(device.app)
-
+            
+            var codeString: String = ""
+            
+            if device.code.count > 0 {
+                if !self.tableShowIDsFlag {
+                    for _ in 0..<device.code.count {
+                        codeString = codeString + "•"
+                    }
+                } else {
+                    codeString = device.code
+                }
+            }
+            
+            cell.detailTextLabel?.text = device.code.count > 0 ? codeString : "Code not yet set"
+            
             // Do we show the re-order control?
             cell.showsReorderControl = self.tableOrderingFlag
         }

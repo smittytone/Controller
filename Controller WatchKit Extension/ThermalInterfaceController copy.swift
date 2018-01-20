@@ -1,7 +1,28 @@
 
 //  ThermalInterfaceController.swift
 //  Created by Tony Smith on 1/17/18.
-//  Copyright © 2018 Black Pyramid. All rights reserved.
+//
+//  Copyright 2018 Tony Smith
+//
+//  SPDX-License-Identifier: MIT
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be
+//  included in all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+//  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+//  EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+//  OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+//  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+//  OTHER DEALINGS IN THE SOFTWARE.
 
 
 import WatchKit
@@ -42,7 +63,8 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     @IBAction func reboot(_ sender: Any) {
 
-        // Send the reset signal
+        // Send the restart signal
+        // NOTE This triggers a forecast update
         var dict = [String: String]()
         dict["action"] = "reboot"
         makeConnection(dict)
@@ -67,10 +89,10 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             return
         }
         
-        if serverSession == nil {
-            serverSession = URLSession(configuration:URLSessionConfiguration.default,
-                                       delegate:self,
-                                       delegateQueue:OperationQueue.main)
+        if self.serverSession == nil {
+            self.serverSession = URLSession(configuration:URLSessionConfiguration.default,
+                                            delegate:self,
+                                            delegateQueue:OperationQueue.main)
         }
         
         var request = URLRequest(url: url!,
@@ -94,7 +116,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         
         if let task = aConnexion.task {
             task.resume()
-            connexions.append(aConnexion)
+            self.connexions.append(aConnexion)
         }
     }
 
@@ -104,7 +126,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // This delegate method is called when the server sends some data back
         // Add the data to the correct connexion object
-        for aConnexion in connexions {
+        for aConnexion in self.connexions {
             // Run through the connections in our list and add the incoming data to the correct one
             if aConnexion.task == dataTask {
                 if let connData = aConnexion.data {
@@ -124,7 +146,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         if code > 399 {
             // The API has responded with a status code that indicates an error
             
-            for aConnexion in connexions {
+            for aConnexion in self.connexions {
                 // Run through the connections in our list and
                 // add the incoming error code to the correct one
                 if aConnexion.task == dataTask { aConnexion.errorCode = code }
@@ -154,9 +176,9 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
             
-            for i in 0..<connexions.count {
+            for i in 0..<self.connexions.count {
                 // Run through the connections in the list and find the one that has just finished loading
-                let aConnexion = connexions[i]
+                let aConnexion = self.connexions[i]
                 
                 if aConnexion.task == task {
                     task.cancel()
@@ -164,21 +186,21 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 }
             }
             
-            if index != -1 { connexions.remove(at:index) }
+            if index != -1 { self.connexions.remove(at:index) }
         } else {
-            for i in 0..<connexions.count {
-                let aConnexion = connexions[i]
+            for i in 0..<self.connexions.count {
+                let aConnexion = self.connexions[i]
                 if let data = aConnexion.data {
                     if aConnexion.task == task {
                         if initialQueryFlag == true {
                             let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            self.deviceLabel.setText(inString == "0" ? aDevice!.name + " !" : aDevice!.name)
+                            self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
                             self.initialQueryFlag = false
                             self.statusLabel.setHidden(true)
                         }
                         
                         task.cancel()
-                        connexions.remove(at:i)
+                        self.connexions.remove(at:i)
                         break
                     }
                 }
