@@ -36,15 +36,13 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         
         super.didAppear()
         
-        // Get the device's status
+        // Get the device's current status
         makeConnection(nil);
     }
 
-    override func willActivate() {
-
-        super.willActivate()
-    }
-
+    
+    // MARK: - Action Functions
+    
     @IBAction func doSwitch(value: Bool) {
 
         var dict = [String: String]()
@@ -230,9 +228,9 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         }
     }
     
-    func reportError(_ message:String)
-    {
-        NSLog(message)
+    func reportError(_ message:String) {
+        
+        print(message)
     }
 
 
