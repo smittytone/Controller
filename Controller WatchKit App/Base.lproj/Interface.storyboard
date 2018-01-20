@@ -19,7 +19,7 @@
                                 <tableRow identifier="main.table.row" id="O5A-Sx-l4z" customClass="TableRow" customModule="Controller_WatchKit_App" customModuleProvider="target">
                                     <group key="rootItem" width="1" alignment="left" id="oCz-yR-0Hg">
                                         <items>
-                                            <label width="128" height="36" alignment="left" text="Label" id="LhE-za-P0f"/>
+                                            <label width="136" height="36" alignment="left" text="Label" id="LhE-za-P0f"/>
                                         </items>
                                     </group>
                                     <connections>
@@ -47,6 +47,7 @@
                         <label width="136" alignment="left" text="Weather" textAlignment="left" id="eHx-34-v8W">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
+                        <label width="136" alignment="left" text="Loading..." id="NRC-Sl-R6q"/>
                         <button width="1" alignment="left" title="Update Forecast" id="cyg-e3-6nZ">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -68,8 +69,8 @@
                         </button>
                     </items>
                     <connections>
-                        <outlet property="appLabel" destination="eHx-34-v8W" id="YSc-h4-UAF"/>
                         <outlet property="deviceLabel" destination="hXB-FP-GVj" id="4yP-Id-SGd"/>
+                        <outlet property="statusLabel" destination="NRC-Sl-R6q" id="PPE-XO-yGg"/>
                     </connections>
                 </controller>
             </objects>
