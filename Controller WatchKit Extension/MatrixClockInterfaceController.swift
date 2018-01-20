@@ -17,7 +17,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
-    var initialQueryFlag: Bool = true
+    var initialQueryFlag: Bool = false
     
 
     // MARK: - Lifecycle Functions
@@ -37,7 +37,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         super.didAppear()
         
         // Get the device's current status
-        makeConnection(nil);
+        self.initialQueryFlag = true
+        makeConnection(nil)
     }
 
     

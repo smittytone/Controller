@@ -1,5 +1,5 @@
 
-//  WeatherInterfaceController.swift
+//  ThermalInterfaceController.swift
 //  Created by Tony Smith on 1/17/18.
 //  Copyright © 2018 Black Pyramid. All rights reserved.
 
@@ -7,7 +7,7 @@
 import WatchKit
 
 
-class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate {
+class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
@@ -40,14 +40,6 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     
     // MARK: - Action Functions
 
-    @IBAction func update(_ sender: Any) {
-
-        // Send the reset signal
-        var dict = [String: String]()
-        dict["action"] = "update"
-        makeConnection(dict)
-    }
-
     @IBAction func reboot(_ sender: Any) {
 
         // Send the reset signal
@@ -67,11 +59,11 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     func makeConnection(_ data:[String:String]?) {
 
-        let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/update" : "/state")
+        let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/actions" : "/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError("WeatherInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError("ThermalInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
             return
         }
         
@@ -90,7 +82,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError("WeatherInterfaceController.makeConnection() passed malformed data")
+                reportError("ThermalInterfaceController.makeConnection() passed malformed data")
                 return
             }
         }

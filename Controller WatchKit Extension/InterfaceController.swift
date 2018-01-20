@@ -96,7 +96,8 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
 
         if self.myDevices.devices.count == 0 {
-            // Tell the user to sync data from the iPhone
+            // The app doesn't know about any devices, so
+            // tell the user to sync data from the iPhone
             let waa: WKAlertAction = WKAlertAction.init(title: "OK", style: WKAlertActionStyle.default, handler: {
                 // NOP
             })
@@ -116,11 +117,14 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 self.pushController(withName: "matrixclock.ui", context: aDevice)
             }
             
-            /*
             if aDevice.app == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" {
                 self.pushController(withName: "homeweather.ui", context: aDevice)
             }
-            */
+            
+            if aDevice.app == "0B5D0687-6095-4F1D-897C-04664B143702" {
+                self.pushController(withName: "thermal.ui", context: aDevice)
+                
+            }
         }
     }
 
@@ -129,6 +133,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "Weather" }
         if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "HomeWeather" }
         if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "MatrixClock" }
+        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "ThermalForecast" }
 
         return "Unknown"
     }

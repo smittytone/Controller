@@ -1,5 +1,5 @@
 
-//  WeatherInterfaceController.swift
+//  HomeWeatherInterfaceController.swift
 //  Created by Tony Smith on 1/17/18.
 //  Copyright © 2018 Black Pyramid. All rights reserved.
 
@@ -7,7 +7,7 @@
 import WatchKit
 
 
-class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate {
+class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
@@ -52,7 +52,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Send the reset signal
         var dict = [String: String]()
-        dict["action"] = "reboot"
+        dict["action"] = "reset"
         makeConnection(dict)
     }
 
@@ -67,11 +67,11 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     func makeConnection(_ data:[String:String]?) {
 
-        let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/update" : "/state")
+        let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/dimmer" : "/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError("WeatherInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError("HomeWeatherInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
             return
         }
         
@@ -90,7 +90,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError("WeatherInterfaceController.makeConnection() passed malformed data")
+                reportError("HomeWeatherInterfaceController.makeConnection() passed malformed data")
                 return
             }
         }
