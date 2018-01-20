@@ -51,7 +51,7 @@
                         <button width="1" alignment="left" title="Update Forecast" id="cyg-e3-6nZ">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <action selector="update:" destination="v0d-aL-cfD" id="wiA-6Y-SfD"/>
+                                <action selector="update:" destination="v0d-aL-cfD" id="7cC-vI-PD8"/>
                             </connections>
                         </button>
                         <button width="1" alignment="left" title="Reset Device" id="gsF-1N-fCT">
@@ -74,12 +74,12 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="269" y="68"/>
+            <point key="canvasLocation" x="259" y="79"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
             <objects>
-                <controller identifier="matrixclock.ui" id="FMC-yj-G74" customClass="MatrixClockInterfaceController" customModule="Controller_WatchKit_Extension">
+                <controller identifier="matrixclock.ui" id="FMC-yj-G74" customClass="MatrixClockInterfaceController" customModule="Controller_WatchKit_App" customModuleProvider="target">
                     <items>
                         <label width="136" alignment="left" text="Label" id="HPh-Hc-Qbq">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -110,7 +110,85 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="508" y="57.5"/>
+            <point key="canvasLocation" x="502" y="59"/>
+        </scene>
+        <!--homeweather.ui-->
+        <scene sceneID="59f-L9-2jD">
+            <objects>
+                <controller identifier="homeweather.ui" id="UMj-Gd-3sA" customClass="HomeWeatherInterfaceController" customModule="Controller_WatchKit_App" customModuleProvider="target">
+                    <items>
+                        <label width="136" alignment="left" text="Label" id="e9u-Ib-Hha">
+                            <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </label>
+                        <label width="136" alignment="left" text="HomeWeather" id="HBx-ym-B1u">
+                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                        </label>
+                        <label width="136" alignment="left" text="Loading..." id="N2q-6O-XAF"/>
+                        <switch width="1" alignment="left" value="YES" title="Switch" id="Lui-XO-j3i">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </switch>
+                        <button width="1" alignment="left" title="Update Forecast" id="2hP-q1-cTw">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="update:" destination="UMj-Gd-3sA" id="Fnm-WT-hTl"/>
+                            </connections>
+                        </button>
+                        <button width="1" alignment="left" title="Reset Device" id="Ohc-hP-08G">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="reboot:" destination="UMj-Gd-3sA" id="6g1-5b-3zB"/>
+                            </connections>
+                        </button>
+                        <separator alignment="left" id="Ric-I0-WPy"/>
+                        <button width="1" alignment="left" title="Back" id="urw-j8-No5">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="back:" destination="UMj-Gd-3sA" id="WBt-Hq-hRM"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="deviceLabel" destination="e9u-Ib-Hha" id="vuj-Ik-gNB"/>
+                        <outlet property="statusLabel" destination="N2q-6O-XAF" id="cA5-gR-qUy"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="743" y="100"/>
+        </scene>
+        <!--thermal.ui-->
+        <scene sceneID="u2q-hJ-v5C">
+            <objects>
+                <controller identifier="thermal.ui" id="yxY-RW-tE6" customClass="ThermalInterfaceController" customModule="Controller_WatchKit_App" customModuleProvider="target">
+                    <items>
+                        <label width="136" alignment="left" text="Label" id="qgU-jM-wYK">
+                            <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </label>
+                        <label width="136" alignment="left" text="ThermalForecast" id="BcK-f5-sbb">
+                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                        </label>
+                        <label width="136" alignment="left" text="Loading..." id="fA6-HY-aqU"/>
+                        <button width="1" alignment="left" title="Restart &amp; Update" id="om2-Nv-xod">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="reboot:" destination="yxY-RW-tE6" id="UXS-6Z-ZJR"/>
+                            </connections>
+                        </button>
+                        <separator alignment="left" id="lHE-QW-lnh"/>
+                        <button width="1" alignment="left" title="Back" id="jh9-YX-Bag">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="back:" destination="yxY-RW-tE6" id="rup-Z6-19d"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="deviceLabel" destination="qgU-jM-wYK" id="5Na-dP-Ec8"/>
+                        <outlet property="statusLabel" destination="fA6-HY-aqU" id="Sp3-dB-Kh3"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="990" y="59"/>
         </scene>
     </scenes>
 </document>
