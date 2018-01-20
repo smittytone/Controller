@@ -29,6 +29,8 @@
 		3BA8F924200E149E00059702 /* DeviceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA8F923200E149E00059702 /* DeviceDetailViewController.swift */; };
 		3BA8F928200E58BC00059702 /* DeviceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA8F927200E58BC00059702 /* DeviceList.swift */; };
 		3BA8F92A200E58DD00059702 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA8F929200E58DD00059702 /* Device.swift */; };
+		3BFEE5CE20139B930069EE36 /* HomeWeatherInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */; };
+		3BFEE5D02013A3290069EE36 /* ThermalInterfaceController copy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +102,8 @@
 		3BA8F923200E149E00059702 /* DeviceDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceDetailViewController.swift; sourceTree = "<group>"; };
 		3BA8F927200E58BC00059702 /* DeviceList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DeviceList.swift; path = Controller/DeviceList.swift; sourceTree = SOURCE_ROOT; };
 		3BA8F929200E58DD00059702 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Device.swift; path = Controller/Device.swift; sourceTree = SOURCE_ROOT; };
+		3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeWeatherInterfaceController.swift; sourceTree = "<group>"; };
+		3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ThermalInterfaceController copy.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +176,8 @@
 				3BA8F907200E088100059702 /* InterfaceController.swift */,
 				3B5401A220137A0500130A06 /* MatrixClockInterfaceController.swift */,
 				3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */,
+				3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */,
+				3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */,
 				3BA8F929200E58DD00059702 /* Device.swift */,
 				3BA8F927200E58BC00059702 /* DeviceList.swift */,
 				3B5401A0201377BD00130A06 /* TableRow.swift */,
@@ -332,6 +338,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B5401A520137A0500130A06 /* WeatherInterfaceController.swift in Sources */,
+				3BFEE5CE20139B930069EE36 /* HomeWeatherInterfaceController.swift in Sources */,
 				3BA8F90A200E088100059702 /* ExtensionDelegate.swift in Sources */,
 				3BA8F908200E088100059702 /* InterfaceController.swift in Sources */,
 				3BA8F90C200E088100059702 /* ComplicationController.swift in Sources */,
@@ -340,6 +347,7 @@
 				3BA8F92A200E58DD00059702 /* Device.swift in Sources */,
 				3B5401A720137CC500130A06 /* Connexion.swift in Sources */,
 				3B5401A1201377BD00130A06 /* TableRow.swift in Sources */,
+				3BFEE5D02013A3290069EE36 /* ThermalInterfaceController copy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

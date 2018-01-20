@@ -18,7 +18,6 @@ class DeviceDetailViewController: UIViewController,
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var typeLabel: UILabel!
     @IBOutlet weak var supportLabel: UILabel!
-    @IBOutlet weak var errorLabel: UILabel!
     @IBOutlet weak var connectionProgress: UIActivityIndicatorView!
     
     var myDevices: DeviceList!
@@ -34,7 +33,6 @@ class DeviceDetailViewController: UIViewController,
         super.viewDidAppear(animated)
 
         // Set up the UI
-        self.errorLabel.isHidden = true
         self.appTypeField.isEnabled = false
 
         // Display the device info
@@ -78,6 +76,11 @@ class DeviceDetailViewController: UIViewController,
         // Jump back to the list of devices
         self.navigationController!.popViewController(animated: true)
     }
+    
+    @IBAction func getProxy(_ sender: Any) {
+        
+        getDeviceInfo()
+    }
 
 
     // MARK: - Text Field Delegate Methods
@@ -95,15 +98,7 @@ class DeviceDetailViewController: UIViewController,
         textField.resignFirstResponder()
         return true
     }
-
-    func textFieldDidEndEditing(_ textField: UITextField) {
-
-        if textField == self.codeField {
-            // User has entered a code, so we should get the device info
-            getDeviceInfo()
-        }
-    }
-
+    
 
     // MARK: - Connection Functions
 
@@ -189,7 +184,7 @@ class DeviceDetailViewController: UIViewController,
     func reportError(_ logMessage:String, _ reportMessage:String) {
 
         // Log the detailed message
-        NSLog(logMessage)
+        print(logMessage)
 
         // Report the basic message to the user via an alert
         let alert = UIAlertController.init(title: "Error", message: reportMessage, preferredStyle: UIAlertControllerStyle.alert)
@@ -202,6 +197,7 @@ class DeviceDetailViewController: UIViewController,
         if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "Weather" }
         if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "HomeWeather" }
         if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "MatrixClock" }
+        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "ThermalForecastWorld" }
 
         return "Unknown"
     }

@@ -318,6 +318,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "weather" }
         if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "homeWeather" }
         if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "matrixclock" }
+        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "thermalworld" }
 
         return "unknown"
     }
