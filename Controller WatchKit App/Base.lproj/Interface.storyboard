@@ -86,11 +86,12 @@
                         <label width="136" alignment="left" text="MatrixClock" textAlignment="left" id="voy-tc-NyC">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
+                        <label width="136" alignment="left" text="Loading..." id="3TI-tS-P84"/>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="ilT-Hv-a2L">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <action selector="doSwitch:" destination="FMC-yj-G74" id="unO-cb-2xe"/>
+                                <action selector="doSwitchWithValue:" destination="FMC-yj-G74" id="5fc-IL-b0L"/>
                             </connections>
                         </switch>
                         <separator alignment="left" id="pwq-gx-4j3"/>
@@ -104,10 +105,11 @@
                     <connections>
                         <outlet property="deviceLabel" destination="HPh-Hc-Qbq" id="WQ9-uq-GMW"/>
                         <outlet property="lightSwitch" destination="ilT-Hv-a2L" id="syR-Ie-dzu"/>
+                        <outlet property="statusLabel" destination="3TI-tS-P84" id="Ii4-Td-PhK"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="508" y="58"/>
+            <point key="canvasLocation" x="508" y="57.5"/>
         </scene>
     </scenes>
 </document>
