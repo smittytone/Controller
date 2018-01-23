@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3B1118D2201535E8006D342F /* BigClockInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1118D1201535E8006D342F /* BigClockInterfaceController.swift */; };
 		3B5401A1201377BD00130A06 /* TableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5401A0201377BD00130A06 /* TableRow.swift */; };
 		3B5401A420137A0500130A06 /* MatrixClockInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5401A220137A0500130A06 /* MatrixClockInterfaceController.swift */; };
 		3B5401A520137A0500130A06 /* WeatherInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */; };
@@ -76,6 +77,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3B1118D1201535E8006D342F /* BigClockInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BigClockInterfaceController.swift; sourceTree = "<group>"; };
 		3B5401A0201377BD00130A06 /* TableRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableRow.swift; sourceTree = "<group>"; };
 		3B5401A220137A0500130A06 /* MatrixClockInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatrixClockInterfaceController.swift; sourceTree = "<group>"; };
 		3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherInterfaceController.swift; sourceTree = "<group>"; };
@@ -178,6 +180,7 @@
 				3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */,
 				3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */,
 				3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */,
+				3B1118D1201535E8006D342F /* BigClockInterfaceController.swift */,
 				3BA8F929200E58DD00059702 /* Device.swift */,
 				3BA8F927200E58BC00059702 /* DeviceList.swift */,
 				3B5401A0201377BD00130A06 /* TableRow.swift */,
@@ -342,6 +345,7 @@
 				3BA8F90A200E088100059702 /* ExtensionDelegate.swift in Sources */,
 				3BA8F908200E088100059702 /* InterfaceController.swift in Sources */,
 				3BA8F90C200E088100059702 /* ComplicationController.swift in Sources */,
+				3B1118D2201535E8006D342F /* BigClockInterfaceController.swift in Sources */,
 				3BA8F928200E58BC00059702 /* DeviceList.swift in Sources */,
 				3B5401A420137A0500130A06 /* MatrixClockInterfaceController.swift in Sources */,
 				3BA8F92A200E58DD00059702 /* Device.swift in Sources */,
