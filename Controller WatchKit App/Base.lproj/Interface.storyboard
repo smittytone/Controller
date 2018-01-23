@@ -19,7 +19,7 @@
                                 <tableRow identifier="main.table.row" id="O5A-Sx-l4z" customClass="TableRow" customModule="Controller_WatchKit_App" customModuleProvider="target">
                                     <group key="rootItem" width="1" alignment="left" id="oCz-yR-0Hg">
                                         <items>
-                                            <label width="136" height="36" alignment="left" text="Label" id="LhE-za-P0f"/>
+                                            <label width="136" height="36" alignment="left" text="Label" textAlignment="center" id="LhE-za-P0f"/>
                                         </items>
                                     </group>
                                     <connections>
@@ -70,7 +70,9 @@
                     </items>
                     <connections>
                         <outlet property="deviceLabel" destination="hXB-FP-GVj" id="4yP-Id-SGd"/>
+                        <outlet property="resetButton" destination="gsF-1N-fCT" id="E44-1L-0dX"/>
                         <outlet property="statusLabel" destination="NRC-Sl-R6q" id="PPE-XO-yGg"/>
+                        <outlet property="updateButton" destination="cyg-e3-6nZ" id="f8A-Iw-dw5"/>
                     </connections>
                 </controller>
             </objects>
@@ -124,14 +126,10 @@
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
                         <label width="136" alignment="left" text="Loading..." id="N2q-6O-XAF"/>
-                        <switch width="1" alignment="left" value="YES" title="Switch" id="Lui-XO-j3i">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        </switch>
-                        <button width="1" alignment="left" title="Update Forecast" id="2hP-q1-cTw">
+                        <button width="1" alignment="left" title="Advance" id="2hP-q1-cTw">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
-                                <action selector="update:" destination="UMj-Gd-3sA" id="Fnm-WT-hTl"/>
+                                <action selector="advance:" destination="UMj-Gd-3sA" id="f2G-jO-UO4"/>
                             </connections>
                         </button>
                         <button width="1" alignment="left" title="Reset Device" id="Ohc-hP-08G">
@@ -150,7 +148,9 @@
                     </items>
                     <connections>
                         <outlet property="deviceLabel" destination="e9u-Ib-Hha" id="vuj-Ik-gNB"/>
+                        <outlet property="resetButton" destination="Ohc-hP-08G" id="cV4-y1-n7o"/>
                         <outlet property="statusLabel" destination="N2q-6O-XAF" id="cA5-gR-qUy"/>
+                        <outlet property="updateButton" destination="2hP-q1-cTw" id="BGs-Gb-UrY"/>
                     </connections>
                 </controller>
             </objects>
@@ -184,11 +184,47 @@
                     </items>
                     <connections>
                         <outlet property="deviceLabel" destination="qgU-jM-wYK" id="5Na-dP-Ec8"/>
+                        <outlet property="resetButton" destination="om2-Nv-xod" id="eCb-pb-aGM"/>
                         <outlet property="statusLabel" destination="fA6-HY-aqU" id="Sp3-dB-Kh3"/>
                     </connections>
                 </controller>
             </objects>
             <point key="canvasLocation" x="990" y="59"/>
+        </scene>
+        <!--bigclock.ui-->
+        <scene sceneID="mmT-qJ-Fwe">
+            <objects>
+                <controller identifier="bigclock.ui" id="Rht-1b-8W6" customClass="BigClockInterfaceController" customModule="Controller_WatchKit_Extension">
+                    <items>
+                        <label width="136" alignment="left" text="Label" id="PZc-li-rhZ">
+                            <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </label>
+                        <label width="136" alignment="left" text="BigClock" id="mnE-IO-PMw">
+                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                        </label>
+                        <label width="136" alignment="left" text="Loading..." id="zFs-wx-gbe"/>
+                        <switch width="1" alignment="left" value="YES" title="Switch" id="ci2-ya-b7n">
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="doSwitchWithValue:" destination="Rht-1b-8W6" id="fjV-Yq-vkJ"/>
+                            </connections>
+                        </switch>
+                        <separator alignment="left" id="j1S-mH-hr8"/>
+                        <button width="1" alignment="left" title="Back" id="GFu-Xz-KHA">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="back:" destination="Rht-1b-8W6" id="W1i-vg-NoD"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="deviceLabel" destination="PZc-li-rhZ" id="gYA-ar-6yf"/>
+                        <outlet property="lightSwitch" destination="ci2-ya-b7n" id="CQN-QO-hc0"/>
+                        <outlet property="statusLabel" destination="zFs-wx-gbe" id="gcN-as-ii7"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="1256" y="58"/>
         </scene>
     </scenes>
 </document>
