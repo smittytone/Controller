@@ -32,12 +32,18 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
+    @IBOutlet weak var updateButton: WKInterfaceButton!
+    @IBOutlet weak var resetButton: WKInterfaceButton!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
+    let dots: String = "................"
+    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
+    var loadingTimer: Timer!
+    var loadCount:Int = 3
     
     // MARK: - Lifecycle Functions
 
@@ -47,6 +53,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
+        self.updateButton.setHidden(true)
+        self.resetButton.setHidden(true)
     }
 
     override func didAppear() {
@@ -56,6 +64,18 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil)
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
+                                                 target: self,
+                                                 selector: #selector(dotter),
+                                                 userInfo: nil,
+                                                 repeats: true)
+    }
+    
+    @objc func dotter() {
+        
+        self.loadCount = self.loadCount + 1
+        if self.loadCount > 12 { self.loadCount = 0 }
+        statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
     
     
@@ -204,6 +224,9 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
                             self.initialQueryFlag = false
                             self.statusLabel.setHidden(true)
+                            self.updateButton.setHidden(false)
+                            self.resetButton.setHidden(false)
+                            self.loadingTimer.invalidate()
                         }
                         
                         task.cancel()

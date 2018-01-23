@@ -32,12 +32,19 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
+    @IBOutlet weak var resetButton: WKInterfaceButton!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
+    let dots: String = "................"
+    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
+    var isConnected: Bool = false
+    var loadingTimer: Timer!
+    var loadCount:Int = 3
+    
     
     // MARK: - Lifecycle Functions
 
@@ -47,6 +54,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
+        self.resetButton.setHidden(true)
     }
 
     override func didAppear() {
@@ -56,6 +64,18 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil)
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
+                                                 target: self,
+                                                 selector: #selector(dotter),
+                                                 userInfo: nil,
+                                                 repeats: true)
+    }
+    
+    @objc func dotter() {
+        
+        self.loadCount = self.loadCount + 1
+        if self.loadCount > 12 { self.loadCount = 0 }
+        statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
     
     
@@ -65,6 +85,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Send the restart signal
         // NOTE This triggers a forecast update
+        if !isConnected { return }
         var dict = [String: String]()
         dict["action"] = "reboot"
         makeConnection(dict)
@@ -195,8 +216,11 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                         if initialQueryFlag == true {
                             let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
                             self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
+                            self.isConnected = inString == "0" ? false : true
                             self.initialQueryFlag = false
                             self.statusLabel.setHidden(true)
+                            self.resetButton.setHidden(false)
+                            self.loadingTimer.invalidate()
                         }
                         
                         task.cancel()

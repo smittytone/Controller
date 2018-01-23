@@ -35,11 +35,14 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
+    let dots: String = "................"
+    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
-    
+    var loadingTimer: Timer!
+    var loadCount:Int = 3
 
     // MARK: - Lifecycle Functions
 
@@ -49,7 +52,6 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
-        self.initialQueryFlag = true
         self.lightSwitch.setHidden(true)
     }
     
@@ -60,6 +62,18 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil)
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
+                                                 target: self,
+                                                 selector: #selector(dotter),
+                                                 userInfo: nil,
+                                                 repeats: true)
+    }
+    
+    @objc func dotter() {
+        
+        self.loadCount = self.loadCount + 1
+        if self.loadCount > 12 { self.loadCount = 0 }
+        statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
 
     
@@ -136,7 +150,6 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
             }
         }
     }
-    
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
@@ -235,6 +248,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                 self.lightSwitch.setHidden(false)
                                 self.initialQueryFlag = false
                                 self.statusLabel.setHidden(true)
+                                self.loadingTimer.invalidate()
                             }
                         }
                     }

@@ -32,12 +32,19 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
+    @IBOutlet weak var updateButton: WKInterfaceButton!
+    @IBOutlet weak var resetButton: WKInterfaceButton!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
+    let dots: String = "................"
+    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
+    var loadingTimer: Timer!
+    var loadCount:Int = 3
+    
     
     // MARK: - Lifecycle Functions
 
@@ -47,6 +54,8 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
+        self.updateButton.setHidden(true)
+        self.resetButton.setHidden(true)
     }
 
     override func didAppear() {
@@ -55,26 +64,38 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil)
+        makeConnection(nil, nil)
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
+                                                 target: self,
+                                                 selector: #selector(dotter),
+                                                 userInfo: nil,
+                                                 repeats: true)
+    }
+    
+    @objc func dotter() {
+        
+        self.loadCount = self.loadCount + 1
+        if self.loadCount > 12 { self.loadCount = 0 }
+        statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
     
     
     // MARK: - Action Functions
 
-    @IBAction func update(_ sender: Any) {
+    @IBAction func advance(_ sender: Any) {
 
         // Send the forecast update signal
         var dict = [String: String]()
-        dict["action"] = "update"
-        makeConnection(dict)
+        dict["advance"] = "advance"
+        makeConnection(dict, "/dimmer")
     }
 
     @IBAction func reboot(_ sender: Any) {
 
         // Send the reset signal
         var dict = [String: String]()
-        dict["action"] = "reset"
-        makeConnection(dict)
+        dict["reset"] = "reset"
+        makeConnection(dict, "/reset")
     }
 
     @IBAction func back(_ sender: Any) {
@@ -86,9 +107,9 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
     // MARK: - Connection Functions
 
-    func makeConnection(_ data:[String:String]?) {
+    func makeConnection(_ data:[String:String]?, _ path:String?) {
 
-        let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/dimmer" : "/state")
+        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
@@ -204,6 +225,9 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                             self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
                             self.initialQueryFlag = false
                             self.statusLabel.setHidden(true)
+                            self.updateButton.setHidden(false)
+                            self.resetButton.setHidden(false)
+                            self.loadingTimer.invalidate()
                         }
                         
                         task.cancel()
