@@ -2,7 +2,7 @@
 //  Connextion.swift
 //  Created by Tony Smith on 06/12/2016.
 //
-//  Copyright 2018 Tony Smith
+//  Copyright 2016-2018 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //
