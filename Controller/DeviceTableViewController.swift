@@ -36,8 +36,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     var myDevices: DeviceList!
     var editingDevice: Device!
-    var actionButton: UIBarButtonItem!
     var ddvc: DeviceDetailViewController!
+    var actionButton: UIBarButtonItem!
     var phoneSession: WCSession? = nil
 
     var deviceRow: Int = -1
@@ -65,7 +65,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                                            target: self,
                                            action: #selector(self.actionsTouched))
         self.navigationItem.leftBarButtonItem = actionButton
-        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
+        self.navigationItem.leftBarButtonItem!.tintColor = UIColor.white
 
         // Initialise object properties
         self.tableOrderingFlag = false
@@ -100,7 +100,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         if self.editingDevice != nil {
             // 'editingDevice' is only non-nil if we have just edited a device's details
             if self.editingDevice.changed {
-                // Only update if this is true
+                // Only update the device record if it has been changed
                 let device = self.myDevices.devices[deviceRow]
                 device.name = self.editingDevice.name
                 device.code = self.editingDevice.code
@@ -115,6 +115,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Read the default for whether we show or hide Agent IDs
         let ud: UserDefaults = UserDefaults.standard
         let udsi: NSNumber? = ud.value(forKey: "com.bps.contoller.show.agentids") as? NSNumber
+        
         if let showIDs = udsi {
             self.tableShowIDsFlag = showIDs.boolValue
         }
@@ -123,7 +124,15 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.deviceTable.reloadData()
     }
 
-
+    override func didReceiveMemoryWarning() {
+        
+        super.didReceiveMemoryWarning()
+        
+        // Zap the device detail view controller if we have one
+        if self.ddvc != nil { self.ddvc = nil }
+    }
+    
+    
     // MARK: - Control Methods
 
     @objc func editTouched() {
@@ -163,41 +172,46 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Show the Actions menu
         let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         var action: UIAlertAction!
-
+        
+        // Update Watch item
         action = UIAlertAction.init(title: "Update Watch",
-                                    style: UIAlertActionStyle.default) { (alertAction) in
+                                    style: UIAlertActionStyle.default) { (_) in
             self.updateWatch()
         }
 
         actionMenu.addAction(action)
-
+        
+        // Show App Info item
         action = UIAlertAction.init(title: "Show App Info",
-                                    style: UIAlertActionStyle.default) { (alertAction) in
+                                    style: UIAlertActionStyle.default) { (_) in
             self.showInfo()
         }
 
         actionMenu.addAction(action)
 
+        // Reorder Device List item
         action = UIAlertAction.init(title: "Re-order Device List",
-                                    style: UIAlertActionStyle.default) { (alertAction) in
+                                    style: UIAlertActionStyle.default) { (_) in
             self.reorderDevicelist()
         }
 
         actionMenu.addAction(action)
         
-        
+        // Show/Hide Agent IDs item
         action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs",
-                                    style: UIAlertActionStyle.default) { (alertAction) in
-              self.showAgentIDs()
-        }
+                                    style: UIAlertActionStyle.default) { (_) in
+                                            self.showAgentIDs()
+                                    }
         
         actionMenu.addAction(action)
         
+        // Cancel item
         action = UIAlertAction.init(title: "Cancel",
                                     style: UIAlertActionStyle.cancel, handler:nil)
 
         actionMenu.addAction(action)
-
+        
+        // Present the menu
         self.present(actionMenu, animated: true, completion: nil)
     }
 
@@ -211,8 +225,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     @objc func showInfo() {
 
         // Show application info
-        let alert = UIAlertController.init(title: "Controller\nInformation", message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.", preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: UIAlertActionStyle.default, handler: nil))
+        let alert = UIAlertController.init(title: "Controller\nInformation",
+                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.",
+                                           preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK",
+                                                               comment: "Default action"),
+                                      style: UIAlertActionStyle.default,
+                                      handler: nil))
         self.present(alert, animated: true)
     }
     
@@ -272,6 +291,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             // Append the extra row required by entering the table's editing mode
             cell.textLabel?.text = "Add New Device"
             cell.detailTextLabel?.text = ""
+            cell.imageView?.image = nil
         } else {
             let device: Device = self.myDevices.devices[indexPath.row]
             cell.textLabel?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
@@ -323,7 +343,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.editingDevice.watchSupported = device.watchSupported
         self.deviceRow = indexPath.row
 
-        // Set the LED colour graphic
+        // Point the device detail view controller at the current device
         self.ddvc.currentDevice = editingDevice
 
         // Present the device detail view controller
@@ -410,7 +430,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             
             if session.isPaired {
                 if session.isWatchAppInstalled {
-                    print("All good")
+                    print("Watch app installed")
                 } else {
                     // Watch app not installed, so warn user
                     self.phoneSession = nil
@@ -473,6 +493,5 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .`default`, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
-    
     
 }

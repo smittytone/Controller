@@ -71,6 +71,7 @@ class DeviceDetailViewController: UIViewController,
                 self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
             }
         } else {
+            // Clear the fields
             self.codeField.text = ""
             self.appTypeField.text = ""
             self.nameField.text = ""
