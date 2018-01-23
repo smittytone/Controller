@@ -59,7 +59,7 @@ class DeviceDetailViewController: UIViewController,
         // Display the device info
         if self.currentDevice != nil {
             // New items have a 'code' property that is an empty string
-            if currentDevice.code.count > 0 {
+            if self.currentDevice.code.count > 0 {
                 self.codeField.text = self.currentDevice.code
                 self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
                 self.nameField.text = self.currentDevice.name
@@ -80,13 +80,13 @@ class DeviceDetailViewController: UIViewController,
 
         if self.currentDevice != nil {
             // The view is about to close so save the text fields' content
-            if self.currentDevice.code != codeField.text! {
-                self.currentDevice.code = codeField.text!
+            if self.currentDevice.code != self.codeField.text! {
+                self.currentDevice.code = self.codeField.text!
                 self.currentDevice.changed = true
             }
 
-            if self.currentDevice.name != nameField.text! {
-                self.currentDevice.name = nameField.text!
+            if self.currentDevice.name != self.nameField.text! {
+                self.currentDevice.name = self.nameField.text!
                 self.currentDevice.changed = true
             }
         }
@@ -219,6 +219,7 @@ class DeviceDetailViewController: UIViewController,
         if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "HomeWeather" }
         if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "MatrixClock" }
         if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "ThermalForecastWorld" }
+        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "BigClock" }
 
         return "Unknown"
     }
