@@ -2,7 +2,7 @@
 //  Device.swift
 //  Created by Tony Smith on 06/12/2016.
 //
-//  Copyright 2017-18 Tony Smith
+//  Copyright 2016-18 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //
