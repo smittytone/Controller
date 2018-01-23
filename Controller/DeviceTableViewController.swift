@@ -99,11 +99,16 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         if self.editingDevice != nil {
             // 'editingDevice' is only non-nil if we have just edited a device's details
-            let device = self.myDevices.devices[deviceRow]
-            device.name = self.editingDevice.name
-            device.code = self.editingDevice.code
-            device.app = self.editingDevice.app
-            device.watchSupported = self.editingDevice.watchSupported
+            if self.editingDevice.changed {
+                // Only update if this is true
+                let device = self.myDevices.devices[deviceRow]
+                device.name = self.editingDevice.name
+                device.code = self.editingDevice.code
+                device.app = self.editingDevice.app
+                device.watchSupported = self.editingDevice.watchSupported
+                device.changed = false
+            }
+            
             self.editingDevice = nil
         }
         
@@ -304,7 +309,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                                                                               style: UIBarButtonItemStyle.plain,
                                                                               target: self.ddvc,
                                                                               action: #selector(self.ddvc.changeDetails))
-            self.ddvc.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
         }
 
         // Set DeviceDetailViewController's currentDevice properties

@@ -48,14 +48,19 @@ class DeviceDetailViewController: UIViewController,
 
 
     // MARK: - Lifecycle Functions
-
-    override func viewDidAppear(_ animated: Bool) {
-
-        super.viewDidAppear(animated)
-
+    
+    override func viewDidLoad() {
+        
+        super.viewDidLoad()
+        
         // Set up the UI
         self.appTypeField.isEnabled = false
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
 
+        super.viewWillAppear(animated)
+        
         // Display the device info
         if self.currentDevice != nil {
             // New items have a 'code' property that is an empty string
@@ -65,6 +70,11 @@ class DeviceDetailViewController: UIViewController,
                 self.nameField.text = self.currentDevice.name
                 self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
             }
+        } else {
+            self.codeField.text = ""
+            self.appTypeField.text = ""
+            self.nameField.text = ""
+            self.supportLabel.text = ""
         }
     }
 
@@ -79,21 +89,51 @@ class DeviceDetailViewController: UIViewController,
     @objc func changeDetails() {
 
         if self.currentDevice != nil {
-            // The view is about to close so save the text fields' content
-            if self.currentDevice.code != self.codeField.text! {
-                self.currentDevice.code = self.codeField.text!
-                self.currentDevice.changed = true
+            // Check that the device is supported — if not, warn the user
+            if !self.currentDevice.watchSupported {
+                let alert = UIAlertController.init(title: "This device can’t be controlled by your watch", message: "Are you sure you wish to add it to the device list? If you do, it will not sync to your watch.", preferredStyle: UIAlertControllerStyle.alert)
+                
+                var action = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { (_) in
+                    self.saveData()
+                    self.goBack()
+                })
+                alert.addAction(action)
+                
+                action = UIAlertAction(title: "No", style: UIAlertActionStyle.default, handler: { (_) in
+                    self.goBack()
+                })
+                alert.addAction(action)
+                
+                self.present(alert, animated: true)
+                return
             }
-
-            if self.currentDevice.name != self.nameField.text! {
-                self.currentDevice.name = self.nameField.text!
-                self.currentDevice.changed = true
-            }
+            
+            saveData()
         }
 
+        goBack()
+    }
+    
+    func saveData() {
+        
+        // The view is about to close so save the text fields' content
+        // if there is anything to save
+        if self.currentDevice.code != self.codeField.text! {
+            self.currentDevice.code = self.codeField.text!
+            self.currentDevice.changed = true
+        }
+        
+        if self.currentDevice.name != self.nameField.text! {
+            self.currentDevice.name = self.nameField.text!
+            self.currentDevice.changed = true
+        }
+    }
+    
+    func goBack() {
+        
         // Stop listening for 'will enter foreground' notifications
         NotificationCenter.default.removeObserver(self)
-
+        
         // Jump back to the list of devices
         self.navigationController!.popViewController(animated: true)
     }
@@ -104,7 +144,7 @@ class DeviceDetailViewController: UIViewController,
     }
 
 
-    // MARK: - Text Field Delegate Methods
+    // MARK: - Text Field Delegate Functions
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 
