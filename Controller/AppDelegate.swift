@@ -69,6 +69,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if self.myDevices.devices.count > 0 {
             // The app is going into the background or closing, so save the list of devices
             let docsPath = self.docsDir[0] + "/devices"
+            
+            // Run through the list of devices to look for empty device records,
+            // which we don't want to save
+            var i: Int = 0
+            repeat {
+                let device: Device = self.myDevices.devices[i]
+                
+                if device.name == "" && device.app == "" && device.code == "" {
+                    // This is an empty device record so remove it
+                    self.myDevices.devices.remove(at: i)
+                }
+                
+                i = i + 1
+            } while (self.myDevices.devices.count > i)
+            
             let success = NSKeyedArchiver.archiveRootObject(self.myDevices, toFile:docsPath)
             if success {
                 NSLog("Device list saved (%@)", docsPath)
