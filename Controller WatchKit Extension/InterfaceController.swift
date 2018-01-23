@@ -146,6 +146,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             if aDevice.app == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { name = "matrixclock.ui" }
             if aDevice.app == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { name = "homeweather.ui" }
             if aDevice.app == "0B5D0687-6095-4F1D-897C-04664B143702" { name = "thermal.ui" }
+            if aDevice.app == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { name = "bigclock.ui" }
             
             if name.count > 0 {
                 self.pushController(withName: name, context: aDevice)
@@ -160,6 +161,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "HomeWeather" }
         if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "MatrixClock" }
         if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "ThermalForecast" }
+        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "BigClock" }
 
         return "Unknown"
     }
@@ -192,6 +194,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         // to reconstruct the device list, making sure we save the list and
         // re-display the UI
         if let context = watchSession.receivedApplicationContext as? [String : String] {
+            WKInterfaceDevice.current().play(.click)
             if let dataString = context["info"] {
                 let ds = dataString as NSString
                 let devices = ds.components(separatedBy: "\n\n")
