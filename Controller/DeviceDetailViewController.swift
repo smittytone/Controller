@@ -78,7 +78,7 @@ class DeviceDetailViewController: UIViewController,
             self.supportLabel.text = ""
         }
     }
-
+    
     @objc func appWillQuit(note:NSNotification) {
 
         NotificationCenter.default.removeObserver(self)

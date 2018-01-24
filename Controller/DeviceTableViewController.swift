@@ -77,7 +77,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                                                selector: #selector(self.viewWillAppear),
                                                name: NSNotification.Name.UIApplicationWillEnterForeground,
                                                object: nil)
-    
+ 
         // Prepare the session
         if WCSession.isSupported() {
             // Only proceed on an iPhone
@@ -110,6 +110,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             }
             
             self.editingDevice = nil
+            if self.ddvc != nil { self.ddvc = nil }
         }
         
         // Read the default for whether we show or hide Agent IDs
@@ -325,10 +326,20 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
             self.ddvc = storyboard.instantiateViewController(withIdentifier: "device.detail.view") as! DeviceDetailViewController
             self.ddvc.navigationItem.title = "Device Info"
+            
+            let button = UIButton(type: .system)
+            button.setImage(UIImage(named: "icon_left"), for: UIControlState.normal)
+            button.setTitle("Devices", for: UIControlState.normal)
+            button.sizeToFit()
+            button.addTarget(self.ddvc, action: #selector(self.ddvc.changeDetails), for: UIControlEvents.touchUpInside)
+            self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: button)
+            
+            /*
             self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Devices",
-                                                                              style: UIBarButtonItemStyle.plain,
+                                                                              style: UIBarButtonItemStyle.done,
                                                                               target: self.ddvc,
                                                                               action: #selector(self.ddvc.changeDetails))
+            */
         }
 
         // Set DeviceDetailViewController's currentDevice properties
