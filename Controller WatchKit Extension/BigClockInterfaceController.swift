@@ -73,7 +73,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     @objc func dotter() {
         
         self.loadCount = self.loadCount + 1
-        if self.loadCount > 12 { self.loadCount = 0 }
+        if self.loadCount > 3 { self.loadCount = 0 }
         statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
 
