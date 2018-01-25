@@ -226,8 +226,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     @objc func showInfo() {
 
         // Show application info
+        let vs = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
         let alert = UIAlertController.init(title: "Controller\nInformation",
-                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.",
+                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.\n\nApp Version " + vs,
                                            preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK",
                                                                comment: "Default action"),
