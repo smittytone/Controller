@@ -12,6 +12,7 @@
 		3B5401A420137A0500130A06 /* MatrixClockInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5401A220137A0500130A06 /* MatrixClockInterfaceController.swift */; };
 		3B5401A520137A0500130A06 /* WeatherInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */; };
 		3B5401A720137CC500130A06 /* Connexion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5401A620137CC500130A06 /* Connexion.swift */; };
+		3B709376201B9ADA00E2B8BF /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3B709375201B9ADA00E2B8BF /* Settings.bundle */; };
 		3BA8F8E5200E088100059702 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA8F8E4200E088100059702 /* AppDelegate.swift */; };
 		3BA8F8EA200E088100059702 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BA8F8E8200E088100059702 /* Main.storyboard */; };
 		3BA8F8EC200E088100059702 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BA8F8EB200E088100059702 /* Assets.xcassets */; };
@@ -82,6 +83,7 @@
 		3B5401A220137A0500130A06 /* MatrixClockInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatrixClockInterfaceController.swift; sourceTree = "<group>"; };
 		3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherInterfaceController.swift; sourceTree = "<group>"; };
 		3B5401A620137CC500130A06 /* Connexion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connexion.swift; sourceTree = "<group>"; };
+		3B709375201B9ADA00E2B8BF /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		3BA8F8E1200E088100059702 /* Controller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Controller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BA8F8E4200E088100059702 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3BA8F8E9200E088100059702 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -155,8 +157,9 @@
 				3BA8F921200E0A5600059702 /* Device.swift */,
 				3BA8F91F200E09D000059702 /* DeviceList.swift */,
 				3BA8F8E8200E088100059702 /* Main.storyboard */,
-				3BA8F8EB200E088100059702 /* Assets.xcassets */,
 				3BA8F8ED200E088100059702 /* LaunchScreen.storyboard */,
+				3BA8F8EB200E088100059702 /* Assets.xcassets */,
+				3B709375201B9ADA00E2B8BF /* Settings.bundle */,
 				3BA8F8F0200E088100059702 /* Info.plist */,
 			);
 			path = Controller;
@@ -298,6 +301,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B709376201B9ADA00E2B8BF /* Settings.bundle in Resources */,
 				3BA8F8EF200E088100059702 /* LaunchScreen.storyboard in Resources */,
 				3BA8F8EC200E088100059702 /* Assets.xcassets in Resources */,
 				3BA8F8EA200E088100059702 /* Main.storyboard in Resources */,

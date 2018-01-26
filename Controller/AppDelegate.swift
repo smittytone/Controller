@@ -36,7 +36,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 NSLog("Device list loaded (%@)", docsPath);
             }
         }
-
+        
+        // Set Settings Page details
+        let defaults: UserDefaults = UserDefaults.standard
+        defaults.set(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String, forKey: "com.bps.controller.app.version")
+        defaults.set(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String, forKey: "com.bps.controller.app.build")
+        
         return true
     }
 
