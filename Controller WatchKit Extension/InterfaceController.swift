@@ -118,7 +118,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 let aDevice: Device = self.myDevices.devices[i]
                 let aRow: TableRow = self.deviceTable.rowController(at: i) as! TableRow
                 aRow.nameLabel.setText(aDevice.name)
-                aRow.appIcon.setImage(UIImage.init(named: getAppImageName(aDevice.app)))
+                aRow.appIcon.setImage(UIImage.init(named: getAppTypeAsString(aDevice.app).lowercased()))
             }
         }
     }
