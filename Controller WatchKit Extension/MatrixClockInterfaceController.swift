@@ -52,6 +52,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
+        self.setTitle("Devices")
         self.lightSwitch.setHidden(true)
     }
     

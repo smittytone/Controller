@@ -54,6 +54,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
+        self.setTitle("Devices")
         self.updateButton.setHidden(true)
         self.resetButton.setHidden(true)
     }

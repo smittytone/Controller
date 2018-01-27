@@ -54,6 +54,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
+        self.setTitle("Devices")
         self.resetButton.setHidden(true)
     }
 

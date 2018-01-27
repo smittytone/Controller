@@ -17,12 +17,14 @@
                         <table alignment="left" id="Loq-Pl-XQN">
                             <items>
                                 <tableRow identifier="main.table.row" id="O5A-Sx-l4z" customClass="TableRow" customModule="Controller_WatchKit_App" customModuleProvider="target">
-                                    <group key="rootItem" width="1" alignment="left" id="oCz-yR-0Hg">
+                                    <group key="rootItem" width="1" height="42" alignment="left" id="oCz-yR-0Hg">
                                         <items>
-                                            <label width="136" height="36" alignment="left" text="Label" textAlignment="center" id="LhE-za-P0f"/>
+                                            <label width="89" height="32" alignment="left" verticalAlignment="center" text="Label" textAlignment="left" id="LhE-za-P0f"/>
+                                            <imageView width="36" height="32" alignment="right" verticalAlignment="center" contentMode="left" id="rDu-pX-74l"/>
                                         </items>
                                     </group>
                                     <connections>
+                                        <outlet property="appIcon" destination="rDu-pX-74l" id="MdT-sA-kUe"/>
                                         <outlet property="nameLabel" destination="LhE-za-P0f" id="J6F-9O-Dqo"/>
                                     </connections>
                                 </tableRow>
@@ -43,26 +45,30 @@
                     <items>
                         <label width="136" alignment="left" text="Label" id="hXB-FP-GVj">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
                         <label width="136" alignment="left" text="Weather" textAlignment="left" id="eHx-34-v8W">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
                         <label width="136" alignment="left" text="Loading..." id="NRC-Sl-R6q"/>
                         <button width="1" alignment="left" title="Update Forecast" id="cyg-e3-6nZ">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="update:" destination="v0d-aL-cfD" id="7cC-vI-PD8"/>
                             </connections>
                         </button>
                         <button width="1" alignment="left" title="Reset Device" id="gsF-1N-fCT">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="reboot:" destination="v0d-aL-cfD" id="cpt-8Y-Gk2"/>
                             </connections>
                         </button>
                         <separator alignment="left" id="hDS-xY-fQV"/>
                         <button width="1" alignment="left" title="Back" id="EEH-Nk-wDz">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="back:" destination="v0d-aL-cfD" id="WKn-yi-lNu"/>
                             </connections>
@@ -85,6 +91,7 @@
                     <items>
                         <label width="136" alignment="left" text="Label" id="HPh-Hc-Qbq">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
                         <label width="136" alignment="left" text="MatrixClock" textAlignment="left" id="voy-tc-NyC">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
@@ -99,7 +106,8 @@
                         </switch>
                         <separator alignment="left" id="pwq-gx-4j3"/>
                         <button width="1" alignment="left" title="Back" id="ZNe-pK-fvh">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="back:" destination="FMC-yj-G74" id="NlO-Z5-j6x"/>
                             </connections>
@@ -121,26 +129,30 @@
                     <items>
                         <label width="136" alignment="left" text="Label" id="e9u-Ib-Hha">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
                         <label width="136" alignment="left" text="HomeWeather" id="HBx-ym-B1u">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
                         <label width="136" alignment="left" text="Loading..." id="N2q-6O-XAF"/>
                         <button width="1" alignment="left" title="Advance" id="2hP-q1-cTw">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="advance:" destination="UMj-Gd-3sA" id="f2G-jO-UO4"/>
                             </connections>
                         </button>
                         <button width="1" alignment="left" title="Reset Device" id="Ohc-hP-08G">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="reboot:" destination="UMj-Gd-3sA" id="6g1-5b-3zB"/>
                             </connections>
                         </button>
                         <separator alignment="left" id="Ric-I0-WPy"/>
                         <button width="1" alignment="left" title="Back" id="urw-j8-No5">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="back:" destination="UMj-Gd-3sA" id="WBt-Hq-hRM"/>
                             </connections>
@@ -163,20 +175,23 @@
                     <items>
                         <label width="136" alignment="left" text="Label" id="qgU-jM-wYK">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
                         <label width="136" alignment="left" text="ThermalForecast" id="BcK-f5-sbb">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
                         <label width="136" alignment="left" text="Loading..." id="fA6-HY-aqU"/>
                         <button width="1" alignment="left" title="Restart &amp; Update" id="om2-Nv-xod">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="reboot:" destination="yxY-RW-tE6" id="UXS-6Z-ZJR"/>
                             </connections>
                         </button>
                         <separator alignment="left" id="lHE-QW-lnh"/>
                         <button width="1" alignment="left" title="Back" id="jh9-YX-Bag">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="back:" destination="yxY-RW-tE6" id="rup-Z6-19d"/>
                             </connections>
@@ -198,6 +213,7 @@
                     <items>
                         <label width="136" alignment="left" text="Label" id="PZc-li-rhZ">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
                         <label width="136" alignment="left" text="BigClock" id="mnE-IO-PMw">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
@@ -211,7 +227,8 @@
                         </switch>
                         <separator alignment="left" id="j1S-mH-hr8"/>
                         <button width="1" alignment="left" title="Back" id="GFu-Xz-KHA">
-                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="back:" destination="Rht-1b-8W6" id="W1i-vg-NoD"/>
                             </connections>
@@ -227,4 +244,5 @@
             <point key="canvasLocation" x="1256" y="58"/>
         </scene>
     </scenes>
+    <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>
