@@ -34,6 +34,7 @@ class Device: NSObject, NSCoding {
     var app: String = ""
     var watchSupported: Bool = false
     var changed: Bool = false
+    var isInstalled: Bool = false
 
     
     // MARK: - Initialization Methods
@@ -44,6 +45,7 @@ class Device: NSObject, NSCoding {
         self.code = ""
         self.app = ""
         self.watchSupported = false
+        self.isInstalled = false
     }
 
 
@@ -61,6 +63,7 @@ class Device: NSObject, NSCoding {
         if let a = decoder.decodeObject(forKey: "device.app") { self.app = a as! String }
 
         self.watchSupported = decoder.decodeBool(forKey: "device.watch")
+        self.isInstalled = decoder.decodeBool(forKey: "device.installed")
     }
 
     func encode(with encoder: NSCoder) {
@@ -69,5 +72,6 @@ class Device: NSObject, NSCoding {
         encoder.encode(self.code, forKey: "device.code")
         encoder.encode(self.app, forKey: "device.app")
         encoder.encode(self.watchSupported, forKey: "device.watch")
+        encoder.encode(self.isInstalled, forKey: "device.installed")
     }
 }
