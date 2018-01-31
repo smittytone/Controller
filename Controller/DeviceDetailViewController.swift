@@ -40,6 +40,7 @@ class DeviceDetailViewController: UIViewController,
     @IBOutlet weak var typeLabel: UILabel!
     @IBOutlet weak var supportLabel: UILabel!
     @IBOutlet weak var connectionProgress: UIActivityIndicatorView!
+    @IBOutlet weak var infoButton: UIButton!
     
     var myDevices: DeviceList!
     var currentDevice: Device!
