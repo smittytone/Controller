@@ -31,7 +31,8 @@ import WatchConnectivity
 
 
 class DeviceTableViewController: UITableViewController, WCSessionDelegate {
-
+    
+    // MARK: Class Properties
     @IBOutlet weak var deviceTable:UITableView!
 
     var myDevices: DeviceList!
@@ -45,7 +46,15 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     var tableEditingFlag: Bool = false
     var tableOrderingFlag: Bool = false
     var tableShowIDsFlag: Bool = true
+    var watchAppInstalled: Bool = false
+    
+    // MARK: Class Constants
+    let STATE_INSTALLING = 1
+    let STATE_REMOVING = 0
+    let STATE_NONE = -1
 
+    
+    // MARK: - Lifecycle Functions
     
     override func viewDidLoad() {
 
@@ -73,10 +82,16 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.editingDevice = nil
         
         // Watch for app returning to foreground with DeviceDetailViewController active
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.viewWillAppear),
-                                               name: NSNotification.Name.UIApplicationWillEnterForeground,
-                                               object: nil)
+        let nc: NotificationCenter = NotificationCenter.default
+        nc.addObserver(self,
+                       selector: #selector(self.viewWillAppear),
+                       name: NSNotification.Name.UIApplicationWillEnterForeground,
+                       object: nil)
+        
+        nc.addObserver(self,
+                       selector: #selector(self.doInstall),
+                       name: NSNotification.Name.init("com.bps.install.switch.hit"),
+                       object: nil)
  
         // Prepare the session
         if WCSession.isSupported() {
@@ -226,9 +241,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     @objc func showInfo() {
 
         // Show application info
-        let vs = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-        let alert = UIAlertController.init(title: "Controller\nInformation",
-                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.\n\nApp Version " + vs,
+        let alert = UIAlertController.init(title: "About Controller",
+                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
                                            preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK",
                                                                comment: "Default action"),
@@ -287,20 +301,28 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         // Get a new table cell from the queue of existing cells, or create one if none are available
-        let cell = tableView.dequeueReusableCell(withIdentifier:"device.cell", for:indexPath)
-
         if indexPath.row == self.myDevices.devices.count {
             // Append the extra row required by entering the table's editing mode
+            // We use a standard UITableViewCell as all we need is a text label
+            let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier:"new.cell", for:indexPath)
             cell.textLabel?.text = "Add New Device"
-            cell.detailTextLabel?.text = ""
-            cell.imageView?.image = nil
+            return cell
         } else {
+            // Add a row to display device information
+            // We use a custom UITableViewCell
+            let cell: DeviceTableViewCell = tableView.dequeueReusableCell(withIdentifier:"device.cell", for:indexPath) as! DeviceTableViewCell
+            
+            // Fill the cell with device data
             let device: Device = self.myDevices.devices[indexPath.row]
-            cell.textLabel?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
-            cell.imageView?.image = getAppImage(device.app)
+            cell.appName?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
+            cell.appIcon?.image = getAppImage(device.app)
             
+            // For the install switch, disable it if the device has no watch support
+            cell.installSwitch.isOn = device.isInstalled
+            cell.installSwitch.isEnabled = device.watchSupported || self.watchAppInstalled
+            
+            // Show bullets or the agent ID according to user preference
             var codeString: String = ""
-            
             if device.code.count > 0 {
                 if !self.tableShowIDsFlag {
                     for _ in 0..<device.code.count {
@@ -311,13 +333,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                 }
             }
             
-            cell.detailTextLabel?.text = device.code.count > 0 ? codeString : "Code not yet set"
+            cell.appCode?.text = device.code.count > 0 ? codeString : "Code not yet set"
+            cell.rowIndex = indexPath.row
             
             // Do we show the re-order control?
             cell.showsReorderControl = self.tableOrderingFlag
+            
+            return cell
         }
-
-        return cell
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -438,19 +461,19 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 
         if activationState == WCSessionActivationState.activated {
-            // sendDeviceList(session)
-            
             if session.isPaired {
                 if session.isWatchAppInstalled {
-                    print("Watch app installed")
+                    self.watchAppInstalled = true
                 } else {
                     // Watch app not installed, so warn user
                     self.phoneSession = nil
+                    self.watchAppInstalled = false
                     showAlert("This app needs a companion Watch app", "Please install the companion app on your Watch")
                 }
             } else {
                 // iPhone is not paired with a watch, so warn user
                 self.phoneSession = nil
+                self.watchAppInstalled = false
                 showAlert("This app requires an Apple Watch", "Please pair your Apple Watch with this iPhone")
             }
         }
@@ -465,7 +488,24 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         // NOP - Function required by delegate but not used
     }
-
+    
+    @objc func doInstall(_ note: Notification) {
+        
+        // Install or uninstall a single app when its row switch is flipped
+        let data: [String : Int] = note.userInfo as! [String : Int]
+        let row: Int = data["row"]!
+        let state: Int = data["state"]!
+        let device: Device = myDevices.devices[row]
+        
+        // Mark the device as installing or uninistalling
+        device.installState = state
+        
+        // Send the current data to the watch
+        if let session = self.phoneSession {
+            sendDeviceList(session)
+        }
+    }
+    
     func sendDeviceList(_ session: WCSession) {
 
         // Construct a list of devices with watch support
@@ -475,23 +515,53 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         if self.myDevices.devices.count > 0 {
             for i in 0..<self.myDevices.devices.count {
                 let aDevice: Device = self.myDevices.devices[i]
-                if aDevice.watchSupported {
+                if (aDevice.isInstalled && aDevice.installState != self.STATE_REMOVING) || aDevice.installState == self.STATE_INSTALLING {
                     dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
                 }
             }
         }
         
-        if dataString.count > 0 {
-            // Try sending the data as a message
-            // session.sendMessage(["devices" : updateableDevices], replyHandler: nil, errorHandler: nil)
-            
-            if let session = self.phoneSession {
-                do {
-                    try session.updateApplicationContext(["info" : dataString])
-                    print("Message Sent")
-                } catch {
-                    print("Message not sent")
+        // Try sending the data as a message
+        if let session = self.phoneSession {
+            do {
+                // Attempt to send the context data
+                try session.updateApplicationContext(["info" : dataString])
+                
+                // If we're here, we've successfully send the context data,
+                // so update the device records: no longer installing/uninistalling,
+                // and is installed/uninstalled
+                if self.myDevices.devices.count > 0 {
+                    for i in 0..<self.myDevices.devices.count {
+                        let aDevice: Device = self.myDevices.devices[i]
+                        if aDevice.installState == self.STATE_INSTALLING {
+                            // Device was being installed; now it is
+                            aDevice.installState = self.STATE_NONE
+                            aDevice.isInstalled = true
+                        } else if aDevice.installState == self.STATE_REMOVING {
+                            // Device was being removed; now it is
+                            aDevice.installState = self.STATE_NONE
+                            aDevice.isInstalled = false
+                        }
+                    }
                 }
+                
+                print("Context Sent")
+            } catch {
+                // Context data did not send for some reason, so mark
+                // the devices is no longer being installed/uninistalled
+                if self.myDevices.devices.count > 0 {
+                    for i in 0..<self.myDevices.devices.count {
+                        let aDevice: Device = self.myDevices.devices[i]
+                        aDevice.installState = self.STATE_NONE
+                    }
+                }
+                
+                // Update the table to reflect the state
+                self.deviceTable.reloadData()
+                print("Context not sent")
+                
+                // Warn the user
+                showAlert("Action Failed", "Could not connect to the Apple Watch to install/uninstall the selected app")
             }
         }
     }

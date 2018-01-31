@@ -183,11 +183,11 @@
                                                 <constraint firstAttribute="height" constant="31" id="Ogj-xE-i63"/>
                                             </constraints>
                                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <color key="onTintColor" red="0.75406885150000003" green="0.75408679249999999" blue="0.75407713649999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="onTintColor" red="0.83741801979999997" green="0.83743780850000005" blue="0.83742713930000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <color key="thumbTintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </switch>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hBs-EA-w1G">
-                                            <rect key="frame" x="64" y="2" width="240" height="21"/>
+                                            <rect key="frame" x="64" y="4" width="240" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="21" id="x2W-UD-d0Y"/>
                                             </constraints>
@@ -213,7 +213,7 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="Uoo-oA-M5P" firstAttribute="leading" secondItem="pFh-x3-gzi" secondAttribute="leading" constant="16" id="2KI-TE-MZe"/>
-                                        <constraint firstItem="hBs-EA-w1G" firstAttribute="top" secondItem="pFh-x3-gzi" secondAttribute="top" constant="2" id="8Eh-yG-bTr"/>
+                                        <constraint firstItem="hBs-EA-w1G" firstAttribute="top" secondItem="pFh-x3-gzi" secondAttribute="top" constant="4" id="8Eh-yG-bTr"/>
                                         <constraint firstItem="ywZ-LO-YXv" firstAttribute="centerY" secondItem="pFh-x3-gzi" secondAttribute="centerY" id="8pg-Vy-Fzn"/>
                                         <constraint firstAttribute="bottom" secondItem="lcj-1e-VU7" secondAttribute="bottom" constant="0.5" id="HQb-ie-9Fc"/>
                                         <constraint firstAttribute="bottom" secondItem="Uoo-oA-M5P" secondAttribute="bottom" constant="6.5" id="Lef-i8-oJu"/>
