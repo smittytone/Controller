@@ -35,6 +35,11 @@ class Device: NSObject, NSCoding {
     var watchSupported: Bool = false
     var changed: Bool = false
     var isInstalled: Bool = false
+    var installState: Int = -1
+    
+    let STATE_INSTALLING = 1
+    let STATE_REMOVING = 0
+    let STATE_NONE = -1
 
     
     // MARK: - Initialization Methods
@@ -46,6 +51,7 @@ class Device: NSObject, NSCoding {
         self.app = ""
         self.watchSupported = false
         self.isInstalled = false
+        self.installState = self.STATE_NONE
     }
 
 
@@ -57,7 +63,9 @@ class Device: NSObject, NSCoding {
         self.code = ""
         self.app = ""
         self.watchSupported = false
-
+        self.isInstalled = false
+        self.installState = self.STATE_NONE
+        
         if let n = decoder.decodeObject(forKey: "device.name") { self.name = n as! String }
         if let c = decoder.decodeObject(forKey: "device.code") { self.code = c as! String }
         if let a = decoder.decodeObject(forKey: "device.app") { self.app = a as! String }
