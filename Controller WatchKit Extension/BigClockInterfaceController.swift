@@ -43,7 +43,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     var initialQueryFlag: Bool = false
     var isConnected: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 3
+    var loadCount:Int = 0
 
     // MARK: - Lifecycle Functions
 

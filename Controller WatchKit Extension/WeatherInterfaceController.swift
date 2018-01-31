@@ -43,7 +43,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 3
+    var loadCount:Int = 0
     
     // MARK: - Lifecycle Functions
 
