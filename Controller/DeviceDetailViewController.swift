@@ -37,6 +37,7 @@ class DeviceDetailViewController: UIViewController,
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var appTypeField: UITextField!
     @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var idLabel: UILabel!
     @IBOutlet weak var typeLabel: UILabel!
     @IBOutlet weak var supportLabel: UILabel!
     @IBOutlet weak var connectionProgress: UIActivityIndicatorView!
@@ -68,9 +69,10 @@ class DeviceDetailViewController: UIViewController,
             if self.currentDevice.code.count > 0 {
                 self.codeField.text = self.currentDevice.code
                 self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
-                self.nameField.text = self.currentDevice.name
                 self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
                 self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControlState.normal)
+                self.idLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Agent ID Code:" : "Enter the Device’s Agent ID Code:"
+                self.nameLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Name:" : "Enter the Device’s Name:"
             }
         } else {
             // Clear the fields

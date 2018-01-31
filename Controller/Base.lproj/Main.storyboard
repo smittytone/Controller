@@ -148,6 +148,7 @@
                         <outlet property="appTypeField" destination="L86-mI-yis" id="awQ-L5-Z9F"/>
                         <outlet property="codeField" destination="0rI-tc-JpT" id="5Ia-wE-sD3"/>
                         <outlet property="connectionProgress" destination="f8l-F9-hjX" id="8ZY-tI-e8T"/>
+                        <outlet property="idLabel" destination="aIM-Cc-7ou" id="67F-9g-UxQ"/>
                         <outlet property="infoButton" destination="ami-mw-pV9" id="3CE-eb-LCB"/>
                         <outlet property="nameField" destination="6dH-PT-FUh" id="7G2-xh-t8F"/>
                         <outlet property="nameLabel" destination="Eir-Df-OIj" id="ZBH-pv-1q9"/>

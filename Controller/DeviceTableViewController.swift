@@ -242,7 +242,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         // Show application info
         let alert = UIAlertController.init(title: "About Controller",
-                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
+                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, select it to enter its details, then tap the switch to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
                                            preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK",
                                                                comment: "Default action"),
