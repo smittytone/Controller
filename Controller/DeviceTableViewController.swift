@@ -40,9 +40,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     var ddvc: DeviceDetailViewController!
     var actionButton: UIBarButtonItem!
     var phoneSession: WCSession? = nil
-
-    var deviceRow: Int = -1
-    var currentDevice: Int = -1
+    var currentDeviceRow: Int = -1
     var tableEditingFlag: Bool = false
     var tableOrderingFlag: Bool = false
     var tableShowIDsFlag: Bool = true
@@ -77,8 +75,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.navigationItem.leftBarButtonItem!.tintColor = UIColor.white
 
         // Initialise object properties
-        self.tableOrderingFlag = false
-        self.tableEditingFlag = false
         self.editingDevice = nil
         
         // Watch for app returning to foreground with DeviceDetailViewController active
@@ -92,17 +88,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                        selector: #selector(self.doInstall),
                        name: NSNotification.Name.init("com.bps.install.switch.hit"),
                        object: nil)
- 
-        // Prepare the session
-        if WCSession.isSupported() {
-            // Only proceed on an iPhone
-            // NOTE This is NOT a universal app
-            self.phoneSession = WCSession.default
-            if let session = self.phoneSession {
-                session.delegate = self
-                session.activate()
-            }
-        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -114,30 +99,49 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         if self.editingDevice != nil {
             // 'editingDevice' is only non-nil if we have just edited a device's details
+            // via a Device Detail View Controller
             if self.editingDevice.changed {
                 // Only update the device record if it has been changed
-                let device = self.myDevices.devices[deviceRow]
+                let device = self.myDevices.devices[self.currentDeviceRow]
                 device.name = self.editingDevice.name
                 device.code = self.editingDevice.code
                 device.app = self.editingDevice.app
                 device.watchSupported = self.editingDevice.watchSupported
+                
+                // May want to keep this set?
                 device.changed = false
             }
             
+            // Clear 'editingDevice' and the Device Detail View Controller
             self.editingDevice = nil
             if self.ddvc != nil { self.ddvc = nil }
         }
         
         // Read the default for whether we show or hide Agent IDs
-        let ud: UserDefaults = UserDefaults.standard
-        let udsi: NSNumber? = ud.value(forKey: "com.bps.contoller.show.agentids") as? NSNumber
-        
-        if let showIDs = udsi {
-            self.tableShowIDsFlag = showIDs.boolValue
+        let defaults: UserDefaults = UserDefaults.standard
+        if let defaultValue = defaults.value(forKey: "com.bps.contoller.show.agentids") as? NSNumber {
+            self.tableShowIDsFlag = defaultValue.boolValue
         }
         
         // Update table to show any changes made
         self.deviceTable.reloadData()
+        
+        // Prepare the session
+        if WCSession.isSupported() {
+            // Only proceed on an iPhone
+            // NOTE This is NOT a universal app
+            self.phoneSession = WCSession.default
+            if let session = self.phoneSession {
+                session.delegate = self
+                if session.activationState == WCSessionActivationState.activated {
+                    // We're already active, so just update the flag
+                    self.watchAppInstalled = true
+                } else {
+                    // Activate the WCSession
+                    session.activate()
+                }
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -145,6 +149,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         super.didReceiveMemoryWarning()
         
         // Zap the device detail view controller if we have one
+        // NOTE We shouldn't have one
         if self.ddvc != nil { self.ddvc = nil }
     }
     
@@ -160,6 +165,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             // According to the current mode, set the title of the Edit button:
             // Editing mode: Done
             // Viewing mode: Edit
+            // And whether the left-hand button is active (NOT during editing)
             if self.deviceTable.isEditing {
                 self.tableEditingFlag = true
                 self.navigationItem.rightBarButtonItem!.title = "Done"
@@ -171,12 +177,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             }
         } else {
             // If the 'Done' button is tapped while table is reordering,
-            // cancel the reordering
+            // cancel the reordering operation
             self.tableOrderingFlag = false
             self.tableEditingFlag = false
             self.deviceTable.setEditing(false, animated: true)
             self.navigationItem.rightBarButtonItem!.title = "Edit"
             self.navigationItem.leftBarButtonItem!.isEnabled = true
+            
+            // TODO Decide whether we should update the watch automatically here
         }
 
         // Re-display the table to add/remove the editing/moving widgets
@@ -184,8 +192,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     }
 
     @objc func actionsTouched() {
-
-        // Show the Actions menu
+        
+        // Build and show the Actions menu
         let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         var action: UIAlertAction!
         
@@ -233,9 +241,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     @objc func updateWatch() {
 
-        if let session = self.phoneSession {
-            sendDeviceList(session)
-        }
+        // Send the app list
+        sendDeviceList()
     }
 
     @objc func showInfo() {
@@ -244,8 +251,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         let alert = UIAlertController.init(title: "About Controller",
                                            message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, select it to enter its details, then tap the switch to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
                                            preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK",
-                                                               comment: "Default action"),
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                       style: UIAlertActionStyle.default,
                                       handler: nil))
         self.present(alert, animated: true)
@@ -258,8 +264,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         deviceTable.reloadData()
         
         // Save the new setting to preferences
-        let ud: UserDefaults = UserDefaults.standard
-        ud.set(self.tableShowIDsFlag, forKey: "com.bps.contoller.show.agentids")
+        let defaults: UserDefaults = UserDefaults.standard
+        defaults.set(self.tableShowIDsFlag, forKey: "com.bps.contoller.show.agentids")
     }
     
     @objc func reorderDevicelist() {
@@ -317,10 +323,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             cell.appName?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
             cell.appIcon?.image = getAppImage(device.app)
             
-            // For the install switch, disable it if the device has no watch support
-            cell.installSwitch.isOn = device.isInstalled
-            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled
-            
             // Show bullets or the agent ID according to user preference
             var codeString: String = ""
             if device.code.count > 0 {
@@ -336,6 +338,10 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             cell.appCode?.text = device.code.count > 0 ? codeString : "Code not yet set"
             cell.rowIndex = indexPath.row
             
+            // For the install switch, disable it if the device has no watch support
+            cell.installSwitch.isOn = device.isInstalled
+            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled
+            
             // Do we show the re-order control?
             cell.showsReorderControl = self.tableOrderingFlag
             
@@ -345,6 +351,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
+        // Get the device being shown at the row
         let device: Device = self.myDevices.devices[indexPath.row]
         
         // Instantiate the device detail view controller as required - ie. every time
@@ -369,7 +376,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.editingDevice.code = device.code
         self.editingDevice.app = device.app
         self.editingDevice.watchSupported = device.watchSupported
-        self.deviceRow = indexPath.row
+        
+        // Record the selected row - we'll use it when this view controller comes back
+        self.currentDeviceRow = indexPath.row
 
         // Point the device detail view controller at the current device
         self.ddvc.currentDevice = editingDevice
@@ -431,24 +440,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         tableView.reloadData()
     }
 
-    func getAppImage(_ type:String) -> UIImage? {
-
-        let imageName: String = getAppTypeAsString(type)
-        return UIImage(named: imageName)
-    }
-
-    func getAppTypeAsString(_ code:String) -> String {
-
-        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "weather" }
-        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "homeweather" }
-        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "matrixclock" }
-        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "thermalworld" }
-        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "bigclock" }
-        
-        return "unknown"
-    }
-
-
+    
     // MARK: - WCSessionDelegate Functions
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -494,28 +486,33 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         device.installState = state
         
         // Send the current data to the watch
-        if let session = self.phoneSession {
-            sendDeviceList(session)
-        }
+        sendDeviceList()
     }
     
-    func sendDeviceList(_ session: WCSession) {
+    func sendDeviceList() {
 
-        // Construct a list of devices with watch support
-        // var updateableDevices: [[String:String]] = []
-        var dataString: String = ""
-        
-        if self.myDevices.devices.count > 0 {
-            for i in 0..<self.myDevices.devices.count {
-                let aDevice: Device = self.myDevices.devices[i]
-                if (aDevice.isInstalled && aDevice.installState != self.STATE_REMOVING) || aDevice.installState == self.STATE_INSTALLING {
-                    dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
+        if let session = self.phoneSession {
+            // Construct a list of devices with watch support
+            // var updateableDevices: [[String:String]] = []
+            var dataString: String = ""
+            
+            // Assemble the sync list string:
+            // Devices are separated by two newlines
+            // Device fields are separated by one newline
+            // Fields: name, agent ID, app type code
+            if self.myDevices.devices.count > 0 {
+                for i in 0..<self.myDevices.devices.count {
+                    let aDevice: Device = self.myDevices.devices[i]
+                    // Add the device to the sync list if:
+                    //   It's installed but not set to be removed
+                    //   It's not installed but set to be installed
+                    if (aDevice.isInstalled && aDevice.installState != self.STATE_REMOVING) || aDevice.installState == self.STATE_INSTALLING {
+                        dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
+                    }
                 }
             }
-        }
-        
-        // Try sending the data as a message
-        if let session = self.phoneSession {
+            
+            // Send the sync list
             do {
                 // Attempt to send the context data
                 try session.updateApplicationContext(["info" : dataString])
@@ -538,7 +535,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                     }
                 }
                 
-                print("Context Sent")
+                NSLog("Sync list sent")
             } catch {
                 // Context data did not send for some reason, so mark
                 // the devices is no longer being installed/uninistalled
@@ -551,22 +548,44 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                 
                 // Update the table to reflect the state
                 self.deviceTable.reloadData()
-                print("Context not sent")
+                NSLog("Sync list not sent")
                 
                 // Warn the user
-                showAlert("Action Failed", "Could not connect to the Apple Watch to install/uninstall the selected app")
+                showAlert("Sync Failed", "Could not connect to the Apple Watch to install/uninstall the selected app")
             }
         }
     }
     
     
-    // MARK: Utility Functions
+    // MARK: - Utility Functions
     
     func showAlert(_ title: String, _ message: String) {
         
+        // Generic alert display function
         let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .`default`, handler: nil))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    func getAppImage(_ type:String) -> UIImage? {
+        
+        // Get the correct icon image for the app
+        let imageName: String = getAppTypeAsString(type)
+        return UIImage(named: imageName)
+    }
+    
+    func getAppTypeAsString(_ code:String) -> String {
+        
+        // Return the app's name as derived from its known UUID
+        // The name is used to get the appropriate icon file
+        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "weather" }
+        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "homeweather" }
+        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "matrixclock" }
+        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "thermalworld" }
+        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "bigclock" }
+        
+        // Otherwise just return "unknown"
+        return "unknown"
     }
     
 }

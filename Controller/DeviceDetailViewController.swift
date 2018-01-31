@@ -33,15 +33,16 @@ class DeviceDetailViewController: UIViewController,
     URLSessionDataDelegate {
 
 
-    @IBOutlet weak var codeField: UITextField!
-    @IBOutlet weak var nameField: UITextField!
-    @IBOutlet weak var appTypeField: UITextField!
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var idLabel: UILabel!
-    @IBOutlet weak var typeLabel: UILabel!
-    @IBOutlet weak var supportLabel: UILabel!
-    @IBOutlet weak var connectionProgress: UIActivityIndicatorView!
+    @IBOutlet weak var nameField: UITextField!
+    @IBOutlet weak var codeField: UITextField!
+    @IBOutlet weak var codeLabel: UILabel!
     @IBOutlet weak var infoButton: UIButton!
+    @IBOutlet weak var connectionProgress: UIActivityIndicatorView!
+    @IBOutlet weak var appTypeLabel: UILabel!
+    @IBOutlet weak var appTypeField: UITextField!
+    @IBOutlet weak var supportLabel: UILabel!
+    
     
     var myDevices: DeviceList!
     var currentDevice: Device!
@@ -67,20 +68,27 @@ class DeviceDetailViewController: UIViewController,
         if self.currentDevice != nil {
             // New items have a 'code' property that is an empty string
             if self.currentDevice.code.count > 0 {
-                self.codeField.text = self.currentDevice.code
-                self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
-                self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
-                self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControlState.normal)
-                self.idLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Agent ID Code:" : "Enter the Device’s Agent ID Code:"
+                self.nameField.text = self.currentDevice.name
                 self.nameLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Name:" : "Enter the Device’s Name:"
+                
+                self.codeField.text = self.currentDevice.code
+                self.codeLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Agent ID Code:" : "Enter the Device’s Agent ID Code:"
+                
+                self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControlState.normal)
+                
+                self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
+                
+                self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
             }
         } else {
             // Clear the fields
-            self.codeField.text = ""
-            self.appTypeField.text = ""
             self.nameField.text = ""
-            self.supportLabel.text = ""
+            self.nameLabel.text = "Enter the Device’s Name:"
+            self.codeLabel.text = "Enter the Device’s Agent ID Code:"
+            self.codeField.text = ""
             self.infoButton.setTitle("Get Device Data", for: UIControlState.normal)
+            self.appTypeField.text = ""
+            self.supportLabel.text = ""
         }
     }
     
