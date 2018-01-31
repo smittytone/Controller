@@ -242,7 +242,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         // Show application info
         let alert = UIAlertController.init(title: "About Controller",
-                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
+                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, then select ‘Update Watch’ to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
                                            preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK",
                                                                comment: "Default action"),
@@ -319,7 +319,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             
             // For the install switch, disable it if the device has no watch support
             cell.installSwitch.isOn = device.isInstalled
-            cell.installSwitch.isEnabled = device.watchSupported || self.watchAppInstalled
+            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled
             
             // Show bullets or the agent ID according to user preference
             var codeString: String = ""
@@ -345,11 +345,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
+        let device: Device = self.myDevices.devices[indexPath.row]
+        
         // Instantiate the device detail view controller as required - ie. every time
         if self.ddvc == nil {
             let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
             self.ddvc = storyboard.instantiateViewController(withIdentifier: "device.detail.view") as! DeviceDetailViewController
-            self.ddvc.navigationItem.title = "Device Info"
+            self.ddvc.navigationItem.title = device.name.count > 0 ? "Device Info" : "Device Setup"
             
             let button = UIButton(type: .system)
             button.setImage(UIImage(named: "icon_left"), for: UIControlState.normal)
@@ -357,21 +359,12 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             button.sizeToFit()
             button.addTarget(self.ddvc, action: #selector(self.ddvc.changeDetails), for: UIControlEvents.touchUpInside)
             self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: button)
-            
-            /*
-            self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Devices",
-                                                                              style: UIBarButtonItemStyle.done,
-                                                                              target: self.ddvc,
-                                                                              action: #selector(self.ddvc.changeDetails))
-            */
         }
 
         // Set DeviceDetailViewController's currentDevice properties
-
         // Create a new device if necessary
         if editingDevice == nil { editingDevice = Device() }
 
-        let device: Device = self.myDevices.devices[indexPath.row]
         self.editingDevice.name = device.name
         self.editingDevice.code = device.code
         self.editingDevice.app = device.app
@@ -407,7 +400,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             self.myDevices.devices.remove(at: indexPath.row)
 
             // Now delete the table row itself then update the table
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.deleteRows(at: [indexPath], with: UITableViewRowAnimation.automatic)
             tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new imp with default name and code values
