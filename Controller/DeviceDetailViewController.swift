@@ -91,7 +91,7 @@ class DeviceDetailViewController: UIViewController,
 
         if self.currentDevice != nil {
             // Check that the device is supported — if not, warn the user
-            if !self.currentDevice.watchSupported {
+            if !self.currentDevice.watchSupported && self.currentDevice.app.count != 0 {
                 let alert = UIAlertController.init(title: "This device can’t be controlled by your watch", message: "Are you sure you wish to add it to the device list? If you do, it will not sync to your watch.", preferredStyle: UIAlertControllerStyle.alert)
                 
                 var action = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { (_) in
