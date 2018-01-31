@@ -70,6 +70,7 @@ class DeviceDetailViewController: UIViewController,
                 self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
                 self.nameField.text = self.currentDevice.name
                 self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
+                self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControlState.normal)
             }
         } else {
             // Clear the fields
@@ -77,6 +78,7 @@ class DeviceDetailViewController: UIViewController,
             self.appTypeField.text = ""
             self.nameField.text = ""
             self.supportLabel.text = ""
+            self.infoButton.setTitle("Get Device Data", for: UIControlState.normal)
         }
     }
     
