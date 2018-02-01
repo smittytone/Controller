@@ -43,7 +43,6 @@ class DeviceDetailViewController: UIViewController,
     @IBOutlet weak var appTypeField: UITextField!
     @IBOutlet weak var supportLabel: UILabel!
     
-    
     var myDevices: DeviceList!
     var currentDevice: Device!
     var receivedData: NSMutableData! = nil
@@ -255,11 +254,14 @@ class DeviceDetailViewController: UIViewController,
         self.connectionProgress.stopAnimating()
         self.receivedData = nil
     }
+    
+    
+    // MARK: - Utility Functions
 
     func reportError(_ logMessage:String, _ reportMessage:String) {
 
         // Log the detailed message
-        print(logMessage)
+        NSLog(logMessage)
 
         // Report the basic message to the user via an alert
         let alert = UIAlertController.init(title: "Error", message: reportMessage, preferredStyle: UIAlertControllerStyle.alert)
