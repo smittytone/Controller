@@ -33,6 +33,7 @@
 		3BA8F928200E58BC00059702 /* DeviceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA8F927200E58BC00059702 /* DeviceList.swift */; };
 		3BA8F92A200E58DD00059702 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA8F929200E58DD00059702 /* Device.swift */; };
 		3BC0BE612023868C00538170 /* apps.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BC0BE602023868C00538170 /* apps.json */; };
+		3BC0BE632023A01700538170 /* apps.json in Resources */ = {isa = PBXBuildFile; fileRef = 3BC0BE622023A01700538170 /* apps.json */; };
 		3BFEE5CE20139B930069EE36 /* HomeWeatherInterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */; };
 		3BFEE5D02013A3290069EE36 /* ThermalInterfaceController copy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */; };
 /* End PBXBuildFile section */
@@ -110,6 +111,7 @@
 		3BA8F927200E58BC00059702 /* DeviceList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DeviceList.swift; path = Controller/DeviceList.swift; sourceTree = SOURCE_ROOT; };
 		3BA8F929200E58DD00059702 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Device.swift; path = Controller/Device.swift; sourceTree = SOURCE_ROOT; };
 		3BC0BE602023868C00538170 /* apps.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = apps.json; path = ../../../../OneDrive/Programming/Controller/apps.json; sourceTree = "<group>"; };
+		3BC0BE622023A01700538170 /* apps.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = apps.json; path = ../../../../OneDrive/Programming/Controller/apps.json; sourceTree = "<group>"; };
 		3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeWeatherInterfaceController.swift; sourceTree = "<group>"; };
 		3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ThermalInterfaceController copy.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -198,6 +200,7 @@
 				3BA8F90B200E088100059702 /* ComplicationController.swift */,
 				3BA8F90D200E088100059702 /* Assets.xcassets */,
 				3BA8F90F200E088100059702 /* Info.plist */,
+				3BC0BE622023A01700538170 /* apps.json */,
 			);
 			path = "Controller WatchKit Extension";
 			sourceTree = "<group>";
@@ -329,6 +332,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3BA8F90E200E088100059702 /* Assets.xcassets in Resources */,
+				3BC0BE632023A01700538170 /* apps.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
