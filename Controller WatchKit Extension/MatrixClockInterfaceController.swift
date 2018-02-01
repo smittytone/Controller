@@ -42,7 +42,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 0
+    var loadCount:Int = 1
 
     // MARK: - Lifecycle Functions
 
@@ -68,6 +68,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
                                                  repeats: true)
+        statusLabel.setText("Loading.")
     }
     
     @objc func dotter() {

@@ -43,7 +43,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var initialQueryFlag: Bool = false
     var isConnected: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 0
+    var loadCount:Int = 1
     
     
     // MARK: - Lifecycle Functions
