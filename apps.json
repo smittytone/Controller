@@ -1,0 +1,6 @@
+{ "apps": [
+    { "code": "E967EC6D-C1BD-48B7-B9E0-F9BE2A780EAA",
+      "name": "MyFirstApp" },
+    { "code": "DCD2B79C-4467-433C-B0D3-7448EDA17575",
+      "name": "MySecondApp" } ]
+}
