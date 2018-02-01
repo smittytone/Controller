@@ -223,18 +223,22 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             if let dataString = context["info"] {
                 let ds = dataString as NSString
                 if ds.length != 0 {
-                    let devices = ds.components(separatedBy: "\n\n")
-                    if devices.count > 1 {
+                    if ds == "clear" {
                         self.myDevices.devices.removeAll()
-                        for i in 0..<devices.count - 1 {
-                            let d = devices[i] as NSString
-                            let device = d.components(separatedBy: "\n")
-                            let aDevice: Device = Device()
-                            aDevice.name = device[0]
-                            aDevice.code = device[1]
-                            aDevice.app = device[2]
-                            
-                            self.myDevices.devices.append(aDevice)
+                    } else {
+                        let devices = ds.components(separatedBy: "\n\n")
+                        if devices.count > 1 {
+                            self.myDevices.devices.removeAll()
+                            for i in 0..<devices.count - 1 {
+                                let d = devices[i] as NSString
+                                let device = d.components(separatedBy: "\n")
+                                let aDevice: Device = Device()
+                                aDevice.name = device[0]
+                                aDevice.code = device[1]
+                                aDevice.app = device[2]
+                                
+                                self.myDevices.devices.append(aDevice)
+                            }
                         }
                     }
                 } else {

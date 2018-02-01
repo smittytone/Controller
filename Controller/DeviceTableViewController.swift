@@ -219,24 +219,24 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Update Watch item
         action = UIAlertAction.init(title: "Update Watch",
                                     style: UIAlertActionStyle.default) { (_) in
-            self.updateWatch()
-        }
+                                        self.updateWatch()
+                                    }
 
         actionMenu.addAction(action)
         
         // Show App Info item
         action = UIAlertAction.init(title: "Show App Info",
                                     style: UIAlertActionStyle.default) { (_) in
-            self.showInfo()
-        }
+                                        self.showInfo()
+                                    }
 
         actionMenu.addAction(action)
 
         // Reorder Device List item
         action = UIAlertAction.init(title: "Re-order Device List",
                                     style: UIAlertActionStyle.default) { (_) in
-            self.reorderDevicelist()
-        }
+                                        self.reorderDevicelist()
+                                    }
 
         actionMenu.addAction(action)
         
@@ -248,9 +248,18 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         actionMenu.addAction(action)
         
+        // Clear list
+        action = UIAlertAction.init(title: "Clear Device List",
+                                    style: UIAlertActionStyle.default) { (_) in
+                                        self.clearList()
+                                    }
+        
+        actionMenu.addAction(action)
+        
         // Cancel item
         action = UIAlertAction.init(title: "Cancel",
-                                    style: UIAlertActionStyle.cancel, handler:nil)
+                                    style: UIAlertActionStyle.cancel,
+                                    handler:nil)
 
         actionMenu.addAction(action)
         
@@ -307,6 +316,26 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Re-display the table
         self.deviceTable.reloadData()
+    }
+    
+    @objc func clearList() {
+        
+        // Clear the device list - but only after checking
+        let alert = UIAlertController.init(title: "Are You Sure?",
+                                           message: "This will remove all devices from this app and from your Watch",
+                                           preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "No",
+                                      style: UIAlertActionStyle.default,
+                                      handler: nil))
+        alert.addAction(UIAlertAction(title: "Yes",
+                                      style: UIAlertActionStyle.destructive,
+                                      handler: { (_) in
+                                        self.myDevices.devices.removeAll()
+                                        self.sendDeviceList()
+                                        self.tableView.reloadData()
+        }))
+        
+        self.present(alert, animated: true)
     }
 
 
@@ -541,6 +570,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                         dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
                     }
                 }
+            } else {
+                dataString = "clear"
             }
             
             // Send the sync list
