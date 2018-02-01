@@ -41,6 +41,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
     
     var myDevices: DeviceList! = nil
     var listChanged: Bool = false
+    var apps: [String : Any] = [:]
     
 
     // MARK: - Lifecycle Functions
@@ -72,6 +73,24 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 self.myDevices.devices.append(contentsOf: devices)
                 self.myDevices.currentDevice = devicesList.currentDevice
             }
+        }
+        
+        // Read in the current apps list
+        do {
+            if let file = Bundle.main.url(forResource: "apps", withExtension: "json") {
+                let data = try Data(contentsOf: file)
+                // NSLog(String.init(data: data, encoding: String.Encoding.utf8)!)
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
+                if let object = json as? [String: Any] {
+                    self.apps = object
+                } else {
+                    NSLog("Error", "Apps list JSON is invalid")
+                }
+            } else {
+                NSLog("Error", "Apps list file missing")
+            }
+        } catch {
+            NSLog("Error", "Apps list file damaged")
         }
         
         // Present the UI
@@ -118,7 +137,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 let aDevice: Device = self.myDevices.devices[i]
                 let aRow: TableRow = self.deviceTable.rowController(at: i) as! TableRow
                 aRow.nameLabel.setText(aDevice.name)
-                aRow.appIcon.setImage(UIImage.init(named: getAppTypeAsString(aDevice.app).lowercased()))
+                aRow.appIcon.setImage(UIImage.init(named: getAppNameLower(aDevice.app)))
             }
         }
     }
@@ -144,11 +163,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             let aDevice: Device = self.myDevices.devices[rowIndex]
             var name: String = ""
 
-            if aDevice.app == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { name = "weather.ui" }
-            if aDevice.app == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { name = "matrixclock.ui" }
-            if aDevice.app == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { name = "homeweather.ui" }
-            if aDevice.app == "0B5D0687-6095-4F1D-897C-04664B143702" { name = "thermal.ui" }
-            if aDevice.app == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { name = "bigclock.ui" }
+            name = getAppNameLower(aDevice.app) + ".ui"
             
             if name.count > 0 {
                 self.pushController(withName: name, context: aDevice)
@@ -156,25 +171,22 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         }
     }
 
-    func getAppTypeAsString(_ code:String) -> String {
-
-        // Use the app code to return the correct app name
-        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "Weather" }
-        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "HomeWeather" }
-        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "MatrixClock" }
-        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "ThermalForecast" }
-        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "BigClock" }
-
-        return "Unknown"
+    func getAppNameLower(_ code:String) -> String {
+        
+        return getAppName(code).lowercased()
     }
     
-    func getAppImageName(_ code:String) -> String {
+    func getAppName(_ code: String) -> String {
         
-        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "weather" }
-        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "homeweather" }
-        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "matrixclock" }
-        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "thermalworld" }
-        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "bigclock" }
+        let apps: [[String : Any]] = self.apps["apps"] as! [[String : Any]]
+        if apps.count > 0 {
+            for i in 0..<apps.count {
+                let app = apps[i]
+                if code == app["code"] as! String {
+                    return app["name"] as! String
+                }
+            }
+        }
         
         return "unknown"
     }

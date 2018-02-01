@@ -168,10 +168,10 @@
             </objects>
             <point key="canvasLocation" x="743" y="100"/>
         </scene>
-        <!--thermal.ui-->
+        <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
             <objects>
-                <controller identifier="thermal.ui" id="yxY-RW-tE6" customClass="ThermalInterfaceController" customModule="Controller_WatchKit_App" customModuleProvider="target">
+                <controller identifier="thermalforecast.ui" id="yxY-RW-tE6" customClass="ThermalInterfaceController" customModule="Controller_WatchKit_App" customModuleProvider="target">
                     <items>
                         <label width="136" alignment="left" text="Label" id="qgU-jM-wYK">
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
