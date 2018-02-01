@@ -95,7 +95,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             if let file = Bundle.main.url(forResource: "apps", withExtension: "json") {
                 let data = try Data(contentsOf: file)
                 // NSLog(String.init(data: data, encoding: String.Encoding.utf8)!)
-                let json = try JSONSerialization.jsonObject(with: data, options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves])
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
                 if let object = json as? [String: Any] {
                     self.apps = object
                 } else {
