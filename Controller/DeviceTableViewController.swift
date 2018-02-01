@@ -248,8 +248,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     @objc func showInfo() {
 
         // Show application info
+        var active: Bool = false
+        if let session = self.phoneSession {
+            active = session.activationState == WCSessionActivationState.activated ? true : false
+        }
+        
         let alert = UIAlertController.init(title: "About Controller",
-                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, select it to enter its details, then tap the switch to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed",
+                                           message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, select it to enter its details, then tap the switch to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed\nSession " + (active ? "" : "in") + "active",
                                            preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                       style: UIAlertActionStyle.default,
@@ -303,7 +308,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             return self.myDevices.devices.count
         }
     }
-
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        let header: UITableViewCell = tableView.dequeueReusableCell(withIdentifier:"header.cell")!
+        return header
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         // Get a new table cell from the queue of existing cells, or create one if none are available
@@ -340,7 +351,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             
             // For the install switch, disable it if the device has no watch support
             cell.installSwitch.isOn = device.isInstalled
-            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled
+            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled && !self.tableEditingFlag && !self.tableOrderingFlag
             
             // Do we show the re-order control?
             cell.showsReorderControl = self.tableOrderingFlag

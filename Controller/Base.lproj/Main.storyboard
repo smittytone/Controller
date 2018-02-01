@@ -253,6 +253,30 @@
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="header.cell" rowHeight="18" id="vdu-Sh-VsS">
+                                <rect key="frame" x="0.0" y="144" width="375" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="right" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vdu-Sh-VsS" id="dlf-xs-q0s">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="17.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="INSTALLED ON WATCH" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gLV-nH-Hpz">
+                                            <rect key="frame" x="16" y="2" width="343" height="14.5"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="14.5" id="eGF-XR-l4z"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="gLV-nH-Hpz" secondAttribute="trailing" constant="16" id="VfZ-OR-dqd"/>
+                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="centerY" secondItem="dlf-xs-q0s" secondAttribute="centerY" id="weN-ib-A9P"/>
+                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="leading" secondItem="dlf-xs-q0s" secondAttribute="leading" constant="16" id="xSl-fX-5fC"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="Qci-gV-txM" id="4Nt-gz-Ja3"/>
