@@ -22,15 +22,31 @@ Each device is listed with a switch which can be used to sync that device with t
 
 You can update the Watch separately by tapping ‘Actions’ and then ‘Update Watch’. This is also useful if you re-order the list of devices. Re-ordering is activated by tapping ‘Actions’ and then ‘Re-order Device List’.
 
-The app stores the current list of devices across app restarts and relaunches. 
+The app stores the current list of devices across app restarts and relaunches.
 
 The list is sync’d with the Watch by sending a string of all the devices to appear on the Watch: device name, agent ID and UUID fields are separated by newlines; device records are separated by two newlines. The string is absolute: it contains all the devices to appear on the Watch from the point it is sent; the Watch app recreates its own list from the string.
+
+The app contains a file, `apps.json`, which lists the apps’ UUIDs and human-readable names. This file is read at launch and used to determine which icons to display based upon the UUID provided by the app’s Agent code. All local app data look-ups used this file’s contents. As such it provides a single place to update app details, though please note that the app icon’s filename should match the app’s name in lower case, for example:
+
+| App Name | App icon name |
+| --- | --- |
+| myApp | myapp(.png/jpg/tif) |
+
+You should embed the same `apps.json` in both your iOS and Watch app bundles.
 
 ### Watch App ###
 
 The Watch app presents a list of available devices. Selecting any of these presents a standard UI customised for the application the device is running. The device-specific UI presents the name of the device; its application type; a series of controls relevant to the device; and finally a button which takes the user back to the device list (easier than tapping on the tiny title bar).
 
 The *WKInterfaceController* instance which manages the device-specific UI is designed to hide the device controls until it has received status information from the the device’s agent — see below. Once this information is received, the UI is unhidden and  is ready for use. The *WKInterfaceController* instance presents a dynamic 'Loading...' label to inform the user that this process is taking place.
+
+The app contains a file, `apps.json`, which lists the apps’ UUIDs and human-readable names. This file is read at launch and used to determine which icons to display based upon the UUID provided by the app’s Agent code via the data sync’d from the iOS app. All local app data look-ups used this file’s contents. As such it provides a single place to update app details, though please note that the app icon’s filename should match the app’s name in lower case, for example:
+
+| App Name | App icon name |
+| --- | --- |
+| myApp | myapp(.png/jpg/tif) |
+
+You should embed the same `apps.json` in both your iOS and Watch app bundles.
 
 ### Squirrel ###
 
@@ -39,12 +55,9 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 ### To Do ###
 
 - Add support for multiple Watches.
-- Simplify the process of adding new app UUIDs and names to the various app components.
-    - Eg. there are currently too many places it needs to be keyed in
 - More frequent checks for device availability on the Watch app.
-- Add ‘Clear List’ action to the iOS app.
 - Standardise the watch-specific information calls.
-
+- Modularise the *WKInterfaceController* for easier customisation.
 
 Copyright 2018, Tony Smith.
 
