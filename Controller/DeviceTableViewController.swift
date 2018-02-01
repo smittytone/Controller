@@ -45,6 +45,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     var tableOrderingFlag: Bool = false
     var tableShowIDsFlag: Bool = true
     var watchAppInstalled: Bool = false
+    var apps: [String : Any] = [:]
     
     // MARK: Class Constants
     let STATE_INSTALLING = 1
@@ -88,6 +89,24 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                        selector: #selector(self.doInstall),
                        name: NSNotification.Name.init("com.bps.install.switch.hit"),
                        object: nil)
+        
+        // Read in the current apps list
+        do {
+            if let file = Bundle.main.url(forResource: "apps", withExtension: "json") {
+                let data = try Data(contentsOf: file)
+                // NSLog(String.init(data: data, encoding: String.Encoding.utf8)!)
+                let json = try JSONSerialization.jsonObject(with: data, options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves])
+                if let object = json as? [String: Any] {
+                    self.apps = object
+                } else {
+                    showAlert("Error", "Apps list JSON is invalid")
+                }
+            } else {
+                showAlert("Error", "Apps list file missing")
+            }
+        } catch {
+            showAlert("Error", "Apps list file damaged")
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -393,6 +412,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         // Point the device detail view controller at the current device
         self.ddvc.currentDevice = editingDevice
+        self.ddvc.apps = self.apps
 
         // Present the device detail view controller
         self.navigationController?.pushViewController(self.ddvc, animated: true)
@@ -578,22 +598,33 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.present(alert, animated: true, completion: nil)
     }
     
-    func getAppImage(_ type:String) -> UIImage? {
+    func getAppImage(_ code: String) -> UIImage? {
         
         // Get the correct icon image for the app
-        let imageName: String = getAppTypeAsString(type)
+        let imageName: String = getAppType(code)
         return UIImage(named: imageName)
     }
     
-    func getAppTypeAsString(_ code:String) -> String {
+    func getAppType(_ code:String) -> String {
         
         // Return the app's name as derived from its known UUID
         // The name is used to get the appropriate icon file
-        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "weather" }
-        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "homeweather" }
-        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "matrixclock" }
-        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "thermalworld" }
-        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "bigclock" }
+        return getAppName(code).lowercased()
+    }
+    
+    func getAppName(_ code: String) -> String {
+        
+        // Return the app's name as derived from its known UUID
+        // The name is used to get the appropriate icon file
+        let apps: [[String : Any]] = self.apps["apps"] as! [[String : Any]]
+        if apps.count > 0 {
+            for i in 0..<apps.count {
+                let app = apps[i]
+                if code == app["code"] as! String {
+                    return app["name"] as! String
+                }
+            }
+        }
         
         // Otherwise just return "unknown"
         return "unknown"

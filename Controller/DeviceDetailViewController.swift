@@ -47,6 +47,7 @@ class DeviceDetailViewController: UIViewController,
     var currentDevice: Device!
     var receivedData: NSMutableData! = nil
     var serverSession: URLSession?
+    var apps: [String : Any] = [:]
 
 
     // MARK: - Lifecycle Functions
@@ -74,9 +75,7 @@ class DeviceDetailViewController: UIViewController,
                 self.codeLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Agent ID Code:" : "Enter the Device’s Agent ID Code:"
                 
                 self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControlState.normal)
-                
-                self.appTypeField.text = getAppTypeAsString(self.currentDevice.app)
-                
+                self.appTypeField.text = getAppName(self.currentDevice.app)
                 self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
             }
         } else {
@@ -113,6 +112,7 @@ class DeviceDetailViewController: UIViewController,
                 alert.addAction(action)
                 
                 action = UIAlertAction(title: "No", style: UIAlertActionStyle.default, handler: { (_) in
+                    self.currentDevice = nil
                     self.goBack()
                 })
                 alert.addAction(action)
@@ -238,9 +238,11 @@ class DeviceDetailViewController: UIViewController,
 
                 do {
                     appData = try JSONSerialization.jsonObject(with: self.receivedData as Data, options: JSONSerialization.ReadingOptions.allowFragments) as! [String:String]
-                    let code = appData["app"]
-                    self.appTypeField.text = getAppTypeAsString(code!)
-                    self.currentDevice.app = code!
+                    if let code = appData["app"] {
+                        self.appTypeField.text = getAppName(code)
+                        self.currentDevice.app = code
+                    }
+                    
                     self.currentDevice.watchSupported = appData["watchsupported"] == "true" ? true : false
                     self.supportLabel.text = "Watch control" + (appData["watchsupported"] == "false" ? " not" : "") + " supported"
                     self.currentDevice.changed = true
@@ -269,15 +271,22 @@ class DeviceDetailViewController: UIViewController,
         self.present(alert, animated: true)
     }
 
-    func getAppTypeAsString(_ code:String) -> String {
-
-        if code == "761DDC8C-E7F5-40D4-87AC-9B06D91A672D" { return "Weather" }
-        if code == "8B6B3A11-00B4-4304-BE27-ABD11DB1B774" { return "HomeWeather" }
-        if code == "0028C36B-444A-408D-B862-F8E4C17CB6D6" { return "MatrixClock" }
-        if code == "0B5D0687-6095-4F1D-897C-04664B143702" { return "ThermalForecastWorld" }
-        if code == "1BD51C33-9F34-48A9-95EA-C3F589A8136C" { return "BigClock" }
-
-        return "Unknown"
+    func getAppName(_ code: String) -> String {
+        
+        // Return the app's name as derived from its known UUID
+        // The name is used to get the appropriate icon file
+        let apps: [[String : Any]] = self.apps["apps"] as! [[String : Any]]
+        if apps.count > 0 {
+            for i in 0..<apps.count {
+                let app = apps[i]
+                if code == app["code"] as! String {
+                    return app["name"] as! String
+                }
+            }
+        }
+        
+        // Otherwise just return "unknown"
+        return "unknown"
     }
 
 }
