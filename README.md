@@ -12,21 +12,39 @@ Or simply take the code apart and use it as the foundation for a completely diff
 
 ## Design ##
 
+### iOS App ###
+
+The Watch app’s iPhone-based companion collates your imp-enabled devices and syncs them with the Watch. Tap ‘Edit’ to add a new device and then select it in order to give it a convenient name and to enter its agent ID. Tap ‘Get Device Data’ to check what app the device is running and whether it is supported by Controller. Click ‘Devices’ to go back when you’re done.
+
+Typically, the iOS app will only be used to add devices. An end-user should not need to use it too often.
+
+Each device is listed with a switch which can be used to sync that device with the Watch app, either to add or remove it.
+
+You can update the Watch separately by tapping ‘Actions’ and then ‘Update Watch’. This is also useful if you re-order the list of devices. Re-ordering is activated by tapping ‘Actions’ and then ‘Re-order Device List’.
+
+The app stores the current list of devices across app restarts and relaunches. 
+
+The list is sync’d with the Watch by sending a string of all the devices to appear on the Watch: device name, agent ID and UUID fields are separated by newlines; device records are separated by two newlines. The string is absolute: it contains all the devices to appear on the Watch from the point it is sent; the Watch app recreates its own list from the string.
+
 ### Watch App ###
 
-The Watch app presents a list of available devices. Selecting any of these presents a standard UI customised for the application the device is running. The device-specific UI presents the name of the device; its application type; a series of controls relevant to the device; and finally a button which takes the user back to the device list.
+The Watch app presents a list of available devices. Selecting any of these presents a standard UI customised for the application the device is running. The device-specific UI presents the name of the device; its application type; a series of controls relevant to the device; and finally a button which takes the user back to the device list (easier than tapping on the tiny title bar).
 
-The *WKInterfaceController* instance which manages the device-specific UI is designed to hide the device controls until it has received status information from the the device’s agent — see below. Once this information is received, the UI is unhidden and ready for use. The *WKInterfaceController* instance presents a dynamic 'Loading...' label to inform the user.
+The *WKInterfaceController* instance which manages the device-specific UI is designed to hide the device controls until it has received status information from the the device’s agent — see below. Once this information is received, the UI is unhidden and  is ready for use. The *WKInterfaceController* instance presents a dynamic 'Loading...' label to inform the user that this process is taking place.
 
 ### Squirrel ###
 
-The Electric Imp application component of the design makes use of the Rocky library to serve standard application information at /info, and a device status (online or offline) information at /status. These and other application control endpoints can of course be modified as required — just update the appropriate section of the relevant *WKInterfaceController* instance.
+The Electric Imp application component of the design makes use of the [Rocky library](https://developer.electricimp.com/libraries/utilities/rocky) to serve standard application information at /info, and a device status (online or offline) information at /status. These and other application control endpoints can of course be modified as required — just update the appropriate section of the relevant *WKInterfaceController* instance.
 
-### iOS App ###
+### To Do ###
 
-The Watch app’s companion collates your imp-enabled devices and syncs them with the Watch. Tap ‘Edit’ to add a new device — give it a convenient name and enter its agent ID. Tap ‘Get Device Data’ to check what app the device is running and whether it is supported by Controller. Click ‘Devices’ to go back when you’re done.
+- Add support for multiple Watches.
+- Simplify the process of adding new app UUIDs and names to the various app components.
+    - Eg. there are currently too many places it needs to be keyed in
+- More frequent checks for device availability on the Watch app.
+- Add ‘Clear List’ action to the iOS app.
+- Standardise the watch-specific information calls.
 
-Tap ‘Actions’ and then ‘Update Watch’ to sync your device list with your Watch.
 
 Copyright 2018, Tony Smith.
 
