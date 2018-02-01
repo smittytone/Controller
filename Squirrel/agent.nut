@@ -5,7 +5,7 @@ api <- Rocky();
 api.get("/controller/appinfo", function(context) {
     // Send back the app's Controller-specific UUID and an
     // indicator to show whether Controller is supported
-    local info = { "app": "<UUID>",
+    local info = { "appcode": "<UUID>",
                    "watchsupported": "true" };
     context.send(200, http.jsonencode(info));
 });
