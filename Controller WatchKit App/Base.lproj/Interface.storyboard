@@ -104,6 +104,19 @@
                                 <action selector="doSwitchWithValue:" destination="FMC-yj-G74" id="5fc-IL-b0L"/>
                             </connections>
                         </switch>
+                        <switch width="1" alignment="left" value="YES" title="Mode: 24" id="VwY-3Z-tkU">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setModeWithValue:" destination="FMC-yj-G74" id="c5z-2z-Mqs"/>
+                            </connections>
+                        </switch>
+                        <slider width="1" alignment="left" continuous="YES" maximum="15" steps="3" id="fTe-AK-uPh">
+                            <color key="color" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setBrightnessWithValue:" destination="FMC-yj-G74" id="gyh-kY-Twh"/>
+                            </connections>
+                        </slider>
                         <separator alignment="left" id="pwq-gx-4j3"/>
                         <button width="1" alignment="left" title="Back" id="ZNe-pK-fvh">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -114,13 +127,15 @@
                         </button>
                     </items>
                     <connections>
+                        <outlet property="brightnessSlider" destination="fTe-AK-uPh" id="6II-iG-5Vl"/>
                         <outlet property="deviceLabel" destination="HPh-Hc-Qbq" id="WQ9-uq-GMW"/>
                         <outlet property="lightSwitch" destination="ilT-Hv-a2L" id="syR-Ie-dzu"/>
+                        <outlet property="modeSwitch" destination="VwY-3Z-tkU" id="Y7U-vx-phq"/>
                         <outlet property="statusLabel" destination="3TI-tS-P84" id="Ii4-Td-PhK"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="502" y="59"/>
+            <point key="canvasLocation" x="504" y="104"/>
         </scene>
         <!--homeweather.ui-->
         <scene sceneID="59f-L9-2jD">
@@ -166,7 +181,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="743" y="100"/>
+            <point key="canvasLocation" x="743" y="80"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
@@ -204,7 +219,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="990" y="59"/>
+            <point key="canvasLocation" x="988" y="60"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">
@@ -241,7 +256,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1256" y="58"/>
+            <point key="canvasLocation" x="1242" y="60"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

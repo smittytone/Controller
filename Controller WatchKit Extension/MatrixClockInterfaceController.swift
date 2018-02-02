@@ -33,6 +33,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
     @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
     let dots: String = "................"
@@ -41,6 +43,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
+    var isDeviceOnline: Bool = false
     var loadingTimer: Timer!
     var loadCount:Int = 1
 
@@ -49,11 +52,16 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     override func awake(withContext context: Any?) {
 
         super.awake(withContext: context)
-
+        
+        // Show the device name and set the controller title
         self.aDevice = context as? Device
         self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
+        
+        // Hide controls until we known the device is online
         self.lightSwitch.setHidden(true)
+        self.modeSwitch.setHidden(true)
+        self.brightnessSlider.setHidden(true)
     }
     
     override func didAppear() {
@@ -63,16 +71,19 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil)
+        
+        // Set the Loading... ellipsis timer
         self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
                                                  target: self,
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
                                                  repeats: true)
-        statusLabel.setText("Loading.")
     }
     
     @objc func dotter() {
         
+        // Increase the number of dots shown after 'Loading'
+        // up to a maximum of three - then start at zero again
         self.loadCount = self.loadCount + 1
         if self.loadCount > 3 { self.loadCount = 0 }
         statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
@@ -83,12 +94,29 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     @IBAction func doSwitch(value: Bool) {
 
+        // Switch the display on or off
         var dict = [String: String]()
         dict["setlight"] = value ? "1" : "0"
         self.lightSwitch.setTitle(value ? "On" : "Off")
         makeConnection(dict)
     }
+    
+    @IBAction func setMode(value: Bool) {
+        
+        // Switch the display between 24 and 12 hour mode
+        var dict = [String: String]()
+        dict["setmode"] = value ? "1" : "0"
+        self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
+        makeConnection(dict)
+    }
 
+    @IBAction func setBrightness(value: Float) {
+        
+        var dict = [String: String]()
+        dict["setbright"] = "\(Int(value))"
+        makeConnection(dict)
+    }
+    
     @IBAction func back(_ sender: Any) {
 
         // Go back to the device list
@@ -208,16 +236,12 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
             // Save the clock state data if the connection succeeds
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
-                
                 if aConnexion.task == task {
                     if let data = aConnexion.data {
                         let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                        
                         if inString != "OK" && inString != "Not Found\n" && inString != "No handler" {
                             if self.initialQueryFlag == true {
                                 let dataArray = inString.components(separatedBy:".")
-                                let dis = dataArray[8] as String
-                                self.deviceLabel.setText(dis == "d" ? aDevice!.name + " ⛔️" : aDevice!.name)
                                 
                                 // Incoming string looks like this:
                                 //    1.1.1.1.01.1.01.1.d.1
@@ -234,22 +258,46 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                 //    8. connection status
                                 //    9. debug status
                                 
-                                let powerString = dataArray[7] as String
+                                let state = dataArray[8] as String
+                                self.isDeviceOnline = (state == "d" ? false : true)
+                                self.deviceLabel.setText(aDevice!.name + (self.isDeviceOnline ? "" : " ⛔️"))
                                 
-                                // Set the clock switch state
-                                if let value = Int(powerString) {
+                                // Set the clock display switch state
+                                let powerState = dataArray[7] as String
+                                if let value = Int(powerState) {
                                     if value == 1 {
-                                        lightSwitch.setOn(true)
-                                        lightSwitch.setTitle("On")
+                                        self.lightSwitch.setOn(true)
+                                        self.lightSwitch.setTitle("On")
                                     } else {
-                                        lightSwitch.setOn(false)
-                                        lightSwitch.setTitle("Off")
+                                        self.lightSwitch.setOn(false)
+                                        self.lightSwitch.setTitle("Off")
                                     }
                                 }
                                 
+                                // Set the clock mode switch state
+                                let modeState = dataArray[0] as String
+                                if let value = Int(modeState) {
+                                    if value == 1 {
+                                        self.modeSwitch.setOn(true)
+                                        self.modeSwitch.setTitle("Mode: 24")
+                                    } else {
+                                        self.modeSwitch.setOn(false)
+                                        self.modeSwitch.setTitle("Mode: 12")
+                                    }
+                                }
+                                
+                                // Set the clock brightness slider state
+                                let brightnessState = dataArray[4] as String
+                                if let value = Int(brightnessState) {
+                                    self.brightnessSlider.setValue(Float(value))
+                                }
+                                
+                                // Update the rest of the UI
                                 self.lightSwitch.setHidden(false)
-                                self.initialQueryFlag = false
+                                self.modeSwitch.setHidden(false)
+                                self.brightnessSlider.setHidden(false)
                                 self.statusLabel.setHidden(true)
+                                self.initialQueryFlag = false
                                 self.loadingTimer.invalidate()
                             }
                         }
