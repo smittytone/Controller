@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "thermalworld.png",
+      "filename" : "thermalforecast.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "thermalworld@2x.png",
+      "filename" : "thermalforecast@2x.png",
       "scale" : "2x"
     },
     {
