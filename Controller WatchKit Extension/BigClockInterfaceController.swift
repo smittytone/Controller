@@ -33,6 +33,8 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
     @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
     let dots: String = "................"
@@ -55,6 +57,8 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
         self.lightSwitch.setHidden(true)
+        self.modeSwitch.setHidden(true)
+        self.brightnessSlider.setHidden(true)
     }
     
     override func didAppear() {
@@ -90,6 +94,22 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         makeConnection(dict)
     }
 
+    @IBAction func setMode(value: Bool) {
+        
+        // Switch the display between 24 and 12 hour mode
+        var dict = [String: String]()
+        dict["setmode"] = value ? "1" : "0"
+        self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
+        makeConnection(dict)
+    }
+    
+    @IBAction func setBrightness(value: Float) {
+        
+        var dict = [String: String]()
+        dict["setbright"] = "\(Int(value))"
+        makeConnection(dict)
+    }
+    
     @IBAction func back(_ sender: Any) {
 
         // Go back to the device list
@@ -217,9 +237,6 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                         if inString != "OK" && inString != "Not Found\n" && inString != "No handler" {
                             if self.initialQueryFlag == true {
                                 let dataArray = inString.components(separatedBy:".")
-                                let dis = dataArray[8] as String
-                                self.deviceLabel.setText(dis == "d" ? aDevice!.name + " ⛔️" : aDevice!.name)
-                                self.isConnected = dis == "d" ? false : true
                                 
                                 // Incoming string looks like this:
                                 //    1.1.1.1.01.1.01.1.d.1
@@ -236,9 +253,13 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                 //    8. connection status
                                 //    9. debug status
                                 
+                                let ds = dataArray[8] as String
+                                self.isConnected = ds == "d" ? false : true
+                                self.deviceLabel.setText(self.isConnected ? aDevice!.name : aDevice!.name + " ⛔️")
+                                
                                 let powerString = dataArray[7] as String
                                 
-                                // Set the clock switch state
+                                // Set the clock display power state
                                 if let value = Int(powerString) {
                                     if value == 1 {
                                         lightSwitch.setOn(true)
@@ -249,10 +270,31 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                     }
                                 }
                                 
-                                self.lightSwitch.setHidden(false)
+                                // Set the clock mode switch state
+                                let modeState = dataArray[0] as String
+                                if let value = Int(modeState) {
+                                    if value == 1 {
+                                        self.modeSwitch.setOn(true)
+                                        self.modeSwitch.setTitle("Mode: 24")
+                                    } else {
+                                        self.modeSwitch.setOn(false)
+                                        self.modeSwitch.setTitle("Mode: 12")
+                                    }
+                                }
+                                
+                                // Set the clock brightness slider state
+                                let brightnessState = dataArray[4] as String
+                                if let value = Int(brightnessState) {
+                                    self.brightnessSlider.setValue(Float(value))
+                                }
+                                
+                                // Update the rest of the UI
                                 self.initialQueryFlag = false
-                                self.statusLabel.setHidden(true)
                                 self.loadingTimer.invalidate()
+                                self.lightSwitch.setHidden(false)
+                                self.modeSwitch.setHidden(false)
+                                self.brightnessSlider.setHidden(false)
+                                self.statusLabel.setHidden(true)
                             }
                         }
                     }

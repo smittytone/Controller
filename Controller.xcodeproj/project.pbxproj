@@ -188,10 +188,10 @@
 			children = (
 				3BA8F907200E088100059702 /* InterfaceController.swift */,
 				3B5401A220137A0500130A06 /* MatrixClockInterfaceController.swift */,
+				3B1118D1201535E8006D342F /* BigClockInterfaceController.swift */,
 				3B5401A320137A0500130A06 /* WeatherInterfaceController.swift */,
 				3BFEE5CD20139B930069EE36 /* HomeWeatherInterfaceController.swift */,
 				3BFEE5CF2013A3290069EE36 /* ThermalInterfaceController copy.swift */,
-				3B1118D1201535E8006D342F /* BigClockInterfaceController.swift */,
 				3BA8F929200E58DD00059702 /* Device.swift */,
 				3BA8F927200E58BC00059702 /* DeviceList.swift */,
 				3B5401A0201377BD00130A06 /* TableRow.swift */,

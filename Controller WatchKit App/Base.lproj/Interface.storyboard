@@ -36,7 +36,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="15" y="58"/>
+            <point key="canvasLocation" x="256" y="58"/>
         </scene>
         <!--weather.ui-->
         <scene sceneID="WbA-ZR-aoD">
@@ -82,7 +82,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="259" y="79"/>
+            <point key="canvasLocation" x="1208" y="80"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
@@ -181,7 +181,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="743" y="80"/>
+            <point key="canvasLocation" x="1450" y="80"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
@@ -219,7 +219,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="988" y="60"/>
+            <point key="canvasLocation" x="984" y="60"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">
@@ -235,11 +235,25 @@
                         </label>
                         <label width="136" alignment="left" text="Loading." id="zFs-wx-gbe"/>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="ci2-ya-b7n">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="doSwitchWithValue:" destination="Rht-1b-8W6" id="fjV-Yq-vkJ"/>
                             </connections>
                         </switch>
+                        <switch width="1" alignment="left" value="YES" title="Switch" id="ufT-MM-U5E">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setModeWithValue:" destination="Rht-1b-8W6" id="pXA-GU-KI0"/>
+                            </connections>
+                        </switch>
+                        <slider width="1" alignment="left" continuous="YES" maximum="15" steps="3" id="CHy-Fs-ghj">
+                            <color key="color" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setBrightnessWithValue:" destination="Rht-1b-8W6" id="8fy-Uv-xql"/>
+                            </connections>
+                        </slider>
                         <separator alignment="left" id="j1S-mH-hr8"/>
                         <button width="1" alignment="left" title="Back" id="GFu-Xz-KHA">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -250,13 +264,15 @@
                         </button>
                     </items>
                     <connections>
+                        <outlet property="brightnessSlider" destination="CHy-Fs-ghj" id="s1N-bI-42i"/>
                         <outlet property="deviceLabel" destination="PZc-li-rhZ" id="gYA-ar-6yf"/>
                         <outlet property="lightSwitch" destination="ci2-ya-b7n" id="CQN-QO-hc0"/>
+                        <outlet property="modeSwitch" destination="ufT-MM-U5E" id="4wo-Jb-L4v"/>
                         <outlet property="statusLabel" destination="zFs-wx-gbe" id="gcN-as-ii7"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1242" y="60"/>
+            <point key="canvasLocation" x="745" y="101"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
