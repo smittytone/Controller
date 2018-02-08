@@ -179,7 +179,7 @@ class DeviceDetailViewController: UIViewController,
     func getDeviceInfo() {
 
         if let code = self.codeField.text {
-            let url:URL? = URL(string: "https://agent.electricimp.com/" + code + "/info")
+            let url:URL? = URL(string: "https://agent.electricimp.com/" + code + "/controller/info")
 
             if url == nil {
                 reportError("DeviceDetailViewController.getDeviceInfo() generated a malformed URL string", "Could not connect to the device")
@@ -238,7 +238,7 @@ class DeviceDetailViewController: UIViewController,
 
                 do {
                     appData = try JSONSerialization.jsonObject(with: self.receivedData as Data, options: JSONSerialization.ReadingOptions.allowFragments) as! [String:String]
-                    if let code = appData["app"] {
+                    if let code = appData["appcode"] {
                         self.appTypeField.text = getAppName(code)
                         self.currentDevice.app = code
                     }
