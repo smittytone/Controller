@@ -110,7 +110,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
     func makeConnection(_ data:[String:String]?, _ path:String?) {
 
-        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/state")
+        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
