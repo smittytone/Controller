@@ -34,6 +34,26 @@
 			<key>DefaultValue</key>
 			<string>1</string>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>Installed Devices</string>
+			<key>Key</key>
+			<string>com.bps.controller.devices.installcount</string>
+			<key>DefaultValue</key>
+			<string>0</string>
+		</dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTitleValueSpecifier</string>
+            <key>Title</key>
+            <string>Listed Devices</string>
+            <key>Key</key>
+            <string>com.bps.controller.devices.listcount</string>
+            <key>Default Value</key>
+            <string>0</string>
+        </dict>
 	</array>
 </dict>
 </plist>

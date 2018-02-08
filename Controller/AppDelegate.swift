@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Point 'myDevices' at the device list singleton
         self.myDevices = DeviceList.sharedDevices
-
+        
         // Load in default device list if the file has already been saved
         let docsPath = self.docsDir[0] + "/devices"
         if FileManager.default.fileExists(atPath: docsPath) {
@@ -37,11 +37,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        var installCount: Int = 0
+        for i in 0..<self.myDevices.devices.count {
+            let device: Device = self.myDevices.devices[i]
+            if device.isInstalled {
+                installCount = installCount + 1
+            }
+        }
+        
         // Set Settings Page details
         let defaults: UserDefaults = UserDefaults.standard
         defaults.set(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String, forKey: "com.bps.controller.app.version")
         defaults.set(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String, forKey: "com.bps.controller.app.build")
-        
+        defaults.set("\(installCount)", forKey: "com.bps.controller.devices.installcount")
+        defaults.set("\(self.myDevices.devices.count)", forKey: "com.bps.controller.devices.listcount")
+
         return true
     }
 
@@ -71,7 +81,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func saveDevices() {
 
+        let defaults: UserDefaults = UserDefaults.standard
+        
         if self.myDevices.devices.count > 0 {
+            var installCount: Int = 0
+            for i in 0..<self.myDevices.devices.count {
+                let device: Device = self.myDevices.devices[i]
+                if device.isInstalled {
+                    installCount = installCount + 1
+                }
+            }
+            
+            defaults.set("\(installCount)", forKey: "com.bps.controller.devices.installcount")
+            defaults.set("\(self.myDevices.devices.count)", forKey: "com.bps.controller.devices.listcount")
+            
             // The app is going into the background or closing, so save the list of devices
             let docsPath = self.docsDir[0] + "/devices"
             
@@ -99,5 +122,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSLog("No devices to save")
         }
     }
+    
 }
 
