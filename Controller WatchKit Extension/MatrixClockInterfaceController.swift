@@ -86,7 +86,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // up to a maximum of three - then start at zero again
         self.loadCount = self.loadCount + 1
         if self.loadCount > 3 { self.loadCount = 0 }
-        statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
+        self.statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
 
     

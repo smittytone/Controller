@@ -153,7 +153,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 // NOP
             })
             
-            presentAlert(withTitle: "I neet setup info",
+            presentAlert(withTitle: "Add Some Devices",
                          message: "Please run the Controller app on your iPhone, add some devices, and click ‘Activate’",
                          preferredStyle: WKAlertControllerStyle.alert,
                          actions: [waa])

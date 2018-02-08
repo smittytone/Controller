@@ -76,7 +76,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         
         self.loadCount = self.loadCount + 1
         if self.loadCount > 3 { self.loadCount = 0 }
-        statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
+        self.statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
     }
     
     
