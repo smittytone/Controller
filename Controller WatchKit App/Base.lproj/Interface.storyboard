@@ -196,7 +196,14 @@
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
                         <label width="136" alignment="left" text="Loading." id="fA6-HY-aqU"/>
-                        <button width="1" alignment="left" title="Restart &amp; Update" id="om2-Nv-xod">
+                        <switch width="1" alignment="left" value="YES" title="Switch" id="kIp-lJ-jHL">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="doSwitchWithValue:" destination="yxY-RW-tE6" id="f5J-Vr-ac8"/>
+                            </connections>
+                        </switch>
+                        <button width="1" alignment="left" title="Update Forecast" id="om2-Nv-xod">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -214,12 +221,13 @@
                     </items>
                     <connections>
                         <outlet property="deviceLabel" destination="qgU-jM-wYK" id="5Na-dP-Ec8"/>
+                        <outlet property="lightSwitch" destination="kIp-lJ-jHL" id="6q6-xH-z4k"/>
                         <outlet property="resetButton" destination="om2-Nv-xod" id="eCb-pb-aGM"/>
                         <outlet property="statusLabel" destination="fA6-HY-aqU" id="Sp3-dB-Kh3"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="984" y="60"/>
+            <point key="canvasLocation" x="985" y="80"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">

@@ -33,6 +33,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
     @IBOutlet weak var resetButton: WKInterfaceButton!
+    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
     let dots: String = "................"
@@ -56,6 +57,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
         self.resetButton.setHidden(true)
+        self.lightSwitch.setHidden(true)
     }
 
     override func didAppear() {
@@ -82,6 +84,16 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     
     // MARK: - Action Functions
 
+    @IBAction func doSwitch(value: Bool) {
+        
+        // Switch the display on or off
+        var dict = [String: String]()
+        dict["action"] = "power"
+        dict["power"] = value ? "1" : "0"
+        self.lightSwitch.setTitle(value ? "On" : "Off")
+        makeConnection(dict)
+    }
+    
     @IBAction func reboot(_ sender: Any) {
 
         // Send the restart signal
@@ -216,12 +228,23 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                     if aConnexion.task == task {
                         if initialQueryFlag == true {
                             let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
-                            self.isConnected = inString == "0" ? false : true
+                            let dataArray = inString.components(separatedBy:".")
+                            
+                            // The data string is formatted as follows:
+                            // "0.1.2.3", where
+                            // 0 - the LED brightness value (0-15)
+                            // 1 - the LED power state (1 = on, 0 = off)
+                            // 2 - the LED orientation (1 = left, 0 = right)
+                            // 3 - the device online status (1 = connected, 0 = disconnected)
+                            
+                            self.loadingTimer.invalidate()
+                            self.deviceLabel.setText(dataArray[3] == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
+                            self.isConnected = dataArray[3] == "1" ? true : false
                             self.initialQueryFlag = false
                             self.statusLabel.setHidden(true)
+                            self.lightSwitch.setTitle(dataArray[1] == "1" ? "On" : "Off")
+                            self.lightSwitch.setHidden(false)
                             self.resetButton.setHidden(false)
-                            self.loadingTimer.invalidate()
                         }
                         
                         task.cancel()
