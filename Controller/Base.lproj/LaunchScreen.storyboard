@@ -19,18 +19,18 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="CGt-cO-KPv">
-                                <rect key="frame" x="20" y="348" width="374" height="40"/>
+                                <rect key="frame" x="20" y="350" width="374" height="36"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="40" id="KBK-VB-n7x"/>
+                                    <constraint firstAttribute="height" constant="36" id="Zsb-Bf-pPZ"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="CGt-cO-KPv" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="1wK-gK-9bV"/>
-                            <constraint firstItem="CGt-cO-KPv" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="4mG-NX-efr"/>
-                            <constraint firstItem="CGt-cO-KPv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="7al-gy-EO7"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="CGt-cO-KPv" secondAttribute="trailing" constant="20" id="NC5-M9-c3Q"/>
+                            <constraint firstItem="CGt-cO-KPv" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="IV8-eX-p1o"/>
+                            <constraint firstItem="CGt-cO-KPv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="ix2-YN-TFp"/>
+                            <constraint firstItem="CGt-cO-KPv" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="mYY-3G-5AS"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="CGt-cO-KPv" secondAttribute="trailing" constant="20" id="xXL-mf-Vfb"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
