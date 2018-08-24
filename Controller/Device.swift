@@ -35,6 +35,7 @@ class Device: NSObject, NSCoding {
     var watchSupported: Bool = false
     var changed: Bool = false
     var isInstalled: Bool = false
+    var autoBack:Bool = false
     var installState: Int = -1
     
     let STATE_INSTALLING = 1
@@ -51,6 +52,7 @@ class Device: NSObject, NSCoding {
         self.app = ""
         self.watchSupported = false
         self.isInstalled = false
+        self.autoBack = true
         self.installState = self.STATE_NONE
     }
 
@@ -64,6 +66,7 @@ class Device: NSObject, NSCoding {
         self.app = ""
         self.watchSupported = false
         self.isInstalled = false
+        self.autoBack = true
         self.installState = self.STATE_NONE
         
         if let n = decoder.decodeObject(forKey: "device.name") { self.name = n as! String }
@@ -72,6 +75,7 @@ class Device: NSObject, NSCoding {
 
         self.watchSupported = decoder.decodeBool(forKey: "device.watch")
         self.isInstalled = decoder.decodeBool(forKey: "device.installed")
+        self.autoBack = decoder.decodeBool(forKey: "device.autoback")
     }
 
     func encode(with encoder: NSCoder) {
@@ -81,5 +85,6 @@ class Device: NSObject, NSCoding {
         encoder.encode(self.app, forKey: "device.app")
         encoder.encode(self.watchSupported, forKey: "device.watch")
         encoder.encode(self.isInstalled, forKey: "device.installed")
+        encoder.encode(self.autoBack, forKey: "device.autoback")
     }
 }
