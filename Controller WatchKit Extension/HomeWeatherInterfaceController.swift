@@ -36,7 +36,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var resetButton: WKInterfaceButton!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
-    let dots: String = "................"
+    let dots: String = "••••••••••••"
     
     var aDevice: Device? = nil
     var serverSession: URLSession?
@@ -67,7 +67,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil, nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.5,
                                                  target: self,
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
@@ -77,8 +77,8 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @objc func dotter() {
         
         self.loadCount = self.loadCount + 1
-        if self.loadCount > 3 { self.loadCount = 0 }
-        self.statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
+        if self.loadCount > 5 { self.loadCount = 0 }
+        self.statusLabel.setText("⌚️" + self.dots.suffix(self.loadCount))
     }
     
     

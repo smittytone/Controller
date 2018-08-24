@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="14113" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
-    <device id="watch38" orientation="portrait">
+    <device id="watch42" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -19,9 +19,12 @@
                                 <tableRow identifier="main.table.row" id="O5A-Sx-l4z" customClass="TableRow" customModule="Controller_WatchKit_App" customModuleProvider="target">
                                     <group key="rootItem" width="1" height="42" alignment="left" id="oCz-yR-0Hg">
                                         <items>
-                                            <label width="89" height="32" alignment="left" verticalAlignment="center" text="Label" textAlignment="left" id="LhE-za-P0f"/>
+                                            <label width="89" height="32" alignment="left" verticalAlignment="center" text="Label" textAlignment="left" id="LhE-za-P0f">
+                                                <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </label>
                                             <imageView width="36" height="32" alignment="right" verticalAlignment="center" contentMode="left" id="rDu-pX-74l"/>
                                         </items>
+                                        <color key="backgroundColor" red="0.37055522200000002" green="0.37056469920000001" blue="0.37055957319999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </group>
                                     <connections>
                                         <outlet property="appIcon" destination="rDu-pX-74l" id="MdT-sA-kUe"/>
@@ -50,7 +53,7 @@
                         <label width="136" alignment="left" text="Weather" textAlignment="left" id="eHx-34-v8W">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
-                        <label width="136" alignment="left" text="Loading." id="NRC-Sl-R6q"/>
+                        <label width="136" alignment="left" text="⌚️•" id="NRC-Sl-R6q"/>
                         <button width="1" alignment="left" title="Display Off" id="XFR-yx-V8c">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -90,7 +93,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1221" y="101"/>
+            <point key="canvasLocation" x="1158" y="85"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
@@ -104,7 +107,7 @@
                         <label width="136" alignment="left" text="MatrixClock" textAlignment="left" id="voy-tc-NyC">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
-                        <label width="136" alignment="left" text="Loading." id="3TI-tS-P84"/>
+                        <label width="136" alignment="left" text="⌚️•" textAlignment="left" id="3TI-tS-P84"/>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="ilT-Hv-a2L">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -143,7 +146,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="504" y="104"/>
+            <point key="canvasLocation" x="478" y="88"/>
         </scene>
         <!--homeweather.ui-->
         <scene sceneID="59f-L9-2jD">
@@ -157,7 +160,7 @@
                         <label width="136" alignment="left" text="HomeWeather" id="HBx-ym-B1u">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
-                        <label width="136" alignment="left" text="Loading." id="N2q-6O-XAF"/>
+                        <label width="136" alignment="left" text="⌚️•" id="N2q-6O-XAF"/>
                         <button width="1" alignment="left" title="Advance" id="2hP-q1-cTw">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -189,7 +192,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1450" y="80"/>
+            <point key="canvasLocation" x="1370" y="66"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
@@ -203,7 +206,7 @@
                         <label width="136" alignment="left" text="ThermalForecast" id="BcK-f5-sbb">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
-                        <label width="136" alignment="left" text="Loading." id="fA6-HY-aqU"/>
+                        <label width="136" alignment="left" text="⌚️•" id="fA6-HY-aqU"/>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="kIp-lJ-jHL">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -235,7 +238,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="985" y="80"/>
+            <point key="canvasLocation" x="925" y="67"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">
@@ -249,7 +252,7 @@
                         <label width="136" alignment="left" text="BigClock" id="mnE-IO-PMw">
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
-                        <label width="136" alignment="left" text="Loading." id="zFs-wx-gbe"/>
+                        <label width="136" alignment="left" text="⌚️•" id="zFs-wx-gbe"/>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="ci2-ya-b7n">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -288,7 +291,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="745" y="101"/>
+            <point key="canvasLocation" x="707" y="88"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

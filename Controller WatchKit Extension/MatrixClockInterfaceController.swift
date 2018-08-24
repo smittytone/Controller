@@ -37,7 +37,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
-    let dots: String = "................"
+    let dots: String = "••••••••••••"
     
     var aDevice: Device? = nil
     var serverSession: URLSession?
@@ -73,7 +73,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         makeConnection(nil)
         
         // Set the Loading... ellipsis timer
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 1.0,
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.5,
                                                  target: self,
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
@@ -85,8 +85,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Increase the number of dots shown after 'Loading'
         // up to a maximum of three - then start at zero again
         self.loadCount = self.loadCount + 1
-        if self.loadCount > 3 { self.loadCount = 0 }
-        self.statusLabel.setText("Loading" + self.dots.suffix(self.loadCount))
+        if self.loadCount > 5 { self.loadCount = 0 }
+        self.statusLabel.setText("⌚️" + self.dots.suffix(self.loadCount))
     }
 
     
