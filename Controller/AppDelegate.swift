@@ -94,7 +94,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             defaults.set("\(installCount)", forKey: "com.bps.controller.devices.installcount")
             defaults.set("\(self.myDevices.devices.count)", forKey: "com.bps.controller.devices.listcount")
-            
+            defaults.set(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String, forKey: "com.bps.controller.app.version")
+            defaults.set(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String, forKey: "com.bps.controller.app.build")
+
             // The app is going into the background or closing, so save the list of devices
             let docsPath = self.docsDir[0] + "/devices"
             
