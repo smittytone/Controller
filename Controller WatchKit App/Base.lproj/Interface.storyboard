@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="13771" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="14113" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
     <device id="watch38" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="watchOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="13756"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="14033"/>
     </dependencies>
     <scenes>
         <!--root.ui-->
@@ -51,6 +51,13 @@
                             <fontDescription key="font" type="italicSystem" pointSize="13"/>
                         </label>
                         <label width="136" alignment="left" text="Loading." id="NRC-Sl-R6q"/>
+                        <button width="1" alignment="left" title="Display Off" id="XFR-yx-V8c">
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="switchDisplay:" destination="v0d-aL-cfD" id="OZ7-aX-nc8"/>
+                            </connections>
+                        </button>
                         <button width="1" alignment="left" title="Update Forecast" id="cyg-e3-6nZ">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -76,13 +83,14 @@
                     </items>
                     <connections>
                         <outlet property="deviceLabel" destination="hXB-FP-GVj" id="4yP-Id-SGd"/>
+                        <outlet property="displayButton" destination="XFR-yx-V8c" id="BlM-dH-2UP"/>
                         <outlet property="resetButton" destination="gsF-1N-fCT" id="E44-1L-0dX"/>
                         <outlet property="statusLabel" destination="NRC-Sl-R6q" id="PPE-XO-yGg"/>
                         <outlet property="updateButton" destination="cyg-e3-6nZ" id="f8A-Iw-dw5"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1208" y="80"/>
+            <point key="canvasLocation" x="1221" y="101"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
