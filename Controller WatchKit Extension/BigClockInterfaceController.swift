@@ -232,10 +232,13 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                 
                 if aConnexion.task == task {
                     if let data = aConnexion.data {
+
                         let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
                         
                         if inString != "OK" && inString != "Not Found\n" && inString != "No handler" {
                             if self.initialQueryFlag == true {
+                                self.loadingTimer.invalidate()
+
                                 let dataArray = inString.components(separatedBy:".")
                                 
                                 // Incoming string looks like this:
@@ -255,7 +258,6 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                 
                                 let ds = dataArray[8] as String
                                 self.isConnected = ds == "d" ? false : true
-                                self.deviceLabel.setText(self.isConnected ? aDevice!.name : aDevice!.name + " ⛔️")
                                 
                                 let powerString = dataArray[7] as String
                                 
@@ -281,20 +283,33 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                         self.modeSwitch.setTitle("Mode: 12")
                                     }
                                 }
-                                
+
                                 // Set the clock brightness slider state
                                 let brightnessState = dataArray[4] as String
                                 if let value = Int(brightnessState) {
                                     self.brightnessSlider.setValue(Float(value))
                                 }
+
+                                // Disable or enabled controls if the device is not connected
+                                // (and add a warning triangle to the watch UI
+                                if !self.isConnected {
+                                    self.deviceLabel.setText(aDevice!.name + " ⚠️")
+                                    self.lightSwitch.setEnabled(false)
+                                    self.modeSwitch.setEnabled(false)
+                                    self.brightnessSlider.setEnabled(false)
+                                } else {
+                                    self.deviceLabel.setText(aDevice!.name)
+                                    self.lightSwitch.setEnabled(true)
+                                    self.modeSwitch.setEnabled(true)
+                                    self.brightnessSlider.setEnabled(true)
+                                }
                                 
                                 // Update the rest of the UI
-                                self.initialQueryFlag = false
-                                self.loadingTimer.invalidate()
+                                self.statusLabel.setHidden(true)
                                 self.lightSwitch.setHidden(false)
                                 self.modeSwitch.setHidden(false)
                                 self.brightnessSlider.setHidden(false)
-                                self.statusLabel.setHidden(true)
+                                self.initialQueryFlag = false
                             }
                         }
                     }

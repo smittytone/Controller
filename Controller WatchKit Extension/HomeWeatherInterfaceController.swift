@@ -42,6 +42,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
+    var isConnected: Bool = false
     var loadingTimer: Timer!
     var loadCount:Int = 1
     
@@ -221,14 +222,29 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 let aConnexion = self.connexions[i]
                 if let data = aConnexion.data {
                     if aConnexion.task == task {
+
                         if initialQueryFlag == true {
+                            self.loadingTimer.invalidate()
+
                             let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
-                            self.initialQueryFlag = false
+                            self.isConnected = inString == "1" ? true : false
+
+                            // Disable or enabled controls if the device is not connected
+                            // (and add a warning triangle to the watch UI
+                            if !self.isConnected {
+                                self.deviceLabel.setText(aDevice!.name + " ⚠️")
+                                self.updateButton.setEnabled(false)
+                                self.resetButton.setEnabled(false)
+                            } else {
+                                self.deviceLabel.setText(aDevice!.name)
+                                self.updateButton.setEnabled(true)
+                                self.resetButton.setEnabled(true)
+                            }
+
                             self.statusLabel.setHidden(true)
                             self.updateButton.setHidden(false)
                             self.resetButton.setHidden(false)
-                            self.loadingTimer.invalidate()
+                            self.initialQueryFlag = false
                         }
                         
                         task.cancel()

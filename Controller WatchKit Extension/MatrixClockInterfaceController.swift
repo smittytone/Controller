@@ -241,6 +241,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                         let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
                         if inString != "OK" && inString != "Not Found\n" && inString != "No handler" {
                             if self.initialQueryFlag == true {
+                                self.loadingTimer.invalidate()
                                 let dataArray = inString.components(separatedBy:".")
                                 
                                 // Incoming string looks like this:
@@ -260,7 +261,6 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                 
                                 let state = dataArray[8] as String
                                 self.isDeviceOnline = (state == "d" ? false : true)
-                                self.deviceLabel.setText(aDevice!.name + (self.isDeviceOnline ? "" : " ⛔️"))
                                 
                                 // Set the clock display switch state
                                 let powerState = dataArray[7] as String
@@ -273,7 +273,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                         self.lightSwitch.setTitle("Off")
                                     }
                                 }
-                                
+
                                 // Set the clock mode switch state
                                 let modeState = dataArray[0] as String
                                 if let value = Int(modeState) {
@@ -285,11 +285,25 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                         self.modeSwitch.setTitle("Mode: 12")
                                     }
                                 }
-                                
+
                                 // Set the clock brightness slider state
                                 let brightnessState = dataArray[4] as String
                                 if let value = Int(brightnessState) {
                                     self.brightnessSlider.setValue(Float(value))
+                                }
+
+                                // Disable or enabled controls if the device is not connected
+                                // (and add a warning triangle to the watch UI
+                                if !self.isDeviceOnline {
+                                    self.deviceLabel.setText(aDevice!.name + " ⚠️")
+                                    self.lightSwitch.setEnabled(false)
+                                    self.modeSwitch.setEnabled(false)
+                                    self.brightnessSlider.setEnabled(false)
+                                } else {
+                                    self.deviceLabel.setText(aDevice!.name)
+                                    self.lightSwitch.setEnabled(true)
+                                    self.modeSwitch.setEnabled(true)
+                                    self.brightnessSlider.setEnabled(true)
                                 }
                                 
                                 // Update the rest of the UI
@@ -298,7 +312,6 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                 self.brightnessSlider.setHidden(false)
                                 self.statusLabel.setHidden(true)
                                 self.initialQueryFlag = false
-                                self.loadingTimer.invalidate()
                             }
                         }
                     }

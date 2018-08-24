@@ -34,6 +34,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     @IBOutlet weak var statusLabel: WKInterfaceLabel!
     @IBOutlet weak var updateButton: WKInterfaceButton!
     @IBOutlet weak var resetButton: WKInterfaceButton!
+    @IBOutlet weak var displayButton: WKInterfaceButton!
     
     let deviceBasePath: String = "https://agent.electricimp.com/"
     let dots: String = "................"
@@ -42,6 +43,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
+    var isConnected:Bool = false
+    var isDisplayOn:Bool = true
     var loadingTimer: Timer!
     var loadCount:Int = 1
     
@@ -56,6 +59,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         self.setTitle("Devices")
         self.updateButton.setHidden(true)
         self.resetButton.setHidden(true)
+        self.displayButton.setHidden(true)
     }
 
     override func didAppear() {
@@ -98,6 +102,14 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         makeConnection(dict)
     }
 
+    @IBAction func switchDisplay(_ sender: Any) {
+
+        // Send the reset signal
+        var dict = [String: String]()
+        dict["action"] = "power"
+        makeConnection(dict, 1)
+    }
+
     @IBAction func back(_ sender: Any) {
 
         // Go back to the device list
@@ -107,7 +119,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     // MARK: - Connection Functions
 
-    func makeConnection(_ data:[String:String]?) {
+    func makeConnection(_ data:[String:String]?, _ code:Int = 0) {
 
         let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/update" : "/controller/state")
         let url:URL? = URL(string: urlPath)
@@ -138,7 +150,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         }
         
         let aConnexion = Connexion()
-        aConnexion.errorCode = -1;
+        aConnexion.errorCode = -1
+        aConnexion.actionCode = code
         aConnexion.data = NSMutableData.init(capacity:0)
         aConnexion.task = serverSession!.dataTask(with:request)
         
@@ -220,14 +233,42 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 let aConnexion = self.connexions[i]
                 if let data = aConnexion.data {
                     if aConnexion.task == task {
+
                         if initialQueryFlag == true {
+                            self.loadingTimer.invalidate()
+
                             let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            self.deviceLabel.setText(inString == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
-                            self.initialQueryFlag = false
+                            let dataArray = inString.components(separatedBy:".")
+                            self.isConnected = dataArray[0] == "1" ? true : false
+                            self.isDisplayOn = dataArray[1] == "1" ? true : false
+
+                            self.displayButton.setTitle("Display " + (self.isDisplayOn ? "off" : "on"))
+
+                            // Disable or enabled controls if the device is not connected
+                            // (and add a warning triangle to the watch UI
+                            if !self.isConnected {
+                                self.deviceLabel.setText(aDevice!.name + " ⚠️")
+                                self.updateButton.setEnabled(false)
+                                self.resetButton.setEnabled(false)
+                                self.displayButton.setEnabled(false)
+                            } else {
+                                self.deviceLabel.setText(aDevice!.name)
+                                self.updateButton.setEnabled(true)
+                                self.resetButton.setEnabled(true)
+                                self.displayButton.setEnabled(true)
+                            }
+
                             self.statusLabel.setHidden(true)
                             self.updateButton.setHidden(false)
                             self.resetButton.setHidden(false)
-                            self.loadingTimer.invalidate()
+                            self.displayButton.setHidden(false)
+                            self.initialQueryFlag = false
+                        }
+
+                        if aConnexion.actionCode == 1 {
+                            // The call updates the UI state, but only when it completed successfully
+                            self.isDisplayOn = !self.isDisplayOn
+                            self.displayButton.setTitle("Display " + (self.isDisplayOn ? "off" : "on"))
                         }
                         
                         task.cancel()

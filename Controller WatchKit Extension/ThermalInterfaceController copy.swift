@@ -226,10 +226,13 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 let aConnexion = self.connexions[i]
                 if let data = aConnexion.data {
                     if aConnexion.task == task {
+
                         if initialQueryFlag == true {
+                            self.loadingTimer.invalidate()
+
                             let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
                             let dataArray = inString.components(separatedBy:".")
-                            
+
                             // The data string is formatted as follows:
                             // "0.1.2.3", where
                             // 0 - the LED brightness value (0-15)
@@ -237,14 +240,25 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             // 2 - the LED orientation (1 = left, 0 = right)
                             // 3 - the device online status (1 = connected, 0 = disconnected)
                             
-                            self.loadingTimer.invalidate()
-                            self.deviceLabel.setText(dataArray[3] == "0" ? aDevice!.name + " ⛔️" : aDevice!.name)
-                            self.isConnected = dataArray[3] == "1" ? true : false
-                            self.initialQueryFlag = false
-                            self.statusLabel.setHidden(true)
                             self.lightSwitch.setTitle(dataArray[1] == "1" ? "On" : "Off")
+                            self.isConnected = dataArray[3] == "1" ? true : false
+
+                            // Disable or enabled controls if the device is not connected
+                            // (and add a warning triangle to the watch UI
+                            if !self.isConnected {
+                                self.deviceLabel.setText(aDevice!.name + " ⚠️")
+                                self.lightSwitch.setEnabled(false)
+                                self.resetButton.setEnabled(false)
+                            } else {
+                                self.deviceLabel.setText(aDevice!.name)
+                                self.lightSwitch.setEnabled(true)
+                                self.resetButton.setEnabled(true)
+                            }
+
+                            self.statusLabel.setHidden(true)
                             self.lightSwitch.setHidden(false)
                             self.resetButton.setHidden(false)
+                            self.initialQueryFlag = false
                         }
                         
                         task.cancel()
