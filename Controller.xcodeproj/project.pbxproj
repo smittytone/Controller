@@ -216,6 +216,7 @@
 				3BA8F8DE200E088100059702 /* Frameworks */,
 				3BA8F8DF200E088100059702 /* Resources */,
 				3BA8F919200E088100059702 /* Embed Watch Content */,
+				3B819AFB212FDC37007459A7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -233,6 +234,7 @@
 			buildPhases = (
 				3BA8F8F1200E088100059702 /* Resources */,
 				3BA8F915200E088100059702 /* Embed App Extensions */,
+				3B819AFC212FDC51007459A7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -251,6 +253,7 @@
 				3BA8F8FE200E088100059702 /* Sources */,
 				3BA8F8FF200E088100059702 /* Frameworks */,
 				3BA8F900200E088100059702 /* Resources */,
+				3B819AFD212FDC62007459A7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -337,6 +340,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3B819AFB212FDC37007459A7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n# This script takes the build number from the release target plist, increments and then saves back\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PRODUCT_SETTINGS_PATH}\")\nbN=$(($bN + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"${PRODUCT_SETTINGS_PATH}\"";
+		};
+		3B819AFC212FDC51007459A7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n# This script takes the build number from the release target plist, increments and then saves back\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PRODUCT_SETTINGS_PATH}\")\nbN=$(($bN + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"${PRODUCT_SETTINGS_PATH}\"";
+		};
+		3B819AFD212FDC62007459A7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n# This script takes the build number from the release target plist, increments and then saves back\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PRODUCT_SETTINGS_PATH}\")\nbN=$(($bN + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"${PRODUCT_SETTINGS_PATH}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3BA8F8DD200E088100059702 /* Sources */ = {
