@@ -250,7 +250,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                                 self.lightSwitch.setEnabled(false)
                                 self.resetButton.setEnabled(false)
                             } else {
-                                self.deviceLabel.setText(aDevice!.name)
+                                self.deviceLabel.setText(aDevice!.name + " ✅")
                                 self.lightSwitch.setEnabled(true)
                                 self.resetButton.setEnabled(true)
                             }

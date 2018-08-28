@@ -300,7 +300,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                     self.modeSwitch.setEnabled(false)
                                     self.brightnessSlider.setEnabled(false)
                                 } else {
-                                    self.deviceLabel.setText(aDevice!.name)
+                                    self.deviceLabel.setText(aDevice!.name + " ✅")
                                     self.lightSwitch.setEnabled(true)
                                     self.modeSwitch.setEnabled(true)
                                     self.brightnessSlider.setEnabled(true)

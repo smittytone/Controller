@@ -236,7 +236,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                 self.updateButton.setEnabled(false)
                                 self.resetButton.setEnabled(false)
                             } else {
-                                self.deviceLabel.setText(aDevice!.name)
+                                self.deviceLabel.setText(aDevice!.name + " ✅")
                                 self.updateButton.setEnabled(true)
                                 self.resetButton.setEnabled(true)
                             }

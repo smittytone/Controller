@@ -252,7 +252,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                                 self.resetButton.setEnabled(false)
                                 self.displayButton.setEnabled(false)
                             } else {
-                                self.deviceLabel.setText(aDevice!.name)
+                                self.deviceLabel.setText(aDevice!.name + " ✅")
                                 self.updateButton.setEnabled(true)
                                 self.resetButton.setEnabled(true)
                                 self.displayButton.setEnabled(true)
