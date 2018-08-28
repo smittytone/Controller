@@ -87,7 +87,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         nc.addObserver(self,
                        selector: #selector(self.doInstall),
-                       name: NSNotification.Name.init("com.bps.install.switch.hit"),
+                       name: NSNotification.Name.init("com.bps.controller.install.switch.hit"),
                        object: nil)
         
         // Read in the current apps list
@@ -138,7 +138,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Read the default for whether we show or hide Agent IDs
         let defaults: UserDefaults = UserDefaults.standard
-        if let defaultValue = defaults.value(forKey: "com.bps.contoller.show.agentids") as? NSNumber {
+        if let defaultValue = defaults.value(forKey: "com.bps.controller.show.agentids") as? NSNumber {
             self.tableShowIDsFlag = defaultValue.boolValue
         }
         
@@ -302,7 +302,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Save the new setting to preferences
         let defaults: UserDefaults = UserDefaults.standard
-        defaults.set(self.tableShowIDsFlag, forKey: "com.bps.contoller.show.agentids")
+        defaults.set(self.tableShowIDsFlag, forKey: "com.bps.controller.show.agentids")
     }
     
     @objc func reorderDevicelist() {

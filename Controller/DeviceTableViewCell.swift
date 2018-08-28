@@ -56,7 +56,7 @@ class DeviceTableViewCell: UITableViewCell {
         
         // ...and send it the main view controller
         let nc: NotificationCenter = NotificationCenter.default
-        nc.post(name: NSNotification.Name.init("com.bps.install.switch.hit"),
+        nc.post(name: NSNotification.Name.init("com.bps.controller.install.switch.hit"),
                 object: self,
                 userInfo: data)
     }
