@@ -30,34 +30,48 @@ import WatchKit
 
 class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
+    // MARK: Generic outlets
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
-    @IBOutlet weak var statusLabel: WKInterfaceLabel!
-    @IBOutlet weak var updateButton: WKInterfaceButton!
-    @IBOutlet weak var resetButton: WKInterfaceButton!
-    
+    @IBOutlet weak var stateImage: WKInterfaceImage!
+
+    // MARK: Generic properties
     let deviceBasePath: String = "https://agent.electricimp.com/"
-    let dots: String = "••••••••••••"
-    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
     var isConnected: Bool = false
+    var flashState: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 1
+
+    // MARK: App-specific outlets
+    @IBOutlet weak var updateButton: WKInterfaceButton!
+    @IBOutlet weak var resetButton: WKInterfaceButton!
+
+    // MARK: App-specific properties
+    let appName = "HomeWeatherInterfaceController"
+
     
-    
-    // MARK: - Lifecycle Functions
+    // MARK: - Generic Lifecycle Functions
 
     override func awake(withContext context: Any?) {
 
         super.awake(withContext: context)
 
-        self.aDevice = context as? Device
-        self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
-        self.updateButton.setHidden(true)
-        self.resetButton.setHidden(true)
+        self.aDevice = context as? Device
+
+        // Show the name of the device
+        self.deviceLabel.setText(aDevice!.name)
+
+        // Hide the app-specific buttons
+        //self.updateButton.setHidden(true)
+        //self.resetButton.setHidden(true)
+
+        // Load and set the 'device offline' indicator
+        if let image = UIImage.init(named: "offline") {
+            self.stateImage.setImage(image)
+        }
     }
 
     override func didAppear() {
@@ -67,7 +81,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil, nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.5,
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
                                                  target: self,
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
@@ -76,29 +90,13 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     @objc func dotter() {
         
-        self.loadCount = self.loadCount + 1
-        if self.loadCount > 5 { self.loadCount = 0 }
-        self.statusLabel.setText("⌚️" + self.dots.suffix(self.loadCount))
+        // Flash the indictor by alternately showing and hiding it
+        self.stateImage.setHidden(self.flashState)
+        self.flashState = !self.flashState
     }
     
     
-    // MARK: - Action Functions
-
-    @IBAction func advance(_ sender: Any) {
-
-        // Send the forecast update signal
-        var dict = [String: String]()
-        dict["advance"] = "advance"
-        makeConnection(dict, "/dimmer")
-    }
-
-    @IBAction func reboot(_ sender: Any) {
-
-        // Send the reset signal
-        var dict = [String: String]()
-        dict["reset"] = "reset"
-        makeConnection(dict, "/reset")
-    }
+    // MARK: - Generic Action Functions
 
     @IBAction func back(_ sender: Any) {
 
@@ -107,15 +105,40 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     }
 
 
+    // MARK: - App-Specific Action Functions
+
+    @IBAction func advance(_ sender: Any) {
+
+        // Send the timer advance signal
+        var dict = [String: String]()
+        dict["advance"] = "advance"
+        makeConnection(dict, "/dimmer")
+    }
+
+    @IBAction func reboot(_ sender: Any) {
+
+        // Send the device reboot signal
+        var dict = [String: String]()
+        dict["reset"] = "reset"
+        makeConnection(dict, "/reset")
+    }
+
     // MARK: - Connection Functions
 
     func makeConnection(_ data:[String:String]?, _ path:String?) {
+
+        // Establish a connection to the device's agent
+        // PARAMETERS
+        //    data - A string:string dictionary containg the JSON data for the endpoint
+        //    path - The endpoint minus the base path. If path is nil, get the state path
+        // RETURNS
+        //    Nothing
 
         let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError("HomeWeatherInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError(self.appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
             return
         }
         
@@ -134,7 +157,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError("HomeWeatherInterfaceController.makeConnection() passed malformed data")
+                reportError(self.appName + ".makeConnection() passed malformed data")
                 return
             }
         }
@@ -147,6 +170,8 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         if let task = aConnexion.task {
             task.resume()
             self.connexions.append(aConnexion)
+        } else {
+            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
         }
     }
 
@@ -220,30 +245,28 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         } else {
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
-                if let data = aConnexion.data {
-                    if aConnexion.task == task {
-
-                        if initialQueryFlag == true {
+                if aConnexion.task == task {
+                    if let data = aConnexion.data {
+                        if self.initialQueryFlag == true {
                             self.loadingTimer.invalidate()
 
-                            let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            self.isConnected = inString == "1" ? true : false
+                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
+                            self.isConnected = inputString == "1" ? true : false
 
-                            // Disable or enabled controls if the device is not connected
-                            // (and add a warning triangle to the watch UI
-                            if !self.isConnected {
-                                self.deviceLabel.setText(aDevice!.name + " ⚠️")
-                                self.updateButton.setEnabled(false)
-                                self.resetButton.setEnabled(false)
-                            } else {
-                                self.deviceLabel.setText(aDevice!.name + " ✅")
-                                self.updateButton.setEnabled(true)
-                                self.resetButton.setEnabled(true)
+                            // Set the online/offline indicator
+                            let nameString = self.isConnected ? "online" : "offline"
+                            if let image = UIImage.init(named: nameString) {
+                                self.stateImage.setImage(image)
                             }
 
-                            self.statusLabel.setHidden(true)
-                            self.updateButton.setHidden(false)
-                            self.resetButton.setHidden(false)
+                            // Enable or disable app-specific controls according to connection state
+                            self.updateButton.setEnabled(self.isConnected)
+                            self.resetButton.setEnabled(self.isConnected)
+
+                            // Show app-specific
+                            //self.updateButton.setHidden(false)
+                            //self.resetButton.setHidden(false)
+                            self.stateImage.setHidden(false)
                             self.initialQueryFlag = false
                         }
                         
@@ -258,6 +281,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     func reportError(_ message:String) {
         
+        // Generic string logger
         print(message)
     }
 }

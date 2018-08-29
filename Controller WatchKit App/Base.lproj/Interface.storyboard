@@ -157,10 +157,14 @@
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
-                        <label width="136" alignment="left" text="HomeWeather" id="HBx-ym-B1u">
-                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
-                        </label>
-                        <label width="136" alignment="left" text="⌚️•" id="N2q-6O-XAF"/>
+                        <group width="1" height="16" alignment="left" id="rfB-yM-rc4">
+                            <items>
+                                <label width="136" alignment="left" text="HomeWeather" id="HBx-ym-B1u">
+                                    <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                                </label>
+                                <imageView width="16" height="16" alignment="right" image="offline" id="Cbm-83-gBZ"/>
+                            </items>
+                        </group>
                         <button width="1" alignment="left" title="Advance" id="2hP-q1-cTw">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -187,12 +191,12 @@
                     <connections>
                         <outlet property="deviceLabel" destination="e9u-Ib-Hha" id="vuj-Ik-gNB"/>
                         <outlet property="resetButton" destination="Ohc-hP-08G" id="cV4-y1-n7o"/>
-                        <outlet property="statusLabel" destination="N2q-6O-XAF" id="cA5-gR-qUy"/>
+                        <outlet property="stateImage" destination="Cbm-83-gBZ" id="8NV-Zf-0p9"/>
                         <outlet property="updateButton" destination="2hP-q1-cTw" id="BGs-Gb-UrY"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1370" y="66"/>
+            <point key="canvasLocation" x="1369.5897435897436" y="65.384615384615387"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
