@@ -64,9 +64,10 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
 
-        // Hide the app-specific buttons
-        //self.updateButton.setHidden(true)
-        //self.resetButton.setHidden(true)
+        // Disable the app-specific buttons - we will re-enable when we're
+        // connected to the target device's agent
+        self.updateButton.setEnabled(false)
+        self.resetButton.setEnabled(false)
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
@@ -123,14 +124,15 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         makeConnection(dict, "/reset")
     }
 
-    // MARK: - Connection Functions
+    // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?) {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
 
         // Establish a connection to the device's agent
         // PARAMETERS
         //    data - A string:string dictionary containg the JSON data for the endpoint
         //    path - The endpoint minus the base path. If path is nil, get the state path
+        //    code - Optional code indicating the action being performed. Default: 0
         // RETURNS
         //    Nothing
 
@@ -164,6 +166,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         
         let aConnexion = Connexion()
         aConnexion.errorCode = -1;
+        aConnexion.actionCode = code
         aConnexion.data = NSMutableData.init(capacity:0)
         aConnexion.task = serverSession!.dataTask(with:request)
         
@@ -174,6 +177,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
             reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
         }
     }
+
 
     // MARK: - URLSession Delegate Functions
 
@@ -226,7 +230,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError("Could not connect to the impCloud")
+            reportError(appName + " could not connect to the impCloud")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
@@ -263,9 +267,6 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                             self.updateButton.setEnabled(self.isConnected)
                             self.resetButton.setEnabled(self.isConnected)
 
-                            // Show app-specific
-                            //self.updateButton.setHidden(false)
-                            //self.resetButton.setHidden(false)
                             self.stateImage.setHidden(false)
                             self.initialQueryFlag = false
                         }

@@ -50,10 +50,14 @@
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
-                        <label width="136" alignment="left" text="Weather" textAlignment="left" id="eHx-34-v8W">
-                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
-                        </label>
-                        <label width="136" alignment="left" text="⌚️•" id="NRC-Sl-R6q"/>
+                        <group width="1" alignment="left" id="Y9r-QL-M0W">
+                            <items>
+                                <label width="136" alignment="left" text="Weather" textAlignment="left" id="eHx-34-v8W">
+                                    <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                                </label>
+                                <imageView width="16" height="16" alignment="right" image="offline" id="wD8-kA-w9I"/>
+                            </items>
+                        </group>
                         <button width="1" alignment="left" title="Display Off" id="XFR-yx-V8c">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -88,12 +92,12 @@
                         <outlet property="deviceLabel" destination="hXB-FP-GVj" id="4yP-Id-SGd"/>
                         <outlet property="displayButton" destination="XFR-yx-V8c" id="BlM-dH-2UP"/>
                         <outlet property="resetButton" destination="gsF-1N-fCT" id="E44-1L-0dX"/>
-                        <outlet property="statusLabel" destination="NRC-Sl-R6q" id="PPE-XO-yGg"/>
+                        <outlet property="stateImage" destination="wD8-kA-w9I" id="CLv-6I-t92"/>
                         <outlet property="updateButton" destination="cyg-e3-6nZ" id="f8A-Iw-dw5"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1158" y="85"/>
+            <point key="canvasLocation" x="1158" y="75"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
@@ -196,7 +200,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1369.5897435897436" y="65.384615384615387"/>
+            <point key="canvasLocation" x="1374" y="58"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
