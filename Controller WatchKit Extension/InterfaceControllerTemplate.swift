@@ -46,6 +46,7 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
     // MARK: App-specific outlets
     @IBOutlet weak var <ButtonName>: WKInterfaceButton!
+    // NOTE The 'Back' button should be considered as generic to all apps
 
     // MARK: App-specific properties
     let appName: String = "<AppName>"
@@ -55,6 +56,8 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
     override func awake(withContext context: Any?) {
 
+        // App is loaded for the first time when the user selects it from
+        // the main menu
         super.awake(withContext: context)
 
         self.aDevice = context as? Device
@@ -62,20 +65,25 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
+    }
 
-        // Disable the app-specific buttons - we will re-enable when we're
-        // connected to the target device's agent
+    override func didAppear() {
+        
+        // App is appearing on the screen, either after 'awake()' was called,
+        // or if the user never went back to the main menu and instead just
+        // switched to another watch app. As a result, we do the main UI
+        // state set-up here
+        super.didAppear()
+        
+        // Disable the app-specific controls 
+        // NOTE we will re-enable then when we're connected to the 
+        //      target device's agent
         self.<ButtonName>.setEnabled(false)
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
             self.stateImage.setImage(image)
         }
-    }
-
-    override func didAppear() {
-        
-        super.didAppear()
         
         // Get the device's current status
         self.initialQueryFlag = true

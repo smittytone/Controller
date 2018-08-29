@@ -63,7 +63,12 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
+    }
 
+    override func didAppear() {
+        
+        super.didAppear()
+        
         // Disable the app-specific buttons - we will re-enable when we're
         // connected to the target device's agent
         self.resetButton.setEnabled(false)
@@ -73,11 +78,6 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         if let image = UIImage.init(named: "offline") {
             self.stateImage.setImage(image)
         }
-    }
-
-    override func didAppear() {
-        
-        super.didAppear()
         
         // Get the device's current status
         self.initialQueryFlag = true
@@ -282,6 +282,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
                             self.stateImage.setHidden(false)
                             self.initialQueryFlag = false
+                            self.flashState = false
                         }
                         
                         task.cancel()

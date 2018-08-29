@@ -65,9 +65,14 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
+    }
 
+    override func didAppear() {
+        
+        super.didAppear()
+        
         // Disable the app-specific buttons - we will re-enable when we're
-        // connected to the target device's agent
+        // sure that we're connected to the target device's agent
         self.updateButton.setEnabled(false)
         self.resetButton.setEnabled(false)
         self.displayButton.setEnabled(false)
@@ -76,12 +81,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         if let image = UIImage.init(named: "offline") {
             self.stateImage.setImage(image)
         }
-    }
 
-    override func didAppear() {
-        
-        super.didAppear()
-        
         // Get the device's current status
         self.initialQueryFlag = true
         makeConnection(nil, nil)
@@ -285,6 +285,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
                             self.stateImage.setHidden(false)
                             self.initialQueryFlag = false
+                            self.flashState = false
                         }
 
                         if aConnexion.actionCode == 1 {
