@@ -30,7 +30,7 @@ import WatchKit
 
 class TableRow: NSObject {
 
-    // Define a watchOS table row with a single label
+    // Define a watchOS table row with a single label and an image
     @IBOutlet weak var nameLabel: WKInterfaceLabel!
     @IBOutlet weak var appIcon: WKInterfaceImage!
     
