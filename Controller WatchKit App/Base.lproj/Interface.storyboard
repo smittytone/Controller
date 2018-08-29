@@ -39,7 +39,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="256" y="58"/>
+            <point key="canvasLocation" x="319" y="58"/>
         </scene>
         <!--weather.ui-->
         <scene sceneID="WbA-ZR-aoD">
@@ -97,7 +97,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1158" y="75"/>
+            <point key="canvasLocation" x="1167" y="75"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
@@ -108,10 +108,14 @@
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
-                        <label width="136" alignment="left" text="MatrixClock" textAlignment="left" id="voy-tc-NyC">
-                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
-                        </label>
-                        <label width="136" alignment="left" text="⌚️•" textAlignment="left" id="3TI-tS-P84"/>
+                        <group width="1" alignment="left" id="ayq-lR-UO9">
+                            <items>
+                                <label width="136" alignment="left" text="MatrixClock" textAlignment="left" id="voy-tc-NyC">
+                                    <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                                </label>
+                                <imageView width="16" height="16" alignment="right" image="offline" id="gFm-gx-NzZ"/>
+                            </items>
+                        </group>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="ilT-Hv-a2L">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -146,11 +150,11 @@
                         <outlet property="deviceLabel" destination="HPh-Hc-Qbq" id="WQ9-uq-GMW"/>
                         <outlet property="lightSwitch" destination="ilT-Hv-a2L" id="syR-Ie-dzu"/>
                         <outlet property="modeSwitch" destination="VwY-3Z-tkU" id="Y7U-vx-phq"/>
-                        <outlet property="statusLabel" destination="3TI-tS-P84" id="Ii4-Td-PhK"/>
+                        <outlet property="stateImage" destination="gFm-gx-NzZ" id="lvK-Ov-fGs"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="478" y="88"/>
+            <point key="canvasLocation" x="953" y="78"/>
         </scene>
         <!--homeweather.ui-->
         <scene sceneID="59f-L9-2jD">
@@ -200,7 +204,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1374" y="58"/>
+            <point key="canvasLocation" x="1380" y="58"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
@@ -211,10 +215,14 @@
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
-                        <label width="136" alignment="left" text="ThermalForecast" id="BcK-f5-sbb">
-                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
-                        </label>
-                        <label width="136" alignment="left" text="⌚️•" id="fA6-HY-aqU"/>
+                        <group width="1" alignment="left" id="jmm-uI-WSJ">
+                            <items>
+                                <label width="136" alignment="left" text="ThermalForecast" id="BcK-f5-sbb">
+                                    <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                                </label>
+                                <imageView width="16" height="16" alignment="right" image="offline" id="dd8-8u-Hc0"/>
+                            </items>
+                        </group>
                         <switch width="1" alignment="left" value="YES" title="Switch" id="kIp-lJ-jHL">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -242,11 +250,11 @@
                         <outlet property="deviceLabel" destination="qgU-jM-wYK" id="5Na-dP-Ec8"/>
                         <outlet property="lightSwitch" destination="kIp-lJ-jHL" id="6q6-xH-z4k"/>
                         <outlet property="resetButton" destination="om2-Nv-xod" id="eCb-pb-aGM"/>
-                        <outlet property="statusLabel" destination="fA6-HY-aqU" id="Sp3-dB-Kh3"/>
+                        <outlet property="stateImage" destination="dd8-8u-Hc0" id="yJ5-cE-9U1"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="925" y="67"/>
+            <point key="canvasLocation" x="748" y="58"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">
@@ -299,7 +307,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="707" y="88"/>
+            <point key="canvasLocation" x="534" y="88"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

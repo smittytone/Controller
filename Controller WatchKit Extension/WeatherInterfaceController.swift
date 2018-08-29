@@ -40,8 +40,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
-    var isConnected:Bool = false
-    var flashState:Bool = false
+    var isConnected: Bool = false
+    var flashState: Bool = false
     var loadingTimer: Timer!
 
     // MARK: App-specific outlets
@@ -50,8 +50,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     @IBOutlet weak var displayButton: WKInterfaceButton!
 
     // MARK: App-specific properties
-    let appName = "WeatherInterfaceController"
-    var isDisplayOn:Bool = true
+    let appName: String = "WeatherInterfaceController"
+    var isDisplayOn: Bool = true
 
 
     // MARK: - Generic Lifecycle Functions

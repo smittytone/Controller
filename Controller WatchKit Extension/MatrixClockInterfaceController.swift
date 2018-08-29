@@ -30,38 +30,51 @@ import WatchKit
 
 class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
+    // MARK: Generic outlets
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
-    @IBOutlet weak var statusLabel: WKInterfaceLabel!
-    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
-    @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
-    @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
-    
+    @IBOutlet weak var stateImage: WKInterfaceImage!
+
+    // MARK: Generic properties
     let deviceBasePath: String = "https://agent.electricimp.com/"
-    let dots: String = "••••••••••••"
-    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
-    var isDeviceOnline: Bool = false
+    var isConnected: Bool = false
+    var flashState: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 1
 
-    // MARK: - Lifecycle Functions
+    // MARK: App-specific outlets
+    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
+
+    // MARK: App-specific properties
+    let appName: String = "MatrixClockInterfaceController"
+
+
+    // MARK: - Generic Lifecycle Functions
 
     override func awake(withContext context: Any?) {
 
         super.awake(withContext: context)
         
-        // Show the device name and set the controller title
-        self.aDevice = context as? Device
-        self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
-        
-        // Hide controls until we known the device is online
-        self.lightSwitch.setHidden(true)
-        self.modeSwitch.setHidden(true)
-        self.brightnessSlider.setHidden(true)
+        self.aDevice = context as? Device
+
+        // Show the device name and set the controller title
+        self.deviceLabel.setText(aDevice!.name)
+
+        // Disable the app-specific buttons - we will re-enable when we're
+        // connected to the target device's agent
+        self.lightSwitch.setEnabled(false)
+        self.modeSwitch.setEnabled(false)
+        self.brightnessSlider.setEnabled(false)
+
+        // Load and set the 'device offline' indicator
+        if let image = UIImage.init(named: "offline") {
+            self.stateImage.setImage(image)
+        }
     }
     
     override func didAppear() {
@@ -70,10 +83,10 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil)
+        makeConnection(nil, nil)
         
         // Set the Loading... ellipsis timer
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.5,
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
                                                  target: self,
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
@@ -82,15 +95,22 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     @objc func dotter() {
         
-        // Increase the number of dots shown after 'Loading'
-        // up to a maximum of three - then start at zero again
-        self.loadCount = self.loadCount + 1
-        if self.loadCount > 5 { self.loadCount = 0 }
-        self.statusLabel.setText("⌚️" + self.dots.suffix(self.loadCount))
+        // Flash the indictor by alternately showing and hiding it
+        self.stateImage.setHidden(self.flashState)
+        self.flashState = !self.flashState
     }
 
-    
-    // MARK: - Action Functions
+
+    // MARK: - Generic Action Functions
+
+    @IBAction func back(_ sender: Any) {
+
+        // Go back to the device list
+        popToRootController()
+    }
+
+
+    // MARK: - App-specific Action Functions
     
     @IBAction func doSwitch(value: Bool) {
 
@@ -98,7 +118,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         var dict = [String: String]()
         dict["setlight"] = value ? "1" : "0"
         self.lightSwitch.setTitle(value ? "On" : "Off")
-        makeConnection(dict)
+        makeConnection(dict, nil)
     }
     
     @IBAction func setMode(value: Bool) {
@@ -107,32 +127,34 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         var dict = [String: String]()
         dict["setmode"] = value ? "1" : "0"
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
-        makeConnection(dict)
+        makeConnection(dict, nil)
     }
 
     @IBAction func setBrightness(value: Float) {
         
         var dict = [String: String]()
         dict["setbright"] = "\(Int(value))"
-        makeConnection(dict)
+        makeConnection(dict, nil)
     }
-    
-    @IBAction func back(_ sender: Any) {
 
-        // Go back to the device list
-        popToRootController()
-    }
     
-    
-    // MARK: - Connection Functions
-    
-    func makeConnection(_ data:[String:String]?) {
-        
-        let urlPath :String = deviceBasePath + aDevice!.code + "/settings"
+    // MARK: - Generic Connection Functions
+
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
+
+        // Establish a connection to the device's agent
+        // PARAMETERS
+        //    data - A string:string dictionary containg the JSON data for the endpoint
+        //    path - The endpoint minus the base path. If path is nil, get the state path
+        //    code - Optional code indicating the action being performed. Default: 0
+        // RETURNS
+        //    Nothing
+
+        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/settings")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError("MatrixClockInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
             return
         }
         
@@ -151,13 +173,14 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError("MatrixClockInterfaceController.makeConnection() passed malformed data")
+                reportError(appName + ".makeConnection() passed malformed data")
                 return
             }
         }
         
         let aConnexion = Connexion()
-        aConnexion.errorCode = -1;
+        aConnexion.errorCode = -1
+        aConnexion.actionCode = code
         aConnexion.data = NSMutableData.init(capacity:0)
         aConnexion.task = serverSession!.dataTask(with:request)
         
@@ -238,11 +261,11 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
                     if let data = aConnexion.data {
-                        let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                        if inString != "OK" && inString != "Not Found\n" && inString != "No handler" {
+                        let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
+                        if inputString != "OK" && inputString != "Not Found\n" && inputString != "No handler" {
                             if self.initialQueryFlag == true {
                                 self.loadingTimer.invalidate()
-                                let dataArray = inString.components(separatedBy:".")
+                                let dataArray = inputString.components(separatedBy:".")
                                 
                                 // Incoming string looks like this:
                                 //    1.1.1.1.01.1.01.1.d.1
@@ -260,7 +283,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                 //    9. debug status
                                 
                                 let state = dataArray[8] as String
-                                self.isDeviceOnline = (state == "d" ? false : true)
+                                self.isConnected = (state == "d" ? false : true)
                                 
                                 // Set the clock display switch state
                                 let powerState = dataArray[7] as String
@@ -292,25 +315,18 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                                     self.brightnessSlider.setValue(Float(value))
                                 }
 
-                                // Disable or enabled controls if the device is not connected
-                                // (and add a warning triangle to the watch UI
-                                if !self.isDeviceOnline {
-                                    self.deviceLabel.setText(aDevice!.name + " ⚠️")
-                                    self.lightSwitch.setEnabled(false)
-                                    self.modeSwitch.setEnabled(false)
-                                    self.brightnessSlider.setEnabled(false)
-                                } else {
-                                    self.deviceLabel.setText(aDevice!.name + " ✅")
-                                    self.lightSwitch.setEnabled(true)
-                                    self.modeSwitch.setEnabled(true)
-                                    self.brightnessSlider.setEnabled(true)
+                                // Set the online/offline indicator
+                                let nameString = self.isConnected ? "online" : "offline"
+                                if let image = UIImage.init(named: nameString) {
+                                    self.stateImage.setImage(image)
                                 }
-                                
-                                // Update the rest of the UI
-                                self.lightSwitch.setHidden(false)
-                                self.modeSwitch.setHidden(false)
-                                self.brightnessSlider.setHidden(false)
-                                self.statusLabel.setHidden(true)
+
+                                // Enable or disable app-specific controls according to connection state
+                                self.lightSwitch.setEnabled(self.isConnected)
+                                self.modeSwitch.setEnabled(self.isConnected)
+                                self.brightnessSlider.setEnabled(self.isConnected)
+
+                                self.stateImage.setHidden(false)
                                 self.initialQueryFlag = false
                             }
                         }
@@ -327,6 +343,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     func reportError(_ message:String) {
         
+        // Generic string logger
         print(message)
     }
 

@@ -30,34 +30,49 @@ import WatchKit
 
 class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
+    // MARK: Generic outlets
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
-    @IBOutlet weak var statusLabel: WKInterfaceLabel!
-    @IBOutlet weak var resetButton: WKInterfaceButton!
-    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
-    
+    @IBOutlet weak var stateImage: WKInterfaceImage!
+
+    // MARK: Generic properties
     let deviceBasePath: String = "https://agent.electricimp.com/"
-    let dots: String = "••••••••••••"
-    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
     var isConnected: Bool = false
+    var flashState: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 1
     
-    
-    // MARK: - Lifecycle Functions
+    // MARK: App-specific outlets
+    @IBOutlet weak var resetButton: WKInterfaceButton!
+    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
+
+    // MARK: App-specific properties
+    let appName: String = "ThermalInterfaceController"
+
+
+    // MARK: - Generic Lifecycle Functions
 
     override func awake(withContext context: Any?) {
 
         super.awake(withContext: context)
 
-        self.aDevice = context as? Device
-        self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
-        self.resetButton.setHidden(true)
-        self.lightSwitch.setHidden(true)
+        self.aDevice = context as? Device
+
+        // Show the name of the device
+        self.deviceLabel.setText(aDevice!.name)
+
+        // Disable the app-specific buttons - we will re-enable when we're
+        // connected to the target device's agent
+        self.resetButton.setEnabled(false)
+        self.lightSwitch.setEnabled(false)
+
+        // Load and set the 'device offline' indicator
+        if let image = UIImage.init(named: "offline") {
+            self.stateImage.setImage(image)
+        }
     }
 
     override func didAppear() {
@@ -66,8 +81,8 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.5,
+        makeConnection(nil, nil)
+        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
                                                  target: self,
                                                  selector: #selector(dotter),
                                                  userInfo: nil,
@@ -76,13 +91,22 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     
     @objc func dotter() {
         
-        self.loadCount = self.loadCount + 1
-        if self.loadCount > 5 { self.loadCount = 0 }
-        self.statusLabel.setText("⌚️" + self.dots.suffix(self.loadCount))
+        // Flash the indictor by alternately showing and hiding it
+        self.stateImage.setHidden(self.flashState)
+        self.flashState = !self.flashState
     }
     
     
-    // MARK: - Action Functions
+    // MARK: - Generic Action Functions
+
+    @IBAction func back(_ sender: Any) {
+
+        // Go back to the device list
+        popToRootController()
+    }
+
+
+    // MARK: - App-specific Action Functions
 
     @IBAction func doSwitch(value: Bool) {
         
@@ -91,7 +115,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         dict["action"] = "power"
         dict["power"] = value ? "1" : "0"
         self.lightSwitch.setTitle(value ? "On" : "Off")
-        makeConnection(dict)
+        makeConnection(dict, "/actions")
     }
     
     @IBAction func reboot(_ sender: Any) {
@@ -101,25 +125,27 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         if !isConnected { return }
         var dict = [String: String]()
         dict["action"] = "reboot"
-        makeConnection(dict)
-    }
-
-    @IBAction func back(_ sender: Any) {
-
-        // Go back to the device list
-        popToRootController()
+        makeConnection(dict, "/actions")
     }
 
 
-    // MARK: - Connection Functions
+    // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?) {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
 
-        let urlPath :String = deviceBasePath + aDevice!.code + (data != nil ? "/actions" : "/controller/state")
+        // Establish a connection to the device's agent
+        // PARAMETERS
+        //    data - A string:string dictionary containg the JSON data for the endpoint
+        //    path - The endpoint minus the base path. If path is nil, get the state path
+        //    code - Optional code indicating the action being performed. Default: 0
+        // RETURNS
+        //    Nothing
+
+        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError("ThermalInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
             return
         }
         
@@ -138,13 +164,14 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError("ThermalInterfaceController.makeConnection() passed malformed data")
+                reportError(appName + ".makeConnection() passed malformed data")
                 return
             }
         }
         
         let aConnexion = Connexion()
-        aConnexion.errorCode = -1;
+        aConnexion.errorCode = -1
+        aConnexion.actionCode = code
         aConnexion.data = NSMutableData.init(capacity:0)
         aConnexion.task = serverSession!.dataTask(with:request)
         
@@ -153,6 +180,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             self.connexions.append(aConnexion)
         }
     }
+
 
     // MARK: - URLSession Delegate Functions
 
@@ -224,14 +252,13 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         } else {
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
-                if let data = aConnexion.data {
-                    if aConnexion.task == task {
-
-                        if initialQueryFlag == true {
+                if aConnexion.task == task {
+                    if let data = aConnexion.data {
+                        if self.initialQueryFlag == true {
                             self.loadingTimer.invalidate()
 
-                            let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            let dataArray = inString.components(separatedBy:".")
+                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
+                            let dataArray = inputString.components(separatedBy:".")
 
                             // The data string is formatted as follows:
                             // "0.1.2.3", where
@@ -243,21 +270,17 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             self.lightSwitch.setTitle(dataArray[1] == "1" ? "On" : "Off")
                             self.isConnected = dataArray[3] == "1" ? true : false
 
-                            // Disable or enabled controls if the device is not connected
-                            // (and add a warning triangle to the watch UI
-                            if !self.isConnected {
-                                self.deviceLabel.setText(aDevice!.name + " ⚠️")
-                                self.lightSwitch.setEnabled(false)
-                                self.resetButton.setEnabled(false)
-                            } else {
-                                self.deviceLabel.setText(aDevice!.name + " ✅")
-                                self.lightSwitch.setEnabled(true)
-                                self.resetButton.setEnabled(true)
+                            // Set the online/offline indicator
+                            let nameString = self.isConnected ? "online" : "offline"
+                            if let image = UIImage.init(named: nameString) {
+                                self.stateImage.setImage(image)
                             }
 
-                            self.statusLabel.setHidden(true)
-                            self.lightSwitch.setHidden(false)
-                            self.resetButton.setHidden(false)
+                            // Enable or disable app-specific controls according to connection state
+                            self.lightSwitch.setEnabled(self.isConnected)
+                            self.resetButton.setEnabled(self.isConnected)
+
+                            self.stateImage.setHidden(false)
                             self.initialQueryFlag = false
                         }
                         
@@ -272,6 +295,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     
     func reportError(_ message:String) {
         
+        // Generic string logger
         print(message)
     }
 }

@@ -49,7 +49,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var resetButton: WKInterfaceButton!
 
     // MARK: App-specific properties
-    let appName = "HomeWeatherInterfaceController"
+    let appName: String = "HomeWeatherInterfaceController"
 
     
     // MARK: - Generic Lifecycle Functions
@@ -124,6 +124,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         makeConnection(dict, "/reset")
     }
 
+
     // MARK: - Generic Connection Functions
 
     func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
@@ -165,7 +166,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         }
         
         let aConnexion = Connexion()
-        aConnexion.errorCode = -1;
+        aConnexion.errorCode = -1
         aConnexion.actionCode = code
         aConnexion.data = NSMutableData.init(capacity:0)
         aConnexion.task = serverSession!.dataTask(with:request)
