@@ -64,6 +64,8 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
 
+        // Disable the controls at the outset
+        controlDisabler()
     }
 
     override func didAppear() {
@@ -72,8 +74,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         // Disable the app-specific buttons - we will re-enable when we're
         // connected to the target device's agent
-        self.updateButton.setEnabled(false)
-        self.resetButton.setEnabled(false)
+        controlDisabler()
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
@@ -97,6 +98,12 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Flash the indictor by alternately showing and hiding it
         self.stateImage.setHidden(self.flashState)
         self.flashState = !self.flashState
+    }
+
+    func controlDisabler() {
+
+        self.updateButton.setEnabled(false)
+        self.resetButton.setEnabled(false)
     }
     
     

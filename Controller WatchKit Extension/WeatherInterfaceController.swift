@@ -65,6 +65,12 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
+
+        // Set controls to defaults
+        self.displayButton.setTitle("Display off")
+
+        // Disable the controls at the outset
+        controlDisabler()
     }
 
     override func didAppear() {
@@ -73,9 +79,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         
         // Disable the app-specific buttons - we will re-enable when we're
         // sure that we're connected to the target device's agent
-        self.updateButton.setEnabled(false)
-        self.resetButton.setEnabled(false)
-        self.displayButton.setEnabled(false)
+        controlDisabler()
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
@@ -100,8 +104,15 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         self.stateImage.setHidden(self.flashState)
         self.flashState = !self.flashState
     }
-    
-    
+
+    func controlDisabler() {
+
+        self.updateButton.setEnabled(false)
+        self.resetButton.setEnabled(false)
+        self.displayButton.setEnabled(false)
+    }
+
+
     // MARK: - Generic Action Functions
 
     @IBAction func back(_ sender: Any) {

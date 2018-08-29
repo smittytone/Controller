@@ -63,6 +63,12 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
+
+        // Set the controls to default
+        self.lightSwitch.setTitle("On")
+
+        // Disable the controls at the outset
+        controlDisabler()
     }
 
     override func didAppear() {
@@ -71,8 +77,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         
         // Disable the app-specific buttons - we will re-enable when we're
         // connected to the target device's agent
-        self.resetButton.setEnabled(false)
-        self.lightSwitch.setEnabled(false)
+        controlDisabler()
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
@@ -99,7 +104,12 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         self.stateImage.setHidden(self.flashState)
         self.flashState = !self.flashState
     }
-    
+
+    func controlDisabler() {
+
+        self.resetButton.setEnabled(false)
+        self.lightSwitch.setEnabled(false)
+    }
     
     // MARK: - Generic Action Functions
 

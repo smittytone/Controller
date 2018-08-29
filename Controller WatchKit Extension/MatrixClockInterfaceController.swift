@@ -64,6 +64,14 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         // Show the device name and set the controller title
         self.deviceLabel.setText(aDevice!.name)
+
+        // Set control defaults
+        self.lightSwitch.setTitle("On")
+        self.modeSwitch.setTitle("Mode: 24")
+        self.brightnessSlider.setValue(15)
+
+        // Disable controls from the start
+        controlDisabler()
     }
     
     override func didAppear() {
@@ -72,9 +80,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         // Disable the app-specific buttons - we will re-enable when we're
         // connected to the target device's agent
-        self.lightSwitch.setEnabled(false)
-        self.modeSwitch.setEnabled(false)
-        self.brightnessSlider.setEnabled(false)
+        controlDisabler()
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
@@ -100,7 +106,14 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         self.flashState = !self.flashState
     }
 
+    func controlDisabler() {
 
+        self.lightSwitch.setEnabled(false)
+        self.modeSwitch.setEnabled(false)
+        self.brightnessSlider.setEnabled(false)
+    }
+
+    
     // MARK: - Generic Action Functions
 
     @IBAction func back(_ sender: Any) {
