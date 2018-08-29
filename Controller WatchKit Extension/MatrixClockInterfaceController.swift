@@ -83,14 +83,14 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil, nil)
-        
-        // Set the Loading... ellipsis timer
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                 target: self,
-                                                 selector: #selector(dotter),
-                                                 userInfo: nil,
-                                                 repeats: true)
+        let success = makeConnection(nil, nil)
+        if success {
+            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                     target: self,
+                                                     selector: #selector(dotter),
+                                                     userInfo: nil,
+                                                     repeats: true)
+        }
     }
     
     @objc func dotter() {
@@ -118,7 +118,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         var dict = [String: String]()
         dict["setlight"] = value ? "1" : "0"
         self.lightSwitch.setTitle(value ? "On" : "Off")
-        makeConnection(dict, nil)
+        let _ = makeConnection(dict, nil)
     }
     
     @IBAction func setMode(value: Bool) {
@@ -127,20 +127,20 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         var dict = [String: String]()
         dict["setmode"] = value ? "1" : "0"
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
-        makeConnection(dict, nil)
+        let _ = makeConnection(dict, nil)
     }
 
     @IBAction func setBrightness(value: Float) {
         
         var dict = [String: String]()
         dict["setbright"] = "\(Int(value))"
-        makeConnection(dict, nil)
+        let _ = makeConnection(dict, nil)
     }
 
     
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -148,14 +148,14 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         //    path - The endpoint minus the base path. If path is nil, get the state path
         //    code - Optional code indicating the action being performed. Default: 0
         // RETURNS
-        //    Nothing
+        //    Bool - was the operation successful
 
         let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/settings")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
             reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
-            return
+            return false
         }
         
         if self.serverSession == nil {
@@ -174,7 +174,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 request.httpMethod = "POST"
             } catch {
                 reportError(appName + ".makeConnection() passed malformed data")
-                return
+                return false
             }
         }
         
@@ -191,6 +191,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
             reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
             return false
         }
+
+        return true
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
