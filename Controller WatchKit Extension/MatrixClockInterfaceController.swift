@@ -187,6 +187,9 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         if let task = aConnexion.task {
             task.resume()
             self.connexions.append(aConnexion)
+        } else {
+            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            return false
         }
     }
     
@@ -255,6 +258,9 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
             }
             
             if index != -1 { self.connexions.remove(at:index) }
+
+            // Clear the 'flash indicator' timer if it's running
+            if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
         } else {
             // Save the clock state data if the connection succeeds
             for i in 0..<self.connexions.count {

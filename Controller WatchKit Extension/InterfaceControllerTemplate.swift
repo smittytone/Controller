@@ -87,12 +87,16 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil, nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                 target: self,
-                                                 selector: #selector(dotter),
-                                                 userInfo: nil,
-                                                 repeats: true)
+        let success = makeConnection(nil, nil)
+        if success {
+            // Start the 'getting state' state indicator flash loop
+            // (but only if we successfully attempted to talk to the agent)
+            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                    target: self,
+                                                    selector: #selector(dotter),
+                                                    userInfo: nil,
+                                                    repeats: true)
+        }
     }
     
     @objc func dotter() {
@@ -119,13 +123,16 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         // Send the update forecast signal
         var dict = [String: String]()
         dict["<key>"] = "<value>"
-        makeConnection(dict, "<endpoint>")
+
+        // Attempt to send the action
+        // NOTE We don't care what the result was
+        let _ = makeConnection(dict, "<endpoint>")
     }
 
     
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -133,14 +140,14 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         //    path - The endpoint minus the base path. If path is nil, get the state path
         //    code - Optional code indicating the action being performed. Default: 0
         // RETURNS
-        //    Nothing
+        //    Bool - Was the operation successful
 
         let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
             reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
-            return
+            return false
         }
         
         if self.serverSession == nil {
@@ -159,7 +166,7 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
                 request.httpMethod = "POST"
             } catch {
                 reportError(appName + ".makeConnection() passed malformed data")
-                return
+                return false
             }
         }
         
@@ -172,7 +179,12 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         if let task = aConnexion.task {
             task.resume()
             self.connexions.append(aConnexion)
+        } else {
+            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            return false
         }
+
+        return true
     }
 
 
@@ -243,6 +255,9 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
             }
             
             if index != -1 { self.connexions.remove(at:index) }
+
+            // Clear the 'flash indicator' timer if it's running
+            if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
         } else {
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]

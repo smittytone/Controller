@@ -82,12 +82,14 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil, nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                 target: self,
-                                                 selector: #selector(dotter),
-                                                 userInfo: nil,
-                                                 repeats: true)
+        let success = makeConnection(nil, nil)
+        if success {
+            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                     target: self,
+                                                     selector: #selector(dotter),
+                                                     userInfo: nil,
+                                                     repeats: true)
+        }
     }
     
     @objc func dotter() {
@@ -114,7 +116,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Send the timer advance signal
         var dict = [String: String]()
         dict["advance"] = "advance"
-        makeConnection(dict, "/dimmer")
+        let _ = makeConnection(dict, "/dimmer")
     }
 
     @IBAction func reboot(_ sender: Any) {
@@ -122,13 +124,13 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Send the device reboot signal
         var dict = [String: String]()
         dict["reset"] = "reset"
-        makeConnection(dict, "/reset")
+        let _ = makeConnection(dict, "/reset")
     }
 
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -136,14 +138,14 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         //    path - The endpoint minus the base path. If path is nil, get the state path
         //    code - Optional code indicating the action being performed. Default: 0
         // RETURNS
-        //    Nothing
+        //    Bool - Was the operation successful?
 
         let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
             reportError(self.appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
-            return
+            return false
         }
         
         if self.serverSession == nil {
@@ -162,7 +164,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 request.httpMethod = "POST"
             } catch {
                 reportError(self.appName + ".makeConnection() passed malformed data")
-                return
+                return false
             }
         }
         
@@ -177,7 +179,10 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
             self.connexions.append(aConnexion)
         } else {
             reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            return false
         }
+
+        return true
     }
 
 
@@ -248,6 +253,9 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
             }
             
             if index != -1 { self.connexions.remove(at:index) }
+
+            // Clear the 'flash indicator' timer if it's running
+            if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
         } else {
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]

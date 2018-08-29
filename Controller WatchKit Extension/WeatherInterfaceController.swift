@@ -84,12 +84,14 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil, nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                 target: self,
-                                                 selector: #selector(dotter),
-                                                 userInfo: nil,
-                                                 repeats: true)
+        let success = makeConnection(nil, nil)
+        if success {
+            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                     target: self,
+                                                     selector: #selector(dotter),
+                                                     userInfo: nil,
+                                                     repeats: true)
+        }
     }
     
     @objc func dotter() {
@@ -116,7 +118,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Send the update forecast signal
         var dict = [String: String]()
         dict["action"] = "update"
-        makeConnection(dict, "/update")
+        let _ = makeConnection(dict, "/update")
     }
 
     @IBAction func reboot(_ sender: Any) {
@@ -124,7 +126,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Send the reset signal
         var dict = [String: String]()
         dict["action"] = "reboot"
-        makeConnection(dict, "/update")
+        let _ = makeConnection(dict, "/update")
     }
 
     @IBAction func switchDisplay(_ sender: Any) {
@@ -132,13 +134,13 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Send the signal to power up/power down the display
         var dict = [String: String]()
         dict["action"] = "power"
-        makeConnection(dict, "/update", 1)
+        let _ = makeConnection(dict, "/update", 1)
     }
 
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -146,14 +148,14 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         //    path - The endpoint minus the base path. If path is nil, get the state path
         //    code - Optional code indicating the action being performed. Default: 0
         // RETURNS
-        //    Nothing
+        //    Bool - Was the operation successful
 
         let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
             reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
-            return
+            return false
         }
         
         if self.serverSession == nil {
@@ -172,7 +174,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 request.httpMethod = "POST"
             } catch {
                 reportError(appName + ".makeConnection() passed malformed data")
-                return
+                return false
             }
         }
         
@@ -185,7 +187,12 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         if let task = aConnexion.task {
             task.resume()
             self.connexions.append(aConnexion)
+        } else {
+            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            return false
         }
+
+        return true
     }
 
 
@@ -256,6 +263,9 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             }
             
             if index != -1 { self.connexions.remove(at:index) }
+
+            // Clear the 'flash indicator' timer if it's running
+            if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
         } else {
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
