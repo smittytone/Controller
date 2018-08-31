@@ -50,7 +50,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var resetButton: WKInterfaceButton!
     @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
 
-    // MARK: App-specific properties
+    // MARK: App-specific constants
     let APP_NAME: String = "MatrixClockInterfaceController"
     let ACTION_CODE_RESET = 1
 
@@ -161,7 +161,6 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         dict["action"] = "reset"
         let _ = makeConnection(dict, "/action", self.ACTION_CODE_RESET)
     }
-
 
     
     // MARK: - Generic Connection Functions

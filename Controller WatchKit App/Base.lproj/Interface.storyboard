@@ -301,6 +301,13 @@
                                 <action selector="setBrightnessWithValue:" destination="Rht-1b-8W6" id="8fy-Uv-xql"/>
                             </connections>
                         </slider>
+                        <button width="1" alignment="left" title="Reset Clock" enabled="NO" id="l5t-C1-ecR">
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="resetClock:" destination="Rht-1b-8W6" id="1Vn-A1-ZP1"/>
+                            </connections>
+                        </button>
                         <separator alignment="left" id="j1S-mH-hr8"/>
                         <button width="1" alignment="left" title="Back" id="GFu-Xz-KHA">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -315,11 +322,12 @@
                         <outlet property="deviceLabel" destination="PZc-li-rhZ" id="gYA-ar-6yf"/>
                         <outlet property="lightSwitch" destination="ci2-ya-b7n" id="CQN-QO-hc0"/>
                         <outlet property="modeSwitch" destination="ufT-MM-U5E" id="4wo-Jb-L4v"/>
+                        <outlet property="resetButton" destination="l5t-C1-ecR" id="QHk-eB-jZu"/>
                         <outlet property="stateImage" destination="RCD-lA-e1N" id="l4h-lS-VPv"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="507" y="78"/>
+            <point key="canvasLocation" x="502" y="95"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

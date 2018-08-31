@@ -48,10 +48,11 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     @IBOutlet weak var resetButton: WKInterfaceButton!
     @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
 
-    // MARK: App-specific properties
-    let appName: String = "ThermalInterfaceController"
+    // MARK: App-specific constants
+    let APP_NAME: String = "ThermalInterfaceController"
+    let ACTION_CODE_RESET = 1
 
-
+    
     // MARK: - Generic Lifecycle Functions
 
     override func awake(withContext context: Any?) {
@@ -159,7 +160,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError(APP_NAME + ".makeConnecion() passed malformed URL string + \(urlPath)")
             return false
         }
         
@@ -178,7 +179,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError(appName + ".makeConnection() passed malformed data")
+                reportError(APP_NAME + ".makeConnection() passed malformed data")
                 return false
             }
         }
@@ -193,7 +194,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             task.resume()
             self.connexions.append(aConnexion)
         } else {
-            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            reportError(self.APP_NAME + ".makeConnection() couldn't create a SessionTask")
             return false
         }
 
