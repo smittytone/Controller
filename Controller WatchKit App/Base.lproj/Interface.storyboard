@@ -58,21 +58,21 @@
                                 <imageView width="16" height="16" alignment="right" image="offline" id="wD8-kA-w9I"/>
                             </items>
                         </group>
-                        <button width="1" alignment="left" title="Display Off" id="XFR-yx-V8c">
+                        <button width="1" alignment="left" title="Display Off" enabled="NO" id="XFR-yx-V8c">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="switchDisplay:" destination="v0d-aL-cfD" id="OZ7-aX-nc8"/>
                             </connections>
                         </button>
-                        <button width="1" alignment="left" title="Update Forecast" id="cyg-e3-6nZ">
+                        <button width="1" alignment="left" title="Update Forecast" enabled="NO" id="cyg-e3-6nZ">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="update:" destination="v0d-aL-cfD" id="7cC-vI-PD8"/>
                             </connections>
                         </button>
-                        <button width="1" alignment="left" title="Reset Device" id="gsF-1N-fCT">
+                        <button width="1" alignment="left" title="Reset Device" enabled="NO" id="gsF-1N-fCT">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -97,7 +97,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1167" y="75"/>
+            <point key="canvasLocation" x="1083" y="75"/>
         </scene>
         <!--matrixclock.ui-->
         <scene sceneID="VZa-Dt-mnR">
@@ -116,21 +116,21 @@
                                 <imageView width="16" height="16" alignment="right" image="offline" id="gFm-gx-NzZ"/>
                             </items>
                         </group>
-                        <switch width="1" alignment="left" value="YES" title="Switch" id="ilT-Hv-a2L">
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="On" id="ilT-Hv-a2L">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="doSwitchWithValue:" destination="FMC-yj-G74" id="5fc-IL-b0L"/>
                             </connections>
                         </switch>
-                        <switch width="1" alignment="left" value="YES" title="Mode: 24" id="VwY-3Z-tkU">
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="Mode: 24" id="VwY-3Z-tkU">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="setModeWithValue:" destination="FMC-yj-G74" id="c5z-2z-Mqs"/>
                             </connections>
                         </switch>
-                        <slider width="1" alignment="left" continuous="YES" maximum="15" steps="3" id="fTe-AK-uPh">
+                        <slider width="1" alignment="left" enabled="NO" continuous="YES" maximum="15" steps="3" id="fTe-AK-uPh">
                             <color key="color" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="setBrightnessWithValue:" destination="FMC-yj-G74" id="gyh-kY-Twh"/>
@@ -154,7 +154,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="953" y="78"/>
+            <point key="canvasLocation" x="887" y="78"/>
         </scene>
         <!--homeweather.ui-->
         <scene sceneID="59f-L9-2jD">
@@ -173,14 +173,14 @@
                                 <imageView width="16" height="16" alignment="right" image="offline" id="Cbm-83-gBZ"/>
                             </items>
                         </group>
-                        <button width="1" alignment="left" title="Advance" id="2hP-q1-cTw">
+                        <button width="1" alignment="left" title="Advance" enabled="NO" id="2hP-q1-cTw">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="advance:" destination="UMj-Gd-3sA" id="f2G-jO-UO4"/>
                             </connections>
                         </button>
-                        <button width="1" alignment="left" title="Reset Device" id="Ohc-hP-08G">
+                        <button width="1" alignment="left" title="Reset Device" enabled="NO" id="Ohc-hP-08G">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -204,7 +204,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="1380" y="58"/>
+            <point key="canvasLocation" x="1276" y="58"/>
         </scene>
         <!--thermalforecast.ui-->
         <scene sceneID="u2q-hJ-v5C">
@@ -223,14 +223,14 @@
                                 <imageView width="16" height="16" alignment="right" image="offline" id="dd8-8u-Hc0"/>
                             </items>
                         </group>
-                        <switch width="1" alignment="left" value="YES" title="Switch" id="kIp-lJ-jHL">
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="On" id="kIp-lJ-jHL">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="doSwitchWithValue:" destination="yxY-RW-tE6" id="f5J-Vr-ac8"/>
                             </connections>
                         </switch>
-                        <button width="1" alignment="left" title="Update Forecast" id="om2-Nv-xod">
+                        <button width="1" alignment="left" title="Update Forecast" enabled="NO" id="om2-Nv-xod">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -254,7 +254,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="748" y="58"/>
+            <point key="canvasLocation" x="697" y="58"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">
@@ -265,25 +265,29 @@
                             <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
                         </label>
-                        <label width="136" alignment="left" text="BigClock" id="mnE-IO-PMw">
-                            <fontDescription key="font" type="italicSystem" pointSize="13"/>
-                        </label>
-                        <label width="136" alignment="left" text="⌚️•" id="zFs-wx-gbe"/>
-                        <switch width="1" alignment="left" value="YES" title="Switch" id="ci2-ya-b7n">
+                        <group width="1" alignment="left" id="emw-Qi-eti">
+                            <items>
+                                <label width="136" alignment="left" text="BigClock" id="mnE-IO-PMw">
+                                    <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                                </label>
+                                <imageView width="16" height="16" alignment="left" image="offline" id="RCD-lA-e1N"/>
+                            </items>
+                        </group>
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="On" id="ci2-ya-b7n">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="doSwitchWithValue:" destination="Rht-1b-8W6" id="fjV-Yq-vkJ"/>
                             </connections>
                         </switch>
-                        <switch width="1" alignment="left" value="YES" title="Switch" id="ufT-MM-U5E">
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="Mode: 24" id="ufT-MM-U5E">
                             <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="setModeWithValue:" destination="Rht-1b-8W6" id="pXA-GU-KI0"/>
                             </connections>
                         </switch>
-                        <slider width="1" alignment="left" continuous="YES" maximum="15" steps="3" id="CHy-Fs-ghj">
+                        <slider width="1" alignment="left" enabled="NO" continuous="YES" maximum="15" steps="3" id="CHy-Fs-ghj">
                             <color key="color" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="setBrightnessWithValue:" destination="Rht-1b-8W6" id="8fy-Uv-xql"/>
@@ -303,11 +307,11 @@
                         <outlet property="deviceLabel" destination="PZc-li-rhZ" id="gYA-ar-6yf"/>
                         <outlet property="lightSwitch" destination="ci2-ya-b7n" id="CQN-QO-hc0"/>
                         <outlet property="modeSwitch" destination="ufT-MM-U5E" id="4wo-Jb-L4v"/>
-                        <outlet property="statusLabel" destination="zFs-wx-gbe" id="gcN-as-ii7"/>
+                        <outlet property="stateImage" destination="RCD-lA-e1N" id="l4h-lS-VPv"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="534" y="88"/>
+            <point key="canvasLocation" x="507" y="78"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

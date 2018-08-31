@@ -66,9 +66,6 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
 
-        // Set controls to defaults
-        self.displayButton.setTitle("Display off")
-
         // Disable the controls at the outset
         controlDisabler()
     }

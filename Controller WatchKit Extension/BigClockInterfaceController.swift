@@ -30,68 +30,102 @@ import WatchKit
 
 class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
+    // MARK: Generic outlets
     @IBOutlet weak var deviceLabel: WKInterfaceLabel!
-    @IBOutlet weak var statusLabel: WKInterfaceLabel!
-    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
-    @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
-    @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
-    
+    @IBOutlet weak var stateImage: WKInterfaceImage!
+
+    // MARK: Generic properties
     let deviceBasePath: String = "https://agent.electricimp.com/"
-    let dots: String = "••••••••••••"
-    
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
     var initialQueryFlag: Bool = false
     var isConnected: Bool = false
+    var flashState: Bool = false
     var loadingTimer: Timer!
-    var loadCount:Int = 1
 
-    // MARK: - Lifecycle Functions
+    // MARK: App-specific outlets
+    @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
+    @IBOutlet weak var brightnessSlider: WKInterfaceSlider!
+    
+    // MARK: App-specific properties
+    let appName: String = "BigClockInterfaceController"
+
+
+    // MARK: - Generic Lifecycle Functions
 
     override func awake(withContext context: Any?) {
 
         super.awake(withContext: context)
 
-        self.aDevice = context as? Device
-        self.deviceLabel.setText(aDevice!.name)
         self.setTitle("Devices")
-        self.lightSwitch.setHidden(true)
-        self.modeSwitch.setHidden(true)
-        self.brightnessSlider.setHidden(true)
+        self.aDevice = context as? Device
+
+        // Show the name of the device
+        self.deviceLabel.setText(aDevice!.name)
+
+        // Disable the controls at the outset
+        controlDisabler()
     }
     
     override func didAppear() {
         
         super.didAppear()
         
+        // Disable the app-specific buttons - we will re-enable when we're
+        // sure that we're connected to the target device's agent
+        controlDisabler()
+
+        // Load and set the 'device offline' indicator
+        if let image = UIImage.init(named: "offline") {
+            self.stateImage.setImage(image)
+        }
+
         // Get the device's current status
         self.initialQueryFlag = true
-        makeConnection(nil)
-        self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.5,
-                                                 target: self,
-                                                 selector: #selector(dotter),
-                                                 userInfo: nil,
-                                                 repeats: true)
+        let success = makeConnection(nil, nil)
+        if success {
+            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                     target: self,
+                                                     selector: #selector(dotter),
+                                                     userInfo: nil,
+                                                     repeats: true)
+        }
     }
     
     @objc func dotter() {
         
-        self.loadCount = self.loadCount + 1
-        if self.loadCount > 5 { self.loadCount = 0 }
-        self.statusLabel.setText("⌚️" + self.dots.suffix(self.loadCount))
+        // Flash the indictor by alternately showing and hiding it
+        self.stateImage.setHidden(self.flashState)
+        self.flashState = !self.flashState
     }
 
-    
-    // MARK: - Action Functions
+    func controlDisabler() {
+
+        self.lightSwitch.setEnabled(false)
+        self.modeSwitch.setEnabled(false)
+        self.brightnessSlider.setEnabled(false)
+    }
+
+
+    // MARK: - Generic Action Functions
+
+    @IBAction func back(_ sender: Any) {
+
+        // Go back to the device list
+        popToRootController()
+    }
+
+
+    // MARK: - App-specific Action Functions
     
     @IBAction func doSwitch(value: Bool) {
 
-        if !isConnected { return }
         var dict = [String: String]()
         dict["setlight"] = value ? "1" : "0"
         self.lightSwitch.setTitle(value ? "On" : "Off")
-        makeConnection(dict)
+        let _ = makeConnection(dict, nil)
     }
 
     @IBAction func setMode(value: Bool) {
@@ -100,33 +134,35 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         var dict = [String: String]()
         dict["setmode"] = value ? "1" : "0"
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
-        makeConnection(dict)
+        let _ = makeConnection(dict, nil)
     }
     
     @IBAction func setBrightness(value: Float) {
         
         var dict = [String: String]()
         dict["setbright"] = "\(Int(value))"
-        makeConnection(dict)
+        let _ = makeConnection(dict, nil)
     }
     
-    @IBAction func back(_ sender: Any) {
+    
+    // MARK: - Generic Connection Functions
 
-        // Go back to the device list
-        popToRootController()
-    }
-    
-    
-    // MARK: - Connection Functions
-    
-    func makeConnection(_ data:[String:String]?) {
-        
-        let urlPath :String = deviceBasePath + aDevice!.code + "/settings"
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
+
+        // Establish a connection to the device's agent
+        // PARAMETERS
+        //    data - A string:string dictionary containg the JSON data for the endpoint
+        //    path - The endpoint minus the base path. If path is nil, get the state path
+        //    code - Optional code indicating the action being performed. Default: 0
+        // RETURNS
+        //    Bool - Was the operation successful
+
+        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/settings")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError("BigClockInterfaceController.makeConnecion() passed malformed URL string + \(urlPath)")
-            return
+            reportError(appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
+            return false
         }
         
         if self.serverSession == nil {
@@ -144,20 +180,26 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError("BigClockInterfaceController.makeConnection() passed malformed data")
-                return
+                reportError(appName + ".makeConnection() passed malformed data")
+                return false
             }
         }
         
         let aConnexion = Connexion()
-        aConnexion.errorCode = -1;
+        aConnexion.errorCode = -1
+        aConnexion.actionCode = code
         aConnexion.data = NSMutableData.init(capacity:0)
         aConnexion.task = serverSession!.dataTask(with:request)
         
         if let task = aConnexion.task {
             task.resume()
             self.connexions.append(aConnexion)
+        } else {
+            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            return false
         }
+
+        return true
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
@@ -174,6 +216,9 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         }
     }
     
+
+    // MARK: - URLSession Delegate Functions
+
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
         // This delegate method is called when the server responds to the connection request
@@ -209,7 +254,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError("Could not connect to the impCloud")
+            reportError(self.appName + " could not connect to the impCloud")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
@@ -225,21 +270,21 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
             }
             
             if index != -1 { self.connexions.remove(at:index) }
+
+            // Clear the 'flash indicator' timer if it's running
+            if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
         } else {
             // Save the clock state data if the connection succeeds
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
-                
                 if aConnexion.task == task {
                     if let data = aConnexion.data {
-
-                        let inString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                        
-                        if inString != "OK" && inString != "Not Found\n" && inString != "No handler" {
+                        let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
+                        if inputString != "OK" && inputString != "Not Found\n" && inputString != "No handler" {
                             if self.initialQueryFlag == true {
                                 self.loadingTimer.invalidate()
 
-                                let dataArray = inString.components(separatedBy:".")
+                                let dataArray = inputString.components(separatedBy:".")
                                 
                                 // Incoming string looks like this:
                                 //    1.1.1.1.01.1.01.1.d.1
@@ -290,26 +335,20 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                     self.brightnessSlider.setValue(Float(value))
                                 }
 
-                                // Disable or enabled controls if the device is not connected
-                                // (and add a warning triangle to the watch UI
-                                if !self.isConnected {
-                                    self.deviceLabel.setText(aDevice!.name + " ⚠️")
-                                    self.lightSwitch.setEnabled(false)
-                                    self.modeSwitch.setEnabled(false)
-                                    self.brightnessSlider.setEnabled(false)
-                                } else {
-                                    self.deviceLabel.setText(aDevice!.name + " ✅")
-                                    self.lightSwitch.setEnabled(true)
-                                    self.modeSwitch.setEnabled(true)
-                                    self.brightnessSlider.setEnabled(true)
+                                // Set the online/offline indicator
+                                let nameString = self.isConnected ? "online" : "offline"
+                                if let image = UIImage.init(named: nameString) {
+                                    self.stateImage.setImage(image)
                                 }
                                 
                                 // Update the rest of the UI
-                                self.statusLabel.setHidden(true)
-                                self.lightSwitch.setHidden(false)
-                                self.modeSwitch.setHidden(false)
-                                self.brightnessSlider.setHidden(false)
+                                self.lightSwitch.setEnabled(self.isConnected)
+                                self.modeSwitch.setEnabled(self.isConnected)
+                                self.brightnessSlider.setEnabled(self.isConnected)
+
+                                self.stateImage.setHidden(false)
                                 self.initialQueryFlag = false
+                                self.flashState = false
                             }
                         }
                     }
@@ -325,6 +364,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     
     func reportError(_ message:String) {
         
+        // Generic string logger
         print(message)
     }
 
