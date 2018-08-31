@@ -65,6 +65,9 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
+
+        // Disable the controls at the outset
+        controlDisabler()
     }
 
     override func didAppear() {
@@ -75,10 +78,9 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         // state set-up here
         super.didAppear()
         
-        // Disable the app-specific controls 
-        // NOTE we will re-enable then when we're connected to the 
-        //      target device's agent
-        self.<ButtonName>.setEnabled(false)
+        // Disable the app-specific buttons - we will re-enable when we're
+        // sure that we're connected to the target device's agent
+        controlDisabler()
 
         // Load and set the 'device offline' indicator
         if let image = UIImage.init(named: "offline") {
@@ -104,6 +106,12 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         // Flash the indictor by alternately showing and hiding it
         self.stateImage.setHidden(self.flashState)
         self.flashState = !self.flashState
+    }
+
+    func controlDisabler() {
+
+        // Disable the app-specific buttons
+        self.<ButtonName>.setEnabled(false)
     }
     
     
@@ -284,6 +292,7 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
                             self.stateImage.setHidden(false)
                             self.initialQueryFlag = false
+                            self.flashState = false
                         }
 
                         task.cancel()
