@@ -108,6 +108,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         self.lightSwitch.setEnabled(false)
         self.modeSwitch.setEnabled(false)
         self.brightnessSlider.setEnabled(false)
+        self.resetButton.setEnabled(false)
     }
 
 
@@ -363,6 +364,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                 self.lightSwitch.setEnabled(self.isConnected)
                                 self.modeSwitch.setEnabled(self.isConnected)
                                 self.brightnessSlider.setEnabled(self.isConnected)
+                                self.resetButton.setEnabled(self.isConnected)
 
                                 self.stateImage.setHidden(false)
                                 self.initialQueryFlag = false
