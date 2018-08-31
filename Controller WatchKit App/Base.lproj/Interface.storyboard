@@ -136,6 +136,13 @@
                                 <action selector="setBrightnessWithValue:" destination="FMC-yj-G74" id="gyh-kY-Twh"/>
                             </connections>
                         </slider>
+                        <button width="1" alignment="left" title="Reset Clock" enabled="NO" id="ADB-js-r0a">
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="resetClock:" destination="FMC-yj-G74" id="Z7t-rv-t50"/>
+                            </connections>
+                        </button>
                         <separator alignment="left" id="pwq-gx-4j3"/>
                         <button width="1" alignment="left" title="Back" id="ZNe-pK-fvh">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -150,11 +157,12 @@
                         <outlet property="deviceLabel" destination="HPh-Hc-Qbq" id="WQ9-uq-GMW"/>
                         <outlet property="lightSwitch" destination="ilT-Hv-a2L" id="syR-Ie-dzu"/>
                         <outlet property="modeSwitch" destination="VwY-3Z-tkU" id="Y7U-vx-phq"/>
+                        <outlet property="resetButton" destination="ADB-js-r0a" id="zve-zA-lZw"/>
                         <outlet property="stateImage" destination="gFm-gx-NzZ" id="lvK-Ov-fGs"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="887" y="78"/>
+            <point key="canvasLocation" x="891" y="95"/>
         </scene>
         <!--homeweather.ui-->
         <scene sceneID="59f-L9-2jD">
