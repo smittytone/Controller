@@ -48,8 +48,9 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBOutlet weak var updateButton: WKInterfaceButton!
     @IBOutlet weak var resetButton: WKInterfaceButton!
 
-    // MARK: App-specific properties
-    let appName: String = "HomeWeatherInterfaceController"
+    // MARK: App-specific constants
+    let APP_NAME: String = "HomeWeatherInterfaceController"
+    let ACTION_CODE_RESET = 1
 
     
     // MARK: - Generic Lifecycle Functions
@@ -131,7 +132,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Send the device reboot signal
         var dict = [String: String]()
         dict["reset"] = "reset"
-        let _ = makeConnection(dict, "/reset")
+        let _ = makeConnection(dict, "/reset", self.ACTION_CODE_RESET)
     }
 
 
@@ -151,7 +152,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
-            reportError(self.appName + ".makeConnecion() passed malformed URL string + \(urlPath)")
+            reportError(self.APP_NAME + ".makeConnecion() passed malformed URL string + \(urlPath)")
             return false
         }
         
@@ -170,7 +171,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
                 request.httpBody = try JSONSerialization.data(withJSONObject: data!, options: [])
                 request.httpMethod = "POST"
             } catch {
-                reportError(self.appName + ".makeConnection() passed malformed data")
+                reportError(self.APP_NAME + ".makeConnection() passed malformed data")
                 return false
             }
         }
@@ -185,7 +186,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
             task.resume()
             self.connexions.append(aConnexion)
         } else {
-            reportError(self.appName + ".makeConnection() couldn't create a SessionTask")
+            reportError(self.APP_NAME + ".makeConnection() couldn't create a SessionTask")
             return false
         }
 
@@ -244,7 +245,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError(appName + " could not connect to the impCloud")
+            reportError(APP_NAME + " could not connect to the impCloud")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
@@ -267,6 +268,13 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
+                    if aConnexion.actionCode == self.ACTION_CODE_RESET {
+                        // Device has just been reset, so we should re-aquire UI state data
+                        self.initialQueryFlag = true
+                        controlDisabler()
+                        let _ = makeConnection(nil, nil)
+                    }
+
                     if let data = aConnexion.data {
                         if self.initialQueryFlag == true {
                             self.loadingTimer.invalidate()
