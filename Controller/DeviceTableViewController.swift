@@ -637,7 +637,12 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Get the correct icon image for the app
         let imageName: String = getAppType(code)
-        return UIImage(named: imageName)
+        let image: UIImage? = UIImage(named: imageName)
+        if image != nil {
+            return image!
+        } else {
+            return UIImage(named: "unknown")
+        }
     }
     
     func getAppType(_ code:String) -> String {

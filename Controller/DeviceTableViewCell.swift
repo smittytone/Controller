@@ -49,12 +49,14 @@ class DeviceTableViewCell: UITableViewCell {
 
     @objc func flipSwitch() {
         
+        // The user wants to install or un-install the device from the watch
+
         // Package up the cell's row number and the state of the switch...
         var data: [String : Int] = [:]
-        data["row"] = rowIndex
+        data["row"] = self.rowIndex
         data["state"] = self.installSwitch.isOn ? 1 : 0
         
-        // ...and send it the main view controller
+        // ...and send it to the main view controller
         let nc: NotificationCenter = NotificationCenter.default
         nc.post(name: NSNotification.Name.init("com.bps.controller.install.switch.hit"),
                 object: self,
