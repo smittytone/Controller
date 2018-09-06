@@ -291,6 +291,7 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             // 3 - the device online status (1 = connected, 0 = disconnected)
                             
                             self.lightSwitch.setTitle(dataArray[1] == "1" ? "On" : "Off")
+                            self.lightSwitch.setOn(dataArray[1] == "1" ? true : false)
                             self.isConnected = dataArray[3] == "1" ? true : false
 
                             // Set the online/offline indicator
