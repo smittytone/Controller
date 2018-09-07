@@ -39,10 +39,19 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
-    var initialQueryFlag: Bool = false
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
+
+    // MARK: Generic constants
+    enum Actions {
+        // These are codes for possible actions. They are used to check whether,
+        // after the action has been performed, that follow-on actions are required
+        static let Other = 0
+        static let GetSettings = 1
+        static let Reboot = 2
+        static let SwitchPower = 3
+    }
 
     // MARK: App-specific outlets
     @IBOutlet weak var updateButton: WKInterfaceButton!
@@ -51,7 +60,6 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     // MARK: App-specific constants
     let APP_NAME: String = "WeatherInterfaceController"
-    let ACTION_CODE_RESET = 1
 
     // MARK: App-specific properties
     var isDisplayOn: Bool = true
@@ -87,8 +95,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         }
 
         // Get the device's current status
-        self.initialQueryFlag = true
-        let success = makeConnection(nil, nil)
+        let success = makeConnection(nil, nil, Actions.GetSettings)
         if success {
             self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
                                                      target: self,
@@ -137,7 +144,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Send the reset signal
         var dict = [String: String]()
         dict["action"] = "reboot"
-        let _ = makeConnection(dict, "/update", self.ACTION_CODE_RESET)
+        let _ = makeConnection(dict, "/update", Actions.Reboot)
     }
 
     @IBAction func switchDisplay(_ sender: Any) {
@@ -145,13 +152,13 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         // Send the signal to power up/power down the display
         var dict = [String: String]()
         dict["action"] = "power"
-        let _ = makeConnection(dict, "/update", 1)
+        let _ = makeConnection(dict, "/update", Actions.SwitchPower)
     }
 
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -281,21 +288,41 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
-                    if aConnexion.actionCode == self.ACTION_CODE_RESET {
+
+                    if aConnexion.actionCode == Actions.Reboot {
                         // Device has just been reset, so we should re-aquire UI state data
-                        self.initialQueryFlag = true
                         controlDisabler()
-                        let _ = makeConnection(nil, nil)
+                        let _ = makeConnection(nil, nil, Actions.GetSettings)
                     }
 
-                    if let data = aConnexion.data {
-                        if self.initialQueryFlag == true {
-                            self.loadingTimer.invalidate()
+                    if aConnexion.actionCode == Actions.SwitchPower {
+                        // The call updates the UI state, but only when it completed successfully
+                        self.isDisplayOn = !self.isDisplayOn
+                        self.displayButton.setTitle("Display " + (self.isDisplayOn ? "off" : "on"))
+                    }
 
-                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            let dataArray = inputString.components(separatedBy:".")
-                            self.isConnected = dataArray[0] == "1" ? true : false
-                            self.isDisplayOn = dataArray[1] == "1" ? true : false
+                    if aConnexion.actionCode == Actions.GetSettings {
+                        self.loadingTimer.invalidate()
+
+                        if let data = aConnexion.data {
+                            do {
+                                let json = try JSONSerialization.jsonObject(with: data as Data, options: [])
+
+                                if let object: [String: Any] = json as? [String: Any] {
+                                    // The agent code should include the device's connection state in the data,
+                                    // and we use this to set the generic 'isConnected' property.
+                                    if let s: Bool = object["isconnected"] as? Bool {
+                                        self.isConnected = s
+                                    }
+
+                                    // Set the switch state
+                                    if let s: Bool = object["ispowered"] as? Bool {
+                                        self.isDisplayOn = s
+                                    }
+                                }
+                            } catch {
+                                reportError("Settings JSON is invalid")
+                            }
 
                             // Set the display button's name according to state
                             self.displayButton.setTitle("Display " + (self.isDisplayOn ? "off" : "on"))
@@ -312,16 +339,9 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             self.displayButton.setEnabled(self.isConnected)
 
                             self.stateImage.setHidden(false)
-                            self.initialQueryFlag = false
                             self.flashState = false
                         }
 
-                        if aConnexion.actionCode == 1 {
-                            // The call updates the UI state, but only when it completed successfully
-                            self.isDisplayOn = !self.isDisplayOn
-                            self.displayButton.setTitle("Display " + (self.isDisplayOn ? "off" : "on"))
-                        }
-                        
                         task.cancel()
                         self.connexions.remove(at:i)
                         break
