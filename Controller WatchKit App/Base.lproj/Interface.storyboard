@@ -238,7 +238,7 @@
                                 <action selector="doSwitchWithValue:" destination="yxY-RW-tE6" id="f5J-Vr-ac8"/>
                             </connections>
                         </switch>
-                        <button width="1" alignment="left" title="Update Forecast" enabled="NO" id="om2-Nv-xod">
+                        <button width="1" alignment="left" title="Restart Device" enabled="NO" id="om2-Nv-xod">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
@@ -262,7 +262,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="697" y="58"/>
+            <point key="canvasLocation" x="701" y="58"/>
         </scene>
         <!--bigclock.ui-->
         <scene sceneID="mmT-qJ-Fwe">
@@ -327,7 +327,76 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="502" y="95"/>
+            <point key="canvasLocation" x="510" y="95"/>
+        </scene>
+        <!--clock.ui-->
+        <scene sceneID="JQK-ip-1Fb">
+            <objects>
+                <controller identifier="clock.ui" id="ISL-Vu-cg7" customClass="ClockInterfaceController" customModule="Controller_WatchKit_Extension">
+                    <items>
+                        <label width="136" alignment="left" text="Label" id="FXT-nO-MUi">
+                            <color key="textColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="font" type="system" weight="semibold" pointSize="18"/>
+                        </label>
+                        <group width="1" alignment="left" id="kNT-ol-yhe">
+                            <items>
+                                <label width="136" alignment="left" text="Cløck" id="Uvj-u8-yQ8">
+                                    <fontDescription key="font" type="italicSystem" pointSize="13"/>
+                                </label>
+                                <imageView width="16" height="16" alignment="left" image="offline" id="MFF-72-lZH"/>
+                            </items>
+                        </group>
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="On" id="ehO-eB-qsy">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="doSwitchWithValue:" destination="ISL-Vu-cg7" id="hEB-bT-955"/>
+                            </connections>
+                        </switch>
+                        <switch width="1" alignment="left" value="YES" enabled="NO" title="Mode: 24" id="9SZ-iX-o1r">
+                            <color key="titleColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="tintColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setModeWithValue:" destination="ISL-Vu-cg7" id="4xH-ex-yAX"/>
+                            </connections>
+                        </switch>
+                        <slider width="1" alignment="left" enabled="NO" continuous="YES" maximum="15" steps="3" id="0wE-bW-UFZ">
+                            <color key="color" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setBrightnessWithValue:" destination="ISL-Vu-cg7" id="Kjk-N7-QFp"/>
+                            </connections>
+                        </slider>
+                        <button width="1" alignment="left" title="Show World Time" id="Tng-Cj-Mws">
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </button>
+                        <button width="1" alignment="left" title="Reset Clock" enabled="NO" id="qqo-lD-6pR">
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="resetClock:" destination="ISL-Vu-cg7" id="nWg-QQ-s5y"/>
+                            </connections>
+                        </button>
+                        <separator alignment="left" id="lVA-1s-c7k"/>
+                        <button width="1" alignment="left" title="Back" id="f1j-3I-gVF">
+                            <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="back:" destination="ISL-Vu-cg7" id="YOM-ET-885"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="brightnessSlider" destination="0wE-bW-UFZ" id="opf-ph-oNP"/>
+                        <outlet property="deviceLabel" destination="FXT-nO-MUi" id="mFU-JG-Nge"/>
+                        <outlet property="lightSwitch" destination="ehO-eB-qsy" id="fYV-eA-ooO"/>
+                        <outlet property="modeSwitch" destination="9SZ-iX-o1r" id="O0z-V1-cFT"/>
+                        <outlet property="resetButton" destination="qqo-lD-6pR" id="KDq-Tc-xei"/>
+                        <outlet property="stateImage" destination="MFF-72-lZH" id="Drr-TE-7UI"/>
+                        <outlet property="worldButton" destination="Tng-Cj-Mws" id="xAL-jS-qHa"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="510" y="459"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.92143100499999997" green="0.92145264149999995" blue="0.92144101860000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
