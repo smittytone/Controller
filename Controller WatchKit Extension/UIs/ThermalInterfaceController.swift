@@ -39,7 +39,6 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
-    var initialQueryFlag: Bool = false
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
@@ -50,7 +49,13 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     // MARK: App-specific constants
     let APP_NAME: String = "ThermalInterfaceController"
-    let ACTION_CODE_RESET = 1
+    enum Actions {
+        // These are codes for possible actions. They are used to check whether,
+        // after the action has been performed, that follow-on actions are required
+        static let Other = 0
+        static let GetSettings = 1
+        static let Reboot = 2
+    }
 
     
     // MARK: - Generic Lifecycle Functions
@@ -73,11 +78,16 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     }
 
     override func didAppear() {
-        
+
+        // This is the 'we're about to go live' delegate function, being called
+        // after 'awake()' and whenever the app is about to appear on screen, including
+        // when it appears in the dock list
+
+        // The following call does nothing, but is included in case that changes in the future
         super.didAppear()
-        
+
         // Disable the app-specific buttons - we will re-enable when we're
-        // connected to the target device's agent
+        // sure that we're connected to the target device's agent
         controlDisabler()
 
         // Load and set the 'device offline' indicator
@@ -86,11 +96,8 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         }
 
         // Get the device's current status
-        self.initialQueryFlag = true
-        let success = makeConnection(nil, nil)
+        let success = makeConnection(nil, nil, Actions.GetSettings)
         if success {
-            // Start the 'getting state' state indicator flash loop
-            // (but only if we successfully attempted to talk to the agent)
             self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
                                                      target: self,
                                                      selector: #selector(dotter),
@@ -98,7 +105,27 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                                                      repeats: true)
         }
     }
-    
+
+    override func willDisappear() {
+
+        // The app is about to go off the screen because the user has hit Back or < Devices
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willDisappear()
+
+        // Reset the app for next time
+        if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
+        }
+    }
+
     @objc func dotter() {
         
         // Flash the indictor by alternately showing and hiding it
@@ -111,7 +138,8 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         self.resetButton.setEnabled(false)
         self.lightSwitch.setEnabled(false)
     }
-    
+
+
     // MARK: - Generic Action Functions
 
     @IBAction func back(_ sender: Any) {
@@ -137,16 +165,15 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
         // Send the restart signal
         // NOTE This triggers a forecast update
-        if !isConnected { return }
         var dict = [String: String]()
         dict["action"] = "reboot"
-        let _ = makeConnection(dict, "/actions")
+        let _ = makeConnection(dict, "/actions", Actions.Reboot)
     }
 
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -276,23 +303,35 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
-                    if let data = aConnexion.data {
-                        if self.initialQueryFlag == true {
-                            self.loadingTimer.invalidate()
 
-                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            let dataArray = inputString.components(separatedBy:".")
+                    // Cancel the task and remove the connection from the list
+                    task.cancel()
+                    self.connexions.remove(at:i)
 
-                            // The data string is formatted as follows:
-                            // "0.1.2.3", where
-                            // 0 - the LED brightness value (0-15)
-                            // 1 - the LED power state (1 = on, 0 = off)
-                            // 2 - the LED orientation (1 = left, 0 = right)
-                            // 3 - the device online status (1 = connected, 0 = disconnected)
-                            
-                            self.lightSwitch.setTitle(dataArray[1] == "1" ? "On" : "Off")
-                            self.lightSwitch.setOn(dataArray[1] == "1" ? true : false)
-                            self.isConnected = dataArray[3] == "1" ? true : false
+                    if aConnexion.actionCode == Actions.GetSettings {
+                        self.loadingTimer.invalidate()
+
+                        if let data = aConnexion.data {
+
+                            do {
+                                let json = try JSONSerialization.jsonObject(with: data as Data, options: [])
+
+                                if let object: [String: Any] = json as? [String: Any] {
+                                    // The agent code should include the device's connection state in the data,
+                                    // and we use this to set the generic 'isConnected' property.
+                                    if let s: Bool = object["isconnected"] as? Bool {
+                                        self.isConnected = s
+                                    }
+
+                                    // Set the switch state
+                                    if let s: Bool = object["ispowered"] as? Bool {
+                                        self.lightSwitch.setOn(s)
+                                        self.lightSwitch.setTitle(s ? "On" : "Off")
+                                    }
+                                }
+                            } catch {
+                                reportError("Settings JSON is invalid")
+                            }
 
                             // Set the online/offline indicator
                             let nameString = self.isConnected ? "online" : "offline"
@@ -305,14 +344,17 @@ class ThermalInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             self.resetButton.setEnabled(self.isConnected)
 
                             self.stateImage.setHidden(false)
-                            self.initialQueryFlag = false
                             self.flashState = false
                         }
-                        
-                        task.cancel()
-                        self.connexions.remove(at:i)
-                        break
                     }
+
+                    if aConnexion.actionCode == Actions.Reboot {
+                        // We have rebooted and possible reset the device, so reacquire the settings
+                        controlDisabler()
+                        let _ = makeConnection(nil, nil, Actions.GetSettings)
+                    }
+
+                    break
                 }
             }
         }

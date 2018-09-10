@@ -43,7 +43,16 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var flashState: Bool = false
     var loadingTimer: Timer!
 
-    // MARK: Generic constants
+    // MARK: App-specific outlets
+    @IBOutlet weak var updateButton: WKInterfaceButton!
+    @IBOutlet weak var resetButton: WKInterfaceButton!
+    @IBOutlet weak var displayButton: WKInterfaceButton!
+
+    // MARK: App-specific properties
+    var isDisplayOn: Bool = true
+
+    // MARK: App-specific constants
+    let APP_NAME: String = "WeatherInterfaceController"
     enum Actions {
         // These are codes for possible actions. They are used to check whether,
         // after the action has been performed, that follow-on actions are required
@@ -53,22 +62,13 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         static let SwitchPower = 3
     }
 
-    // MARK: App-specific outlets
-    @IBOutlet weak var updateButton: WKInterfaceButton!
-    @IBOutlet weak var resetButton: WKInterfaceButton!
-    @IBOutlet weak var displayButton: WKInterfaceButton!
-
-    // MARK: App-specific constants
-    let APP_NAME: String = "WeatherInterfaceController"
-
-    // MARK: App-specific properties
-    var isDisplayOn: Bool = true
-
 
     // MARK: - Generic Lifecycle Functions
 
     override func awake(withContext context: Any?) {
 
+        // App is loaded for the first time when the user selects it from the main menu
+        // Use this delegate function to perform app setup
         super.awake(withContext: context)
 
         self.aDevice = context as? Device
@@ -102,6 +102,27 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                                                      selector: #selector(dotter),
                                                      userInfo: nil,
                                                      repeats: true)
+        }
+    }
+
+    override func willDisappear() {
+
+        // The app is about to go off the screen
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willDisappear()
+
+        // Reset the app for next time
+        self.isConnected = false
+        if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
         }
     }
     
@@ -289,6 +310,10 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
 
+                    // Cancel the task and remove the connection from the list
+                    task.cancel()
+                    self.connexions.remove(at:i)
+
                     if aConnexion.actionCode == Actions.Reboot {
                         // Device has just been reset, so we should re-aquire UI state data
                         controlDisabler()
@@ -341,11 +366,9 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
                             self.stateImage.setHidden(false)
                             self.flashState = false
                         }
-
-                        task.cancel()
-                        self.connexions.remove(at:i)
-                        break
                     }
+
+                    break
                 }
             }
         }

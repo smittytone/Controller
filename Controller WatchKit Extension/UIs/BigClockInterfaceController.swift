@@ -39,7 +39,6 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
-    var initialQueryFlag: Bool = false
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
@@ -52,7 +51,13 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     
     // MARK: App-specific constants
     let APP_NAME: String = "BigClockInterfaceController"
-    let ACTION_CODE_RESET = 1
+    enum Actions {
+        // These are codes for possible actions. They are used to check whether,
+        // after the action has been performed, that follow-on actions are required
+        static let Other = 0
+        static let GetSettings = 1
+        static let Reboot = 2
+    }
 
 
     // MARK: - Generic Lifecycle Functions
@@ -85,8 +90,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         }
 
         // Get the device's current status
-        self.initialQueryFlag = true
-        let success = makeConnection(nil, nil)
+        let success = makeConnection(nil, nil, Actions.GetSettings)
         if success {
             self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
                                                      target: self,
@@ -95,7 +99,28 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                                      repeats: true)
         }
     }
-    
+
+    override func willDisappear() {
+
+        // The app is about to go off the screen
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willDisappear()
+
+        // Reset the app for next time
+        self.isConnected = false
+        if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
+        }
+    }
+
     @objc func dotter() {
         
         // Flash the indictor by alternately showing and hiding it
@@ -152,7 +177,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         // Send the reset signal
         var dict = [String: String]()
         dict["action"] = "reset"
-        let _ = makeConnection(dict, "/action", self.ACTION_CODE_RESET)
+        let _ = makeConnection(dict, "/action", Actions.Reboot)
     }
 
 
@@ -289,20 +314,23 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
-                    if aConnexion.actionCode == self.ACTION_CODE_RESET {
 
+                    // End the connection
+                    task.cancel()
+                    self.connexions.remove(at:i)
+
+                    if aConnexion.actionCode == Actions.Reboot {
                         // Clock has just been reset, so we should re-aquire UI state data
-                        self.initialQueryFlag = true
                         controlDisabler()
-                        let _ = makeConnection(nil, nil)
+                        let _ = makeConnection(nil, nil, Actions.GetSettings)
                     }
 
-                    if let data = aConnexion.data {
-                        let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                        if inputString != "OK" && inputString != "Not Found\n" && inputString != "No handler" {
-                            if self.initialQueryFlag == true {
-                                self.loadingTimer.invalidate()
+                    if aConnexion.actionCode == Actions.GetSettings {
+                        self.loadingTimer.invalidate()
 
+                        if let data = aConnexion.data {
+                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
+                            if inputString != "OK" && inputString != "Not Found\n" && inputString != "No handler" {
                                 let dataArray = inputString.components(separatedBy:".")
                                 
                                 // Incoming string looks like this:
@@ -367,15 +395,11 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                 self.resetButton.setEnabled(self.isConnected)
 
                                 self.stateImage.setHidden(false)
-                                self.initialQueryFlag = false
                                 self.flashState = false
                             }
                         }
                     }
                     
-                    // End connection
-                    task.cancel()
-                    self.connexions.remove(at:i)
                     break
                 }
             }
