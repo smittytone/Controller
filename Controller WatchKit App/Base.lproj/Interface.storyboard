@@ -366,8 +366,11 @@
                                 <action selector="setBrightnessWithValue:" destination="ISL-Vu-cg7" id="Kjk-N7-QFp"/>
                             </connections>
                         </slider>
-                        <button width="1" alignment="left" title="Show World Time" id="Tng-Cj-Mws">
+                        <button width="1" alignment="left" title="Show World Time" id="KIV-VF-9od">
                             <color key="backgroundColor" red="0.7071880894" green="0.0" blue="0.014067025089999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <connections>
+                                <action selector="setWorld:" destination="ISL-Vu-cg7" id="6e9-dg-Jlj"/>
+                            </connections>
                         </button>
                         <button width="1" alignment="left" title="Reset Clock" enabled="NO" id="qqo-lD-6pR">
                             <color key="titleColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -392,7 +395,7 @@
                         <outlet property="modeSwitch" destination="9SZ-iX-o1r" id="O0z-V1-cFT"/>
                         <outlet property="resetButton" destination="qqo-lD-6pR" id="KDq-Tc-xei"/>
                         <outlet property="stateImage" destination="MFF-72-lZH" id="Drr-TE-7UI"/>
-                        <outlet property="worldButton" destination="Tng-Cj-Mws" id="xAL-jS-qHa"/>
+                        <outlet property="worldButton" destination="KIV-VF-9od" id="UZm-DK-mvJ"/>
                     </connections>
                 </controller>
             </objects>
