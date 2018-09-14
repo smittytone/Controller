@@ -372,7 +372,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
                         // Update the UI based on the response to switching between local and world time
                         let object: [String:Any] = getJson(aConnexion.data)
                         if object["error"] != nil {
-                            reportError(object["error"])
+                            reportError(object["error"] as! String)
                         } else if let o: [String: Any] = object["world"] as? [String:Any] {
                             if let s: Bool = o["utc"] as? Bool {
                                 self.isWorld = s
@@ -387,7 +387,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
                         let object: [String:Any] = getJson(aConnexion.data)
                         if object["error"] != nil {
-                            reportError(object["error"])
+                            reportError(object["error"] as! String)
                         } else {
                             if let s: Bool = object["isconnected"] as? Bool {
                                 self.isConnected = s
