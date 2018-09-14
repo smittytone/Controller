@@ -141,6 +141,9 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
     func controlDisabler() {
 
+        // Disable all of the visible controls.
+        // Typically performed right before checking whether the device is online
+        // (in which case, they can be enabled - see didCompleteWithError()
         self.lightSwitch.setEnabled(false)
         self.modeSwitch.setEnabled(false)
         self.brightnessSlider.setEnabled(false)
@@ -162,23 +165,28 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
     
     @IBAction func doSwitch(value: Bool) {
 
+        // Switch the display on or off
+        self.lightSwitch.setTitle(value ? "On" : "Off")
+
         var dict = [String: String]()
         dict["on"] = value ? "true" : "false"
-        self.lightSwitch.setTitle(value ? "On" : "Off")
         let _ = makeConnection(dict, "/settings")
     }
 
     @IBAction func setMode(value: Bool) {
         
         // Switch the display between 24 and 12 hour mode
+        self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
+
         var dict = [String: String]()
         dict["mode"] = value ? "true" : "false"
-        self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
         let _ = makeConnection(dict, "/settings")
+
     }
     
     @IBAction func setBrightness(value: Float) {
         
+        // Send the brightness slider value to the servrer
         var dict = [String: String]()
         dict["bright"] = "\(Int(value))"
         let _ = makeConnection(dict, "/settings")
@@ -186,18 +194,23 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
     @IBAction func setWorld(_ sender: Any) {
 
-        var dict = [String: String]()
-        dict["action"] = "world"
+        // Switch between local and world time
         self.isWorld = !self.isWorld
         self.worldButton.setTitle((self.isWorld ? "Hide" : "Show") + " World Time")
+
+        var dict = [String: String]()
+        dict["action"] = "world"
         let _ = makeConnection(dict, "/action", Actions.SwitchWorld)
     }
     
     @IBAction func resetClock(_ sender: Any) {
 
-        // Send the reset signal
+        // Send the device-reset signal to the server
         var dict = [String: String]()
         dict["action"] = "reset"
+
+        // NOTE Provide an action code (cf. above calls) so we can trap it
+        //      at the other end and trigger a secondary action
         let _ = makeConnection(dict, "/action", Actions.Reset)
     }
 
@@ -212,7 +225,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         //    path - The endpoint minus the base path. If path is nil, get the state path
         //    code - Optional code indicating the action being performed. Default: 0
         // RETURNS
-        //    Bool - Was the operation successful
+        //    Bool - Was the operation successful?
 
         let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
@@ -261,20 +274,6 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         return true
     }
     
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        
-        // This delegate method is called when the server sends some data back
-        // Add the data to the correct connexion object
-        for aConnexion in self.connexions {
-            // Run through the connections in our list and add the incoming data to the correct one
-            if aConnexion.task == dataTask {
-                if let connData = aConnexion.data {
-                    connData.append(data)
-                }
-            }
-        }
-    }
-    
 
     // MARK: - URLSession Delegate Functions
 
@@ -305,6 +304,20 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         }
     }
     
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+
+        // This delegate method is called when the server sends some data back
+        // Add the data to the correct connexion object
+        for aConnexion in self.connexions {
+            // Run through the connections in our list and add the incoming data to the correct one
+            if aConnexion.task == dataTask {
+                if let connData = aConnexion.data {
+                    connData.append(data)
+                }
+            }
+        }
+    }
+
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
         // All the data has been supplied by the server in response to a connection -
@@ -328,30 +341,39 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
                 }
             }
             
-            if index != -1 { self.connexions.remove(at:index) }
+            if index != -1 {
+                self.connexions.remove(at:index)
+            }
 
             // Clear the 'flash indicator' timer if it's running
-            if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
+            if self.loadingTimer.isValid {
+                self.loadingTimer.invalidate()
+            }
         } else {
             // Save the clock state data if the connection succeeds
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
-
                     // End the connection
                     task.cancel()
 
+                    // Check for an action code, which indicates how we proceed - do we
+                    // need perform any special actions from this point?
                     if aConnexion.actionCode == Actions.Reset {
-
                         // Clock has just been reset, so we should re-aquire UI state data
+                        // Disable the controls
                         controlDisabler()
+
+                        // Get the new settings
                         let _ = makeConnection(nil, nil, Actions.GetSettings)
                     }
 
                     if aConnexion.actionCode == Actions.SwitchWorld {
-
+                        // Update the UI based on the response to switching between local and world time
                         let object: [String:Any] = getJson(aConnexion.data)
-                        if let o: [String: Any] = object["world"] as? [String:Any] {
+                        if object["error"] != nil {
+                            reportError(object["error"])
+                        } else if let o: [String: Any] = object["world"] as? [String:Any] {
                             if let s: Bool = o["utc"] as? Bool {
                                 self.isWorld = s
                                 self.worldButton.setTitle((s ? "Hide" : "Show") + " World Time")
@@ -360,58 +382,63 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
                     }
 
                     if aConnexion.actionCode == Actions.GetSettings {
-
+                        // We have got the current settings from the server, so we can update the UI
                         self.loadingTimer.invalidate()
 
                         let object: [String:Any] = getJson(aConnexion.data)
-
-                        if let s: Bool = object["isconnected"] as? Bool {
-                            self.isConnected = s
-                        }
-
-                        // Set the online/offline indicator
-                        let nameString = self.isConnected ? "online" : "offline"
-                        if let image = UIImage.init(named: nameString) {
-                            self.stateImage.setImage(image)
-                        }
-
-                        // Set the display on/off switch
-                        if let s: Bool = object["on"] as? Bool {
-                            self.lightSwitch.setTitle(s ? "On" : "Off")
-                            self.lightSwitch.setOn(s)
-                        }
-
-                        // Set the clock mode switch
-                        if let s: Bool = object["mode"] as? Bool {
-                            self.modeSwitch.setTitle(s ? "Mode: 24" : "Mode: 12")
-                            self.modeSwitch.setOn(s)
-                        }
-
-                        // Set the clock brightness slider state
-                        if let v: Float = object["bright"] as? Float {
-                            self.brightnessSlider.setValue(v)
-                        }
-
-                        // Set the world time button
-                        if let o: [String:Any] = object["world"] as? [String:Any] {
-                            if let u: Bool = o["utc"] as? Bool {
-                                self.isWorld = u
-                                self.worldButton.setTitle((u ? "Hide" : "Show") + " World Time")
+                        if object["error"] != nil {
+                            reportError(object["error"])
+                        } else {
+                            if let s: Bool = object["isconnected"] as? Bool {
+                                self.isConnected = s
                             }
+
+                            // Set the online/offline indicator
+                            let nameString = self.isConnected ? "online" : "offline"
+                            if let image = UIImage.init(named: nameString) {
+                                self.stateImage.setImage(image)
+                            }
+
+                            // Set the display on/off switch
+                            if let s: Bool = object["on"] as? Bool {
+                                self.lightSwitch.setTitle(s ? "On" : "Off")
+                                self.lightSwitch.setOn(s)
+                            }
+
+                            // Set the clock mode switch
+                            if let s: Bool = object["mode"] as? Bool {
+                                self.modeSwitch.setTitle(s ? "Mode: 24" : "Mode: 12")
+                                self.modeSwitch.setOn(s)
+                            }
+
+                            // Set the clock brightness slider state
+                            if let v: Float = object["bright"] as? Float {
+                                self.brightnessSlider.setValue(v)
+                            }
+
+                            // Set the world time button
+                            if let o: [String:Any] = object["world"] as? [String:Any] {
+                                if let u: Bool = o["utc"] as? Bool {
+                                    self.isWorld = u
+                                    self.worldButton.setTitle((u ? "Hide" : "Show") + " World Time")
+                                }
+                            }
+
+
+                            // Enable (or disable, if disconnected) the UI state
+                            self.lightSwitch.setEnabled(self.isConnected)
+                            self.modeSwitch.setEnabled(self.isConnected)
+                            self.brightnessSlider.setEnabled(self.isConnected)
+                            self.worldButton.setEnabled(self.isConnected)
+                            self.resetButton.setEnabled(self.isConnected)
+
+                            // Clear up the UI
+                            self.stateImage.setHidden(false)
+                            self.flashState = false
                         }
-
-                        // Update the UI state
-                        self.lightSwitch.setEnabled(self.isConnected)
-                        self.modeSwitch.setEnabled(self.isConnected)
-                        self.brightnessSlider.setEnabled(self.isConnected)
-                        self.worldButton.setEnabled(self.isConnected)
-                        self.resetButton.setEnabled(self.isConnected)
-
-                        // Clear up the UI
-                        self.stateImage.setHidden(false)
-                        self.flashState = false
                     }
-                    
+
+                    // Remove the processed connection from the list
                     self.connexions.remove(at:i)
                     break
                 }
@@ -427,22 +454,21 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
     func getJson(_ data:NSMutableData?) -> [String: Any] {
 
-        // Return a JSON string
+        // Interpret the received data as JSON and convert to a Dictionary
         if let soliddata = data {
-            let inputString = String(data:soliddata as Data, encoding:String.Encoding.ascii)!
-            print(inputString)
+            //let inputString = String(data:soliddata as Data, encoding:String.Encoding.ascii)!
+            //print(inputString)
             do {
                 let json = try JSONSerialization.jsonObject(with: soliddata as Data, options: [])
                 if let object: [String: Any] = json as? [String: Any] {
                     return object
                 }
             } catch {
-                reportError("Settings JSON is invalid")
-                return ["error":""]
+                return ["error":"Settings JSON is invalid"]
             }
         }
 
-        return ["error":""]
+        return ["error":"Data error"]
     }
 
 }
