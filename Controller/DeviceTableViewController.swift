@@ -69,7 +69,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         // Set up the Actions button
         actionButton = UIBarButtonItem.init(title: "Actions",
-                                           style: UIBarButtonItemStyle.plain,
+                                           style: UIBarButtonItem.Style.plain,
                                            target: self,
                                            action: #selector(self.actionsTouched))
         self.navigationItem.leftBarButtonItem = actionButton
@@ -82,7 +82,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         let nc: NotificationCenter = NotificationCenter.default
         nc.addObserver(self,
                        selector: #selector(self.viewWillAppear),
-                       name: NSNotification.Name.UIApplicationWillEnterForeground,
+                       name: UIApplication.willEnterForegroundNotification,
                        object: nil)
         
         nc.addObserver(self,
@@ -213,12 +213,12 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     @objc func actionsTouched() {
         
         // Build and show the Actions menu
-        let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
+        let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertController.Style.actionSheet)
         var action: UIAlertAction!
         
         // Update Watch item
         action = UIAlertAction.init(title: "Update Watch",
-                                    style: UIAlertActionStyle.default) { (_) in
+                                    style: UIAlertAction.Style.default) { (_) in
                                         self.updateWatch()
                                     }
 
@@ -226,7 +226,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Show App Info item
         action = UIAlertAction.init(title: "Show App Info",
-                                    style: UIAlertActionStyle.default) { (_) in
+                                    style: UIAlertAction.Style.default) { (_) in
                                         self.showInfo()
                                     }
 
@@ -234,7 +234,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
         // Reorder Device List item
         action = UIAlertAction.init(title: "Re-order Device List",
-                                    style: UIAlertActionStyle.default) { (_) in
+                                    style: UIAlertAction.Style.default) { (_) in
                                         self.reorderDevicelist()
                                     }
 
@@ -242,7 +242,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Show/Hide Agent IDs item
         action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs",
-                                    style: UIAlertActionStyle.default) { (_) in
+                                    style: UIAlertAction.Style.default) { (_) in
                                             self.showAgentIDs()
                                     }
         
@@ -250,7 +250,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Clear list
         action = UIAlertAction.init(title: "Clear Device List",
-                                    style: UIAlertActionStyle.default) { (_) in
+                                    style: UIAlertAction.Style.default) { (_) in
                                         self.clearList()
                                     }
         
@@ -258,7 +258,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         // Cancel item
         action = UIAlertAction.init(title: "Cancel",
-                                    style: UIAlertActionStyle.cancel,
+                                    style: UIAlertAction.Style.cancel,
                                     handler:nil)
 
         actionMenu.addAction(action)
@@ -287,9 +287,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         let alert = UIAlertController.init(title: "About Controller",
                                            message: "Use this app to add controllers for your Electric Imp-enabled devices to your Apple Watch. Add a new device here, select it to enter its details, then tap the switch to add the device to the Controller Watch app.\n\n" + "Watch app " + (self.watchAppInstalled ? "" : "not ") + "installed\nSession " + (active ? "" : "in") + "active\n" + "Devices: " + c + "\nInstalled: " + i,
-                                           preferredStyle: UIAlertControllerStyle.alert)
+                                           preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
-                                      style: UIAlertActionStyle.default,
+                                      style: UIAlertAction.Style.default,
                                       handler: nil))
         self.present(alert, animated: true)
     }
@@ -327,12 +327,12 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Clear the device list - but only after checking
         let alert = UIAlertController.init(title: "Are You Sure?",
                                            message: "This will remove all devices from this app and from your Watch",
-                                           preferredStyle: UIAlertControllerStyle.alert)
+                                           preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "No",
-                                      style: UIAlertActionStyle.default,
+                                      style: UIAlertAction.Style.default,
                                       handler: nil))
         alert.addAction(UIAlertAction(title: "Yes",
-                                      style: UIAlertActionStyle.destructive,
+                                      style: UIAlertAction.Style.destructive,
                                       handler: { (_) in
                                         self.myDevices.devices.removeAll()
                                         self.sendDeviceList()
@@ -424,10 +424,10 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             self.ddvc.navigationItem.title = device.name.count > 0 ? "Device Info" : "Device Setup"
             
             let button = UIButton(type: .system)
-            button.setImage(UIImage(named: "icon_left"), for: UIControlState.normal)
-            button.setTitle("Devices", for: UIControlState.normal)
+            button.setImage(UIImage(named: "icon_left"), for: UIControl.State.normal)
+            button.setTitle("Devices", for: UIControl.State.normal)
             button.sizeToFit()
-            button.addTarget(self.ddvc, action: #selector(self.ddvc.changeDetails), for: UIControlEvents.touchUpInside)
+            button.addTarget(self.ddvc, action: #selector(self.ddvc.changeDetails), for: UIControl.Event.touchUpInside)
             self.ddvc.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: button)
         }
 
@@ -457,23 +457,23 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         return true
     }
 
-    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) ->UITableViewCellEditingStyle {
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) ->UITableViewCell.EditingStyle {
 
         if !self.tableOrderingFlag {
-            return (indexPath.row == self.myDevices.devices.count ? UITableViewCellEditingStyle.insert : UITableViewCellEditingStyle.delete)
+            return (indexPath.row == self.myDevices.devices.count ? UITableViewCell.EditingStyle.insert : UITableViewCell.EditingStyle.delete)
         } else {
-            return UITableViewCellEditingStyle.none
+            return UITableViewCell.EditingStyle.none
         }
     }
 
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 
         if editingStyle == .delete {
             // Remove the deleted row's imp from the data source FIRST
             self.myDevices.devices.remove(at: indexPath.row)
 
             // Now delete the table row itself then update the table
-            tableView.deleteRows(at: [indexPath], with: UITableViewRowAnimation.automatic)
+            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.automatic)
             tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new imp with default name and code values
@@ -483,7 +483,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             self.myDevices.devices.append(device)
 
             // And add it to the table
-            tableView.insertRows(at: [indexPath], with: UITableViewRowAnimation.none)
+            tableView.insertRows(at: [indexPath], with: UITableView.RowAnimation.none)
             self.deviceTable.reloadData()
         }
     }
@@ -637,7 +637,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     func showAlert(_ title: String, _ message: String) {
         
         // Generic alert display function
-        let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .`default`, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }

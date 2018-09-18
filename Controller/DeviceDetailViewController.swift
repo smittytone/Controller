@@ -74,7 +74,7 @@ class DeviceDetailViewController: UIViewController,
                 self.codeField.text = self.currentDevice.code
                 self.codeLabel.text = self.currentDevice.app.count > 0 ? "The Device’s Agent ID Code:" : "Enter the Device’s Agent ID Code:"
                 
-                self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControlState.normal)
+                self.infoButton.setTitle((self.currentDevice.app.count > 0 ? "Refresh Device Data" : "Get Device Data"), for: UIControl.State.normal)
                 self.appTypeField.text = getAppName(self.currentDevice.app)
                 self.supportLabel.text = "Watch control" + (!self.currentDevice.watchSupported ? " not" : "") + " supported"
             }
@@ -84,7 +84,7 @@ class DeviceDetailViewController: UIViewController,
             self.nameLabel.text = "Enter the Device’s Name:"
             self.codeLabel.text = "Enter the Device’s Agent ID Code:"
             self.codeField.text = ""
-            self.infoButton.setTitle("Get Device Data", for: UIControlState.normal)
+            self.infoButton.setTitle("Get Device Data", for: UIControl.State.normal)
             self.appTypeField.text = ""
             self.supportLabel.text = ""
         }
@@ -103,15 +103,15 @@ class DeviceDetailViewController: UIViewController,
         if self.currentDevice != nil {
             // Check that the device is supported — if not, warn the user
             if !self.currentDevice.watchSupported && self.currentDevice.app.count != 0 {
-                let alert = UIAlertController.init(title: "This device can’t be controlled by your watch", message: "Are you sure you wish to add it to the device list? If you do, it will not sync to your watch.", preferredStyle: UIAlertControllerStyle.alert)
+                let alert = UIAlertController.init(title: "This device can’t be controlled by your watch", message: "Are you sure you wish to add it to the device list? If you do, it will not sync to your watch.", preferredStyle: UIAlertController.Style.alert)
                 
-                var action = UIAlertAction(title: "Yes", style: UIAlertActionStyle.default, handler: { (_) in
+                var action = UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { (_) in
                     self.saveData()
                     self.goBack()
                 })
                 alert.addAction(action)
                 
-                action = UIAlertAction(title: "No", style: UIAlertActionStyle.default, handler: { (_) in
+                action = UIAlertAction(title: "No", style: UIAlertAction.Style.default, handler: { (_) in
                     self.currentDevice = nil
                     self.goBack()
                 })
@@ -206,7 +206,7 @@ class DeviceDetailViewController: UIViewController,
                 // No agent ID provided, so post a warning
                 let alert = UIAlertController.init(title: "No agent ID",
                                                    message: "Please enter a valid agent ID for the Device.",
-                                                   preferredStyle: UIAlertControllerStyle.alert)
+                                                   preferredStyle: UIAlertController.Style.alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"),
                                               style: .`default`,
                                               handler: nil))
@@ -277,8 +277,8 @@ class DeviceDetailViewController: UIViewController,
         NSLog(logMessage)
 
         // Report the basic message to the user via an alert
-        let alert = UIAlertController.init(title: "Error", message: reportMessage, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: UIAlertActionStyle.default, handler: nil))
+        let alert = UIAlertController.init(title: "Error", message: reportMessage, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: UIAlertAction.Style.default, handler: nil))
         self.present(alert, animated: true)
     }
 

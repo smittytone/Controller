@@ -44,7 +44,7 @@ class DeviceTableViewCell: UITableViewCell {
         // Set the action of the UITableViewCell's switch
         self.installSwitch.addTarget(self,
                                      action: #selector(self.flipSwitch),
-                                     for: UIControlEvents.touchUpInside)
+                                     for: UIControl.Event.touchUpInside)
     }
 
     @objc func flipSwitch() {
