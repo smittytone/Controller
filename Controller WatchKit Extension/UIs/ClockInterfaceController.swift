@@ -1,5 +1,5 @@
 
-//  BigClockInterfaceController.swift
+//  ClockInterfaceController.swift
 //  Created by Tony Smith on 1/17/18.
 //
 //  Copyright 2018 Tony Smith
@@ -42,6 +42,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
+    var timeStamp: Date! = Date.init(timeIntervalSince1970: 0)
 
     // MARK: App-specific outlets
     @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
@@ -55,6 +56,8 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
     
     // MARK: App-specific constants
     let APP_NAME: String = "ClockInterfaceController"
+    let REFRESH_INTERVAL: Double = 120.0
+
     enum Actions {
         // These are codes for possible actions. They are used to check whether,
         // after the action has been performed, that follow-on actions are required
@@ -78,10 +81,49 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
 
-        // Disable the controls at the outset
+        // Disable the app-specific buttons - we will re-enable when we're
+        // sure that we're connected to the target device's agent
         controlDisabler()
     }
-    
+
+    override func willActivate() {
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willActivate()
+
+        let now: Date = Date()
+        var flag: Bool = false
+
+        // Set flag if we're activating more than REFRESH_INTERVAL seconds
+        // since we last deactivated
+        if now.compare(self.timeStamp + REFRESH_INTERVAL) == ComparisonResult.orderedDescending {
+            flag = true
+        }
+
+        if !self.isConnected || flag {
+            // We're not connected or it's more that REFRESH_INTERVAL seconds since we deactivated
+
+            // Disable the app-specific buttons - we will re-enable when we're
+            // sure that we're connected to the target device's agent
+            controlDisabler()
+
+            // Load and set the 'device offline' indicator
+            if let image = UIImage.init(named: "offline") {
+                self.stateImage.setImage(image)
+            }
+
+            // Get the device's current status
+            let success = makeConnection(nil, nil, Actions.GetSettings)
+            if success {
+                self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                         target: self,
+                                                         selector: #selector(dotter),
+                                                         userInfo: nil,
+                                                         repeats: true)
+            }
+        }
+    }
+
     override func didAppear() {
 
         // This is the 'we're about to go live' delegate function, being called
@@ -90,46 +132,31 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
         // The following call does nothing, but is included in case that changes in the future
         super.didAppear()
-
-        // Disable the app-specific buttons - we will re-enable when we're
-        // sure that we're connected to the target device's agent
-        controlDisabler()
-
-        // Load and set the 'device offline' indicator
-        if let image = UIImage.init(named: "offline") {
-            self.stateImage.setImage(image)
-        }
-
-        // Get the device's current status
-        let success = makeConnection(nil, nil, Actions.GetSettings)
-        if success {
-            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                     target: self,
-                                                     selector: #selector(dotter),
-                                                     userInfo: nil,
-                                                     repeats: true)
-        }
     }
 
     override func willDisappear() {
 
-        // The app is about to go off the screen
+        // This is called when the user goes back to the main menu
 
         // The following call does nothing, but is included in case that changes in the future
         super.willDisappear()
 
-        // Reset the app for next time
+        // Mark us as disconnected — 'didDeactivate()' will have done the rest
         self.isConnected = false
-        if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
+    }
 
-        // Close down and remove any existing connections
-        if self.connexions.count > 0 {
-            for aConnexion in self.connexions {
-                aConnexion.task?.cancel()
-            }
+    override func didDeactivate() {
 
-            self.connexions.removeAll()
-        }
+        // This is called when the user goes back to the main menu, hits the crown, or the screen sleeps
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.didDeactivate()
+
+        // Store time
+        self.timeStamp = Date()
+
+        // Clear any activities we don't want going in the background
+        resetApp()
     }
 
     @objc func dotter() {
@@ -144,11 +171,35 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         // Disable all of the visible controls.
         // Typically performed right before checking whether the device is online
         // (in which case, they can be enabled - see didCompleteWithError()
+
+        // Force the disabled switches' tint colour to grey, as this does not
+        // happen automatically when the switches are disabled
+        self.lightSwitch.setColor(UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0))
+        self.modeSwitch.setColor(UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0))
+
+        // Disable the controls
         self.lightSwitch.setEnabled(false)
         self.modeSwitch.setEnabled(false)
         self.brightnessSlider.setEnabled(false)
         self.worldButton.setEnabled(false)
         self.resetButton.setEnabled(false)
+    }
+
+    func resetApp() {
+
+        // Clear the timer, if it's running
+        if self.loadingTimer.isValid {
+            self.loadingTimer.invalidate()
+        }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
+        }
     }
 
 
@@ -326,7 +377,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError(self.APP_NAME + " could not connect to the impCloud")
+            reportError(self.APP_NAME + " could not connect to the impCloud (" + error!.localizedDescription + ")")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
@@ -424,13 +475,19 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
                                 }
                             }
 
-
                             // Enable (or disable, if disconnected) the UI state
                             self.lightSwitch.setEnabled(self.isConnected)
                             self.modeSwitch.setEnabled(self.isConnected)
                             self.brightnessSlider.setEnabled(self.isConnected)
                             self.worldButton.setEnabled(self.isConnected)
                             self.resetButton.setEnabled(self.isConnected)
+
+                            // Set the switches' colour
+                            let color = self.isConnected ?
+                                UIColor.init(red: 0.71, green: 0.0, blue: 0.02, alpha: 1.0) :
+                                UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+                            self.lightSwitch.setColor(color)
+                            self.modeSwitch.setColor(color)
 
                             // Clear up the UI
                             self.stateImage.setHidden(false)
