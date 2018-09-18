@@ -42,7 +42,8 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
-
+    var timeStamp: Date! = Date.init(timeIntervalSince1970: 0)
+    
     // MARK: App-specific outlets
     @IBOutlet weak var lightSwitch: WKInterfaceSwitch!
     @IBOutlet weak var modeSwitch: WKInterfaceSwitch!
@@ -51,6 +52,8 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     
     // MARK: App-specific constants
     let APP_NAME: String = "BigClockInterfaceController"
+    let REFRESH_INTERVAL: Double = 120.0
+
     enum Actions {
         // These are codes for possible actions. They are used to check whether,
         // after the action has been performed, that follow-on actions are required
@@ -76,49 +79,77 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         controlDisabler()
     }
     
+    override func willActivate() {
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willActivate()
+
+        let now: Date = Date()
+        var flag: Bool = false
+
+        // Set flag if we're activating more than REFRESH_INTERVAL seconds
+        // since we last deactivated
+        if now.compare(self.timeStamp + REFRESH_INTERVAL) == ComparisonResult.orderedDescending {
+            flag = true
+        }
+
+        if !self.isConnected || flag {
+            // We're not connected or it's more that REFRESH_INTERVAL seconds since we deactivated
+
+            // Disable the app-specific buttons - we will re-enable when we're
+            // sure that we're connected to the target device's agent
+            controlDisabler()
+
+            // Load and set the 'device offline' indicator
+            if let image = UIImage.init(named: "offline") {
+                self.stateImage.setImage(image)
+            }
+
+            // Get the device's current status
+            let success = makeConnection(nil, nil, Actions.GetSettings)
+            if success {
+                self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                         target: self,
+                                                         selector: #selector(dotter),
+                                                         userInfo: nil,
+                                                         repeats: true)
+            }
+        }
+    }
+
+    override func didDeactivate() {
+
+        // This is called when the user goes back to the main menu, hits the crown, or the screen sleeps
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.didDeactivate()
+
+        // Store time
+        self.timeStamp = Date()
+
+        // Clear any activities we don't want going in the background
+        resetApp()
+    }
+
     override func didAppear() {
         
+        // This is the 'we're about to go live' delegate function, being called
+        // after 'awake()' and whenever the app is about to appear on screen, including
+        // when it appears in the dock list
+
+        // The following call does nothing, but is included in case that changes in the future
         super.didAppear()
-        
-        // Disable the app-specific buttons - we will re-enable when we're
-        // sure that we're connected to the target device's agent
-        controlDisabler()
-
-        // Load and set the 'device offline' indicator
-        if let image = UIImage.init(named: "offline") {
-            self.stateImage.setImage(image)
-        }
-
-        // Get the device's current status
-        let success = makeConnection(nil, nil, Actions.GetSettings)
-        if success {
-            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                     target: self,
-                                                     selector: #selector(dotter),
-                                                     userInfo: nil,
-                                                     repeats: true)
-        }
     }
 
     override func willDisappear() {
 
-        // The app is about to go off the screen
+        // This is called when the user goes back to the main menu
 
         // The following call does nothing, but is included in case that changes in the future
         super.willDisappear()
 
-        // Reset the app for next time
+        // Mark us as disconnected — 'didDeactivate()' will have done the rest
         self.isConnected = false
-        if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
-
-        // Close down and remove any existing connections
-        if self.connexions.count > 0 {
-            for aConnexion in self.connexions {
-                aConnexion.task?.cancel()
-            }
-
-            self.connexions.removeAll()
-        }
     }
 
     @objc func dotter() {
@@ -130,13 +161,40 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
 
     func controlDisabler() {
 
+        // Disable all of the visible controls.
+        // Typically performed right before checking whether the device is online
+        // (in which case, they can be enabled - see didCompleteWithError()
+
+        // Force the disabled switches' tint colour to grey, as this does not
+        // happen automatically when the switches are disabled
+        self.lightSwitch.setColor(UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0))
+        self.modeSwitch.setColor(UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0))
+
+        // Disable the controls
         self.lightSwitch.setEnabled(false)
         self.modeSwitch.setEnabled(false)
         self.brightnessSlider.setEnabled(false)
         self.resetButton.setEnabled(false)
     }
 
+    func resetApp() {
 
+        // Clear the timer, if it's running
+        if self.loadingTimer.isValid {
+            self.loadingTimer.invalidate()
+        }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
+        }
+    }
+
+    
     // MARK: - Generic Action Functions
 
     @IBAction func back(_ sender: Any) {
@@ -238,20 +296,6 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         return true
     }
     
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        
-        // This delegate method is called when the server sends some data back
-        // Add the data to the correct connexion object
-        for aConnexion in self.connexions {
-            // Run through the connections in our list and add the incoming data to the correct one
-            if aConnexion.task == dataTask {
-                if let connData = aConnexion.data {
-                    connData.append(data)
-                }
-            }
-        }
-    }
-    
 
     // MARK: - URLSession Delegate Functions
 
@@ -282,6 +326,20 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         }
     }
     
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+
+        // This delegate method is called when the server sends some data back
+        // Add the data to the correct connexion object
+        for aConnexion in self.connexions {
+            // Run through the connections in our list and add the incoming data to the correct one
+            if aConnexion.task == dataTask {
+                if let connData = aConnexion.data {
+                    connData.append(data)
+                }
+            }
+        }
+    }
+
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
         // All the data has been supplied by the server in response to a connection -
@@ -290,7 +348,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError(self.APP_NAME + " could not connect to the impCloud")
+            reportError(self.APP_NAME + " could not connect to the impCloud (" + error!.localizedDescription + ")")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
@@ -388,6 +446,13 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
                                     self.stateImage.setImage(image)
                                 }
                                 
+                                // Set the switches' colour
+                                let color = self.isConnected ?
+                                    UIColor.init(red: 0.71, green: 0.0, blue: 0.02, alpha: 1.0) :
+                                    UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+                                self.lightSwitch.setColor(color)
+                                self.modeSwitch.setColor(color)
+
                                 // Update the rest of the UI
                                 self.lightSwitch.setEnabled(self.isConnected)
                                 self.modeSwitch.setEnabled(self.isConnected)

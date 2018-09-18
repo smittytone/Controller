@@ -42,7 +42,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
-
+    var timeStamp: Date! = Date.init(timeIntervalSince1970: 0)
+    
     // MARK: App-specific outlets
     @IBOutlet weak var updateButton: WKInterfaceButton!
     @IBOutlet weak var resetButton: WKInterfaceButton!
@@ -53,6 +54,8 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     // MARK: App-specific constants
     let APP_NAME: String = "WeatherInterfaceController"
+    let REFRESH_INTERVAL: Double = 120.0
+
     enum Actions {
         // These are codes for possible actions. They are used to check whether,
         // after the action has been performed, that follow-on actions are required
@@ -81,51 +84,79 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         controlDisabler()
     }
 
+    override func willActivate() {
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willActivate()
+
+        let now: Date = Date()
+        var flag: Bool = false
+
+        // Set flag if we're activating more than REFRESH_INTERVAL seconds
+        // since we last deactivated
+        if now.compare(self.timeStamp + REFRESH_INTERVAL) == ComparisonResult.orderedDescending {
+            flag = true
+        }
+
+        if !self.isConnected || flag {
+            // We're not connected or it's more that REFRESH_INTERVAL seconds since we deactivated
+
+            // Disable the app-specific buttons - we will re-enable when we're
+            // sure that we're connected to the target device's agent
+            controlDisabler()
+
+            // Load and set the 'device offline' indicator
+            if let image = UIImage.init(named: "offline") {
+                self.stateImage.setImage(image)
+            }
+
+            // Get the device's current status
+            let success = makeConnection(nil, nil, Actions.GetSettings)
+            if success {
+                self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                         target: self,
+                                                         selector: #selector(dotter),
+                                                         userInfo: nil,
+                                                         repeats: true)
+            }
+        }
+    }
+
     override func didAppear() {
         
+        // This is the 'we're about to go live' delegate function, being called
+        // after 'awake()' and whenever the app is about to appear on screen, including
+        // when it appears in the dock list
+
+        // The following call does nothing, but is included in case that changes in the future
         super.didAppear()
-        
-        // Disable the app-specific buttons - we will re-enable when we're
-        // sure that we're connected to the target device's agent
-        controlDisabler()
-
-        // Load and set the 'device offline' indicator
-        if let image = UIImage.init(named: "offline") {
-            self.stateImage.setImage(image)
-        }
-
-        // Get the device's current status
-        let success = makeConnection(nil, nil, Actions.GetSettings)
-        if success {
-            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                     target: self,
-                                                     selector: #selector(dotter),
-                                                     userInfo: nil,
-                                                     repeats: true)
-        }
     }
 
     override func willDisappear() {
 
-        // The app is about to go off the screen
+        // This is called when the user goes back to the main menu
 
         // The following call does nothing, but is included in case that changes in the future
         super.willDisappear()
 
-        // Reset the app for next time
+        // Mark us as disconnected — 'didDeactivate()' will have done the rest
         self.isConnected = false
-        if self.loadingTimer.isValid { self.loadingTimer.invalidate() }
-
-        // Close down and remove any existing connections
-        if self.connexions.count > 0 {
-            for aConnexion in self.connexions {
-                aConnexion.task?.cancel()
-            }
-
-            self.connexions.removeAll()
-        }
     }
     
+    override func didDeactivate() {
+
+        // This is called when the user goes back to the main menu, hits the crown, or the screen sleeps
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.didDeactivate()
+
+        // Store time
+        self.timeStamp = Date()
+
+        // Clear any activities we don't want going in the background
+        resetApp()
+    }
+
     @objc func dotter() {
         
         // Flash the indictor by alternately showing and hiding it
@@ -135,9 +166,29 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
 
     func controlDisabler() {
 
+        // Disable all of the visible controls.
+        // Typically performed right before checking whether the device is online
+        // (in which case, they can be enabled - see didCompleteWithError()
         self.updateButton.setEnabled(false)
         self.resetButton.setEnabled(false)
         self.displayButton.setEnabled(false)
+    }
+
+    func resetApp() {
+
+        // Clear the timer, if it's running
+        if self.loadingTimer.isValid {
+            self.loadingTimer.invalidate()
+        }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
+        }
     }
 
 
@@ -286,7 +337,7 @@ class WeatherInterfaceController: WKInterfaceController, URLSessionDataDelegate 
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError(APP_NAME + " could not connect to the impCloud")
+            reportError(self.APP_NAME + " could not connect to the impCloud (" + error!.localizedDescription + ")")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
