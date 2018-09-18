@@ -420,7 +420,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Instantiate the device detail view controller as required - ie. every time
         if self.ddvc == nil {
             let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
-            self.ddvc = storyboard.instantiateViewController(withIdentifier: "device.detail.view") as! DeviceDetailViewController
+            self.ddvc = storyboard.instantiateViewController(withIdentifier: "device.detail.view") as? DeviceDetailViewController
             self.ddvc.navigationItem.title = device.name.count > 0 ? "Device Info" : "Device Setup"
             
             let button = UIButton(type: .system)
