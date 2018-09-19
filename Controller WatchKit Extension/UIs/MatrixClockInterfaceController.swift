@@ -59,7 +59,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // after the action has been performed, that follow-on actions are required
         static let Other = 0
         static let GetSettings = 1
-        static let Reboot = 2
+        static let Reset = 2
     }
 
 
@@ -217,7 +217,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         var dict = [String: String]()
         dict["setlight"] = value ? "1" : "0"
         self.lightSwitch.setTitle(value ? "On" : "Off")
-        let _ = makeConnection(dict, nil)
+        let _ = makeConnection(dict, "/settings")
     }
     
     @IBAction func setMode(value: Bool) {
@@ -226,7 +226,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         var dict = [String: String]()
         dict["setmode"] = value ? "1" : "0"
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
-        let _ = makeConnection(dict, nil)
+        let _ = makeConnection(dict, "/settings")
     }
 
     @IBAction func setBrightness(value: Float) {
@@ -234,7 +234,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Set the display brightness
         var dict = [String: String]()
         dict["setbright"] = "\(Int(value))"
-        let _ = makeConnection(dict, nil)
+        let _ = makeConnection(dict, "/settings")
     }
 
     @IBAction func resetClock(_ sender: Any) {
@@ -242,7 +242,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // Send the reset signal
         var dict = [String: String]()
         dict["action"] = "reset"
-        let _ = makeConnection(dict, "/action", Actions.Reboot)
+        let _ = makeConnection(dict, "/action", Actions.Reset)
     }
 
     
@@ -258,7 +258,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         // RETURNS
         //    Bool - was the operation successful
 
-        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/settings")
+        let urlPath :String = deviceBasePath + aDevice!.code + (path != nil ? path! : "/controller/state")
         let url:URL? = URL(string: urlPath)
         
         if url == nil {
@@ -381,90 +381,62 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                     task.cancel()
                     self.connexions.remove(at:i)
 
-                    if aConnexion.actionCode == Actions.Reboot {
+                    if aConnexion.actionCode == Actions.Reset {
                         // Clock has just been reset, so we should re-aquire UI state data
                         controlDisabler()
                         let _ = makeConnection(nil, nil, Actions.GetSettings)
                     }
 
                     if aConnexion.actionCode == Actions.GetSettings {
+                        // We have got the current settings from the server, so we can update the UI
                         self.loadingTimer.invalidate()
 
-                        if let data = aConnexion.data {
-                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            if inputString != "OK" && inputString != "Not Found\n" && inputString != "No handler" {
-                                let dataArray = inputString.components(separatedBy:".")
-                                
-                                // Incoming string looks like this:
-                                //    1.1.1.1.01.1.01.1.d.1
-                                //
-                                // with the values:
-                                //    0. mode (1: 24hr, 0: 12hr)
-                                //    1. bst state
-                                //    2. colon flash
-                                //    3. colon state
-                                //    4. brightness
-                                //    5. world time state
-                                //    6. world time offset (0-24 -> -12 to 12)
-                                //    7. display state
-                                //    8. connection status
-                                //    9. debug status
-                                
-                                let state = dataArray[8] as String
-                                self.isConnected = (state == "d" ? false : true)
-                                
-                                // Set the clock display switch state
-                                let powerState = dataArray[7] as String
-                                if let value = Int(powerState) {
-                                    if value == 1 {
-                                        self.lightSwitch.setOn(true)
-                                        self.lightSwitch.setTitle("On")
-                                    } else {
-                                        self.lightSwitch.setOn(false)
-                                        self.lightSwitch.setTitle("Off")
-                                    }
-                                }
-
-                                // Set the clock mode switch state
-                                let modeState = dataArray[0] as String
-                                if let value = Int(modeState) {
-                                    if value == 1 {
-                                        self.modeSwitch.setOn(true)
-                                        self.modeSwitch.setTitle("Mode: 24")
-                                    } else {
-                                        self.modeSwitch.setOn(false)
-                                        self.modeSwitch.setTitle("Mode: 12")
-                                    }
-                                }
-
-                                // Set the clock brightness slider state
-                                let brightnessState = dataArray[4] as String
-                                if let value = Int(brightnessState) {
-                                    self.brightnessSlider.setValue(Float(value))
-                                }
-
-                                // Set the online/offline indicator
-                                let nameString = self.isConnected ? "online" : "offline"
-                                if let image = UIImage.init(named: nameString) {
-                                    self.stateImage.setImage(image)
-                                }
-
-                                // Set the switches' colour
-                                let color = self.isConnected ?
-                                    UIColor.init(red: 0.71, green: 0.0, blue: 0.02, alpha: 1.0) :
-                                    UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
-                                self.lightSwitch.setColor(color)
-                                self.modeSwitch.setColor(color)
-
-                                // Enable or disable app-specific controls according to connection state
-                                self.lightSwitch.setEnabled(self.isConnected)
-                                self.modeSwitch.setEnabled(self.isConnected)
-                                self.brightnessSlider.setEnabled(self.isConnected)
-                                self.resetButton.setEnabled(self.isConnected)
-
-                                self.stateImage.setHidden(false)
-                                self.flashState = false
+                        let object: [String:Any] = getJson(aConnexion.data)
+                        if object["error"] != nil {
+                            reportError(object["error"] as! String)
+                        } else {
+                            if let s: Bool = object["isconnected"] as? Bool {
+                                self.isConnected = s
                             }
+
+                            // Set the online/offline indicator
+                            let nameString = self.isConnected ? "online" : "offline"
+                            if let image = UIImage.init(named: nameString) {
+                                self.stateImage.setImage(image)
+                            }
+
+                            // Set the display on/off switch
+                            if let s: Bool = object["on"] as? Bool {
+                                self.lightSwitch.setTitle(s ? "On" : "Off")
+                                self.lightSwitch.setOn(s)
+                            }
+
+                            // Set the clock mode switch
+                            if let s: Bool = object["mode"] as? Bool {
+                                self.modeSwitch.setTitle(s ? "Mode: 24" : "Mode: 12")
+                                self.modeSwitch.setOn(s)
+                            }
+
+                            // Set the clock brightness slider state
+                            if let v: Float = object["bright"] as? Float {
+                                self.brightnessSlider.setValue(v)
+                            }
+
+                            // Set the switches' colour
+                            let color = self.isConnected ?
+                                UIColor.init(red: 0.71, green: 0.0, blue: 0.02, alpha: 1.0) :
+                                UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+                            self.lightSwitch.setColor(color)
+                            self.modeSwitch.setColor(color)
+
+                            // Enable or disable app-specific controls according to connection state
+                            self.lightSwitch.setEnabled(self.isConnected)
+                            self.modeSwitch.setEnabled(self.isConnected)
+                            self.brightnessSlider.setEnabled(self.isConnected)
+                            self.resetButton.setEnabled(self.isConnected)
+
+                            self.stateImage.setHidden(false)
+                            self.flashState = false
                         }
                     }
                     
@@ -474,6 +446,25 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
         }
     }
     
+    func getJson(_ data:NSMutableData?) -> [String: Any] {
+
+        // Interpret the received data as JSON and convert to a Dictionary
+        if let soliddata = data {
+            //let inputString = String(data:soliddata as Data, encoding:String.Encoding.ascii)!
+            //print(inputString)
+            do {
+                let json = try JSONSerialization.jsonObject(with: soliddata as Data, options: [])
+                if let object: [String: Any] = json as? [String: Any] {
+                    return object
+                }
+            } catch {
+                return ["error":"Settings JSON is invalid"]
+            }
+        }
+
+        return ["error":"Data error"]
+    }
+
     func reportError(_ message:String) {
         
         // Generic string logger
