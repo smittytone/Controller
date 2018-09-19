@@ -155,7 +155,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
             })
             
             presentAlert(withTitle: "Add Some Devices",
-                         message: "Please run the Controller app on your iPhone, add some devices, and click ‘Activate’",
+                         message: "Please run the Controller app on your iPhone, add some devices, and select ‘Update Watch’ from the ‘Actions’ menu",
                          preferredStyle: WKAlertControllerStyle.alert,
                          actions: [waa])
         } else {

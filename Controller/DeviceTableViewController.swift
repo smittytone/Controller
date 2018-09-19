@@ -342,6 +342,98 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.present(alert, animated: true)
     }
 
+    @objc func doInstall(_ note: Notification) {
+
+        // Install or uninstall a single app when its row switch is flipped
+        let data: [String : Int] = note.userInfo as! [String : Int]
+        let row: Int = data["row"]!
+        let state: Int = data["state"]!
+        let device: Device = myDevices.devices[row]
+
+        // Mark the device as installing or uninistalling
+        device.installState = state
+
+        // Send the current data to the watch
+        sendDeviceList()
+    }
+
+    func sendDeviceList() {
+
+        if let session = self.phoneSession {
+            // Construct a list of devices with watch support
+            // var updateableDevices: [[String:String]] = []
+            var dataString: String = ""
+
+            // Assemble the sync list string:
+            // Devices are separated by two newlines
+            // Device fields are separated by one newline
+            // Fields: name, agent ID, app type code
+            if self.myDevices.devices.count > 0 {
+                for i in 0..<self.myDevices.devices.count {
+                    let aDevice: Device = self.myDevices.devices[i]
+                    // Add the device to the sync list if:
+                    //   It's installed but not set to be removed
+                    //   It's not installed but set to be installed
+                    if (aDevice.isInstalled && aDevice.installState != self.STATE_REMOVING) || aDevice.installState == self.STATE_INSTALLING {
+                        dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
+                    }
+                }
+            } else {
+                dataString = "clear"
+            }
+
+            // Send the sync list
+            do {
+                // Attempt to send the context data
+                try session.updateApplicationContext(["info" : dataString])
+
+                var installedCount: Int = 0
+
+                // If we're here, we've successfully send the context data,
+                // so update the device records: no longer installing/uninistalling,
+                // and is installed/uninstalled
+                if self.myDevices.devices.count > 0 {
+                    for i in 0..<self.myDevices.devices.count {
+                        let aDevice: Device = self.myDevices.devices[i]
+                        if aDevice.installState == self.STATE_INSTALLING {
+                            // Device was being installed; now it is
+                            aDevice.installState = self.STATE_NONE
+                            aDevice.isInstalled = true
+                        } else if aDevice.installState == self.STATE_REMOVING {
+                            // Device was being removed; now it is
+                            aDevice.installState = self.STATE_NONE
+                            aDevice.isInstalled = false
+                        }
+
+                        if aDevice.isInstalled {
+                            installedCount = installedCount + 1
+                        }
+                    }
+                }
+
+                let defaults: UserDefaults = UserDefaults.standard
+                defaults.set("\(installedCount)", forKey: "com.bps.controller.devices.installcount")
+
+                NSLog("Sync list sent")
+            } catch {
+                // Context data did not send for some reason, so mark
+                // the devices is no longer being installed/uninistalled
+                if self.myDevices.devices.count > 0 {
+                    for i in 0..<self.myDevices.devices.count {
+                        let aDevice: Device = self.myDevices.devices[i]
+                        aDevice.installState = self.STATE_NONE
+                    }
+                }
+
+                // Update the table to reflect the state
+                self.deviceTable.reloadData()
+                NSLog("Sync list not sent")
+
+                // Warn the user
+                showAlert("Sync Failed", "Could not connect to the Apple Watch to install/uninstall the selected app")
+            }
+        }
+    }
 
     // MARK: - Table view data source
 
@@ -536,99 +628,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     func sessionDidDeactivate(_ session: WCSession) {
 
         // NOP - Function required by delegate but not used
-    }
-    
-    @objc func doInstall(_ note: Notification) {
-        
-        // Install or uninstall a single app when its row switch is flipped
-        let data: [String : Int] = note.userInfo as! [String : Int]
-        let row: Int = data["row"]!
-        let state: Int = data["state"]!
-        let device: Device = myDevices.devices[row]
-        
-        // Mark the device as installing or uninistalling
-        device.installState = state
-        
-        // Send the current data to the watch
-        sendDeviceList()
-    }
-    
-    func sendDeviceList() {
-
-        if let session = self.phoneSession {
-            // Construct a list of devices with watch support
-            // var updateableDevices: [[String:String]] = []
-            var dataString: String = ""
-            
-            // Assemble the sync list string:
-            // Devices are separated by two newlines
-            // Device fields are separated by one newline
-            // Fields: name, agent ID, app type code
-            if self.myDevices.devices.count > 0 {
-                for i in 0..<self.myDevices.devices.count {
-                    let aDevice: Device = self.myDevices.devices[i]
-                    // Add the device to the sync list if:
-                    //   It's installed but not set to be removed
-                    //   It's not installed but set to be installed
-                    if (aDevice.isInstalled && aDevice.installState != self.STATE_REMOVING) || aDevice.installState == self.STATE_INSTALLING {
-                        dataString = dataString + aDevice.name + "\n" + aDevice.code + "\n" + aDevice.app + "\n\n"
-                    }
-                }
-            } else {
-                dataString = "clear"
-            }
-            
-            // Send the sync list
-            do {
-                // Attempt to send the context data
-                try session.updateApplicationContext(["info" : dataString])
-
-                var installedCount: Int = 0
-
-                // If we're here, we've successfully send the context data,
-                // so update the device records: no longer installing/uninistalling,
-                // and is installed/uninstalled
-                if self.myDevices.devices.count > 0 {
-                    for i in 0..<self.myDevices.devices.count {
-                        let aDevice: Device = self.myDevices.devices[i]
-                        if aDevice.installState == self.STATE_INSTALLING {
-                            // Device was being installed; now it is
-                            aDevice.installState = self.STATE_NONE
-                            aDevice.isInstalled = true
-                        } else if aDevice.installState == self.STATE_REMOVING {
-                            // Device was being removed; now it is
-                            aDevice.installState = self.STATE_NONE
-                            aDevice.isInstalled = false
-                        }
-
-                        if aDevice.isInstalled {
-                            installedCount = installedCount + 1
-                        }
-                    }
-                }
-
-                let defaults: UserDefaults = UserDefaults.standard
-                defaults.set("\(installedCount)", forKey: "com.bps.controller.devices.installcount")
-
-                NSLog("Sync list sent")
-            } catch {
-                // Context data did not send for some reason, so mark
-                // the devices is no longer being installed/uninistalled
-                if self.myDevices.devices.count > 0 {
-                    for i in 0..<self.myDevices.devices.count {
-                        let aDevice: Device = self.myDevices.devices[i]
-                        aDevice.installState = self.STATE_NONE
-                    }
-                }
-                
-                // Update the table to reflect the state
-                self.deviceTable.reloadData()
-                NSLog("Sync list not sent")
-                
-                // Warn the user
-                showAlert("Sync Failed", "Could not connect to the Apple Watch to install/uninstall the selected app")
-            }
-        }
     }
     
     
