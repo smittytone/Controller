@@ -58,10 +58,7 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 ### To Do ###
 
 - Add support for multiple Watches.
-- More frequent checks for device availability on the Watch app.
-- Standardise the watch-specific information calls.
-- Modularise the *WKInterfaceController* for easier customisation.
 
-Copyright 2018, Tony Smith.
+Copyright &copy; 2018, Tony Smith.
 
 Controller is made available under the MIT licence.
