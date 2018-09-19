@@ -39,17 +39,27 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
     var aDevice: Device? = nil
     var serverSession: URLSession?
     var connexions: [Connexion] = []
-    var initialQueryFlag: Bool = false
     var isConnected: Bool = false
     var flashState: Bool = false
     var loadingTimer: Timer!
+    var timeStamp: Date! = Date.init(timeIntervalSince1970: 0)
 
     // MARK: App-specific outlets
     @IBOutlet weak var <ButtonName>: WKInterfaceButton!
+    @IBOutlet weak var <SwitchName>: WKInterfaceSwitch!
     // NOTE The 'Back' button should be considered as generic to all apps
 
     // MARK: App-specific properties
     let appName: String = "<AppName>"
+    let REFRESH_INTERVAL: Double = 120.0
+
+    enum Actions {
+        // These are codes for possible actions. They are used to check whether,
+        // after the action has been performed, that follow-on actions are required
+        static let Other = 0
+        static let GetSettings = 1
+        static let Reset = 2
+    }
 
 
     // MARK: - Generic Lifecycle Functions
@@ -66,8 +76,61 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         // Show the name of the device
         self.deviceLabel.setText(aDevice!.name)
 
-        // Disable the controls at the outset
+        // Disable the app-specific buttons - we will re-enable when we're
+        // sure that we're connected to the target device's agent
         controlDisabler()
+    }
+
+    override func willActivate() {
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willActivate()
+
+        let now: Date = Date()
+        var flag: Bool = false
+
+        // Set flag if we're activating more than REFRESH_INTERVAL seconds
+        // since we last deactivated
+        if now.compare(self.timeStamp + REFRESH_INTERVAL) == ComparisonResult.orderedDescending {
+            flag = true
+        }
+
+        if !self.isConnected || flag {
+            // We're not connected or it's more that REFRESH_INTERVAL seconds since we deactivated
+
+            // Disable the app-specific buttons - we will re-enable when we're
+            // sure that we're connected to the target device's agent
+            controlDisabler()
+
+            // Load and set the 'device offline' indicator
+            if let image = UIImage.init(named: "offline") {
+                self.stateImage.setImage(image)
+            }
+
+            // Get the device's current status
+            let success = makeConnection(nil, nil, Actions.GetSettings)
+            if success {
+                self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
+                                                         target: self,
+                                                         selector: #selector(dotter),
+                                                         userInfo: nil,
+                                                         repeats: true)
+            }
+        }
+    }
+
+    override func didDeactivate() {
+
+        // This is called when the user goes back to the main menu, hits the crown, or the screen sleeps
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.didDeactivate()
+
+        // Store the current deactivation time
+        self.timeStamp = Date()
+
+        // Clear any activities we don't want going in the background
+        resetApp()
     }
 
     override func didAppear() {
@@ -77,30 +140,19 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         // switched to another watch app. As a result, we do the main UI
         // state set-up here
         super.didAppear()
-        
-        // Disable the app-specific buttons - we will re-enable when we're
-        // sure that we're connected to the target device's agent
-        controlDisabler()
-
-        // Load and set the 'device offline' indicator
-        if let image = UIImage.init(named: "offline") {
-            self.stateImage.setImage(image)
-        }
-        
-        // Get the device's current status
-        self.initialQueryFlag = true
-        let success = makeConnection(nil, nil)
-        if success {
-            // Start the 'getting state' state indicator flash loop
-            // (but only if we successfully attempted to talk to the agent)
-            self.loadingTimer = Timer.scheduledTimer(timeInterval: 0.25,
-                                                    target: self,
-                                                    selector: #selector(dotter),
-                                                    userInfo: nil,
-                                                    repeats: true)
-        }
     }
     
+    override func willDisappear() {
+
+        // This is called when the user goes back to the main menu
+
+        // The following call does nothing, but is included in case that changes in the future
+        super.willDisappear()
+
+        // Mark us as disconnected — 'didDeactivate()' will have done the rest
+        self.isConnected = false
+    }
+
     @objc func dotter() {
         
         // Flash the indictor by alternately showing and hiding it
@@ -110,8 +162,17 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
     func controlDisabler() {
 
-        // Disable the app-specific buttons
+        // Disable all of the visible controls.
+        // Typically performed right before checking whether the device is online
+        // (in which case, they can be enabled - see didCompleteWithError()
+
+        // Force the disabled switches' tint colour to grey, as this does not
+        // happen automatically when the switches are disabled
+        self.<SwitchName>.setColor(UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0))
+
+        // Disable the app-specific buttons, etc.
         self.<ButtonName>.setEnabled(false)
+        self.<SwitchName>.setEnabled(false)
     }
     
     
@@ -121,6 +182,23 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
         // Go back to the device list
         popToRootController()
+    }
+
+    func resetApp() {
+
+        // Clear the timer, if it's running
+        if self.loadingTimer.isValid {
+            self.loadingTimer.invalidate()
+        }
+
+        // Close down and remove any existing connections
+        if self.connexions.count > 0 {
+            for aConnexion in self.connexions {
+                aConnexion.task?.cancel()
+            }
+
+            self.connexions.removeAll()
+        }
     }
 
 
@@ -140,7 +218,7 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
     
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
+    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -247,7 +325,7 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
         if error != nil {
             // React to a passed client-side error - most likely a timeout or inability to resolve the URL
             // Notify the host app
-            reportError(appName + " could not connect to the impCloud")
+            reportError(self.APP_NAME + " could not connect to the impCloud (" + error!.localizedDescription + ")")
             
             // Terminate the failed connection and remove it from the list of current connections
             var index = -1
@@ -270,17 +348,27 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
             for i in 0..<self.connexions.count {
                 let aConnexion = self.connexions[i]
                 if aConnexion.task == task {
-                    if let data = aConnexion.data {
-                        if self.initialQueryFlag == true {
-                            self.loadingTimer.invalidate()
+                    // End the connection
+                    task.cancel()
+                    
+                    if aConnexion.actionCode == Actions.GetSettings {
+                        self.loadingTimer.invalidate()
 
-                            // Convert the incoming data to a string
-                            let inputString = String(data:data as Data, encoding:String.Encoding.ascii)!
-                            
-                            // The agent code should include the device's connection state in the data,
-                            // and we use this to set the generic 'isConnected' property.
-                            self.isConnected = inputString == "1" ? true : false
-                            
+                        // Try and convert the incoming data to JSON as a Dictionary
+                        // We expect the data to be something like:
+                        // { "isconnected" : true,
+                        //   "switchstate" : false }
+                        // The app-sent JSON should always contain the 'isconencted' key at minimum
+                        let object: [String:Any] = getJson(aConnexion.data)
+                        
+                        if object["error"] != nil {
+                            reportError(object["error"] as! String)
+                        } else {
+                            // Is the device connected?
+                            if let s: Bool = object["isconnected"] as? Bool {
+                                self.isConnected = s
+                            }
+                        
                             // Set the online/offline indicator
                             let nameString = self.isConnected ? "online" : "offline"
                             if let image = UIImage.init(named: nameString) {
@@ -289,19 +377,43 @@ class <AppName>InterfaceController: WKInterfaceController, URLSessionDataDelegat
 
                             // Enable or disable app-specific controls according to connection state
                             self.<ButtonName>.setEnabled(self.isConnected)
+                            self.<SwitchName>.setEnabled(self.isConnected)
 
+                            // Set the switches' colour - ie. grey if it is disabled
+                            let color = self.isConnected ?
+                                UIColor.init(red: 0.71, green: 0.0, blue: 0.02, alpha: 1.0) :
+                                UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+                            self.<SwitchName>.setColor(color)
+
+                            // Clear up the UI
                             self.stateImage.setHidden(false)
-                            self.initialQueryFlag = false
                             self.flashState = false
                         }
 
-                        task.cancel()
+                        // Remove the processed connection from the list
                         self.connexions.remove(at:i)
                         break
                     }
                 }
             }
         }
+    }
+    
+    func getJson(_ data:NSMutableData?) -> [String: Any] {
+
+        // Interpret the received data as JSON and convert to a Dictionary
+        if let soliddata = data {
+            do {
+                let json = try JSONSerialization.jsonObject(with: soliddata as Data, options: [])
+                if let object: [String: Any] = json as? [String: Any] {
+                    return object
+                }
+            } catch {
+                return ["error":"Settings JSON is invalid"]
+            }
+        }
+
+        return ["error":"Data error"]
     }
     
     func reportError(_ message:String) {
