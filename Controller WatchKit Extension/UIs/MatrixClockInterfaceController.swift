@@ -214,8 +214,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBAction func doSwitch(value: Bool) {
 
         // Switch the display on or off
-        var dict = [String: String]()
-        dict["setlight"] = value ? "1" : "0"
+        var dict = [String: Any]()
+        dict["setlight"] = value
         self.lightSwitch.setTitle(value ? "On" : "Off")
         let _ = makeConnection(dict, "/settings")
     }
@@ -223,8 +223,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBAction func setMode(value: Bool) {
         
         // Switch the display between 24 and 12 hour mode
-        var dict = [String: String]()
-        dict["setmode"] = value ? "1" : "0"
+        var dict = [String: Any]()
+        dict["setmode"] = value
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
         let _ = makeConnection(dict, "/settings")
     }
@@ -232,7 +232,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBAction func setBrightness(value: Float) {
         
         // Set the display brightness
-        var dict = [String: String]()
+        var dict = [String: Any]()
         dict["setbright"] = "\(Int(value))"
         let _ = makeConnection(dict, "/settings")
     }
@@ -240,7 +240,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     @IBAction func resetClock(_ sender: Any) {
 
         // Send the reset signal
-        var dict = [String: String]()
+        var dict = [String: Any]()
         dict["action"] = "reset"
         let _ = makeConnection(dict, "/action", Actions.Reset)
     }
@@ -248,7 +248,7 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
+    func makeConnection(_ data:[String:Any]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
@@ -379,7 +379,6 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
                     // End the connection
                     task.cancel()
-                    self.connexions.remove(at:i)
 
                     if aConnexion.actionCode == Actions.Reset {
                         // Clock has just been reset, so we should re-aquire UI state data
@@ -439,7 +438,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
                             self.flashState = false
                         }
                     }
-                    
+
+                    self.connexions.remove(at:i)
                     break
                 }
             }
