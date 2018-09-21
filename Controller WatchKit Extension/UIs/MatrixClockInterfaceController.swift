@@ -213,7 +213,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     @IBAction func doSwitch(value: Bool) {
 
-        // Switch the display on or off
+        // Switch the display on or off by sending a bool value in JSON
+        // eg. { "setlight" : false }
         var dict = [String: Any]()
         dict["setlight"] = value
         self.lightSwitch.setTitle(value ? "On" : "Off")
@@ -222,7 +223,9 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
     
     @IBAction func setMode(value: Bool) {
         
-        // Switch the display between 24 and 12 hour mode
+        // Switch the display between 24 and 12 hour mode by sending a bool value in JSON
+        // where true = 24-hour, false = 12-hour
+        // eg. { "setmode" : true }
         var dict = [String: Any]()
         dict["setmode"] = value
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
@@ -231,7 +234,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
     @IBAction func setBrightness(value: Float) {
         
-        // Set the display brightness
+        // Set the display brightness by sending a string value in JSON
+        // eg. { "setbrigt" : "15" }
         var dict = [String: Any]()
         dict["setbright"] = "\(Int(value))"
         let _ = makeConnection(dict, "/settings")
@@ -239,7 +243,8 @@ class MatrixClockInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
     @IBAction func resetClock(_ sender: Any) {
 
-        // Send the reset signal
+        // Send the reset signal by sending a string action type in JSON
+        // ie. { "action" : "reset" }
         var dict = [String: Any]()
         dict["action"] = "reset"
         let _ = makeConnection(dict, "/action", Actions.Reset)
