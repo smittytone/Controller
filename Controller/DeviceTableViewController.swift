@@ -142,9 +142,6 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             self.tableShowIDsFlag = defaultValue.boolValue
         }
         
-        // Update table to show any changes made
-        self.deviceTable.reloadData()
-        
         // Prepare the session
         if WCSession.isSupported() {
             // Only proceed on an iPhone
@@ -161,6 +158,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                 }
             }
         }
+
+        // Update table to show any changes made
+        self.deviceTable.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -605,6 +605,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             if session.isPaired {
                 if session.isWatchAppInstalled {
                     self.watchAppInstalled = true
+
+                    // Update table to show any changes made
+                    self.deviceTable.reloadData()
                 } else {
                     // Watch app not installed, so warn user
                     self.phoneSession = nil
@@ -623,11 +626,17 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     func sessionDidBecomeInactive(_ session: WCSession) {
 
         // NOP - Function required by delegate but not used
+
+        // Update table to show any changes made
+        self.deviceTable.reloadData()
     }
 
     func sessionDidDeactivate(_ session: WCSession) {
 
         // NOP - Function required by delegate but not used
+
+        // Update table to show any changes made
+        self.deviceTable.reloadData()
     }
     
     
