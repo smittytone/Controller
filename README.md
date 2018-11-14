@@ -55,12 +55,12 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 ## Release Notes ##
 
-- 1.0.1 *14 November 2018*
+- 1.0.1 &mdash; *14 November 2018*
     - Enable 3D Touch shortcut to app's GitHub page.
     - Tidy repo and tweak code:
         - Remove auto-increment on build number.
         - Remove iOS app, watchOS app and imp app icon art. 
-- 1.0.0 *3 October 2018*
+- 1.0.0 &mdash; *3 October 2018*
     - Initial release.
 
 ## To Do ##
