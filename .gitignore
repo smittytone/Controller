@@ -6,7 +6,7 @@
 ## CONTROLLER
 
 Controller/Assets.xcassets/*
-'Controller\ WatchKit\ Extension'/Assets.xcassets/*
+Controller\ WatchKit\ Extension/Assets.xcassets/*
 
 ## Build generated
 build/
