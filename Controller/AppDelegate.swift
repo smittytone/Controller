@@ -12,6 +12,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var myDevices:DeviceList!
     let docsDir = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
+    var launchedShortcutItem: UIApplicationShortcutItem?
+
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
@@ -52,32 +54,95 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         defaults.set("\(installCount)", forKey: "com.bps.controller.devices.installcount")
         defaults.set("\(self.myDevices.devices.count)", forKey: "com.bps.controller.devices.listcount")
 
-        return true
+        // If a shortcut was launched, display its information and take the appropriate action.
+        var shouldPerformAdditionalDelegateHandling = true
+
+        if let shortcut = launchOptions?[UIApplication.LaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
+
+            self.launchedShortcutItem = shortcut
+
+            // This will block "performActionForShortcutItem:completionHandler" from being called.
+            shouldPerformAdditionalDelegateHandling = false
+        }
+
+        return shouldPerformAdditionalDelegateHandling
     }
+
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     }
 
+
     func applicationDidEnterBackground(_ application: UIApplication) {
 
         saveDevices()
     }
 
+
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     }
 
+
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+
+        // Check for a previous 3D touch
+        guard let shortcut = self.launchedShortcutItem else { return }
+
+        // Handle the saved shortcut...
+        _ = handleShortcut(shortcut)
+
+        // ...then clear it
+        self.launchedShortcutItem = nil
     }
+
 
     func applicationWillTerminate(_ application: UIApplication) {
 
         saveDevices()
         NotificationCenter.default.post(name:NSNotification.Name("com.bps.controller.will.quit"), object:self)
     }
+
+
+    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+
+        // Called when the user 3D taps the app icon on the home screen while the app is backgrounded
+        let handledShortcut = handleShortcut(shortcutItem)
+        completionHandler(handledShortcut)
+    }
+
+
+    // MARK: 3D Touch Handler Function
+
+    func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
+
+        var handled = false
+
+        // Verify that the provided `shortcutItem`'s `type` is one handled by the application.
+        guard let shortCutType = shortcutItem.type as String? else { return false }
+        guard let last = shortCutType.components(separatedBy: ".").last else { return false }
+
+        switch last {
+            case "visitsite":
+                // Handle Visit Site Quick Action: send a notification to the requisite view controller
+                handled = true
+
+                // Open the EI shop in Safari
+                let uiapp = UIApplication.shared
+                let url: URL = URL.init(string: "https://github.com/smittytone/Controller")!
+                uiapp.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+                break
+            default:
+                break
+        }
+
+        return handled
+    }
+
+
+    // MARK: Save Device List Handler Function
 
     func saveDevices() {
 
@@ -127,3 +192,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 }
 
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+    return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
+}
