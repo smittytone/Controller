@@ -2,6 +2,12 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
+
+## CONTROLLER
+
+Controller/Assets.xcassets/*
+'Controller WatchKit Extension'/Assets.xcassets/*
+
 ## Build generated
 build/
 DerivedData/
@@ -77,3 +83,4 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+

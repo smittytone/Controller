@@ -1,8 +1,6 @@
-# Controller #
+# Controller 1.0.1 #
 
 Control Electric Imp Platform-based Internet of Things devices from your Apple Watch.
-
-**This code is in development and not yet complete**
 
 ## Usage ##
 
@@ -55,10 +53,17 @@ The *WKInterfaceController* instance which manages the device-specific UI is des
 
 The Electric Imp application component of the design makes use of the [Rocky library](https://developer.electricimp.com/libraries/utilities/rocky) to serve standard application information at /info, and a device status (online or offline) information at /status. These and other application control endpoints can of course be modified as required — just update the appropriate section of the relevant *WKInterfaceController* instance.
 
-### To Do ###
+## Release Notes ##
+
+- 1.0.1 *In Development*
+    - TBD
+- 1.0.0 *3 October 2018*
+    - Initial release.
+
+## To Do ##
 
 - Add support for multiple Watches.
 
-Copyright &copy; 2018, Tony Smith.
+Copyright &copy; 2018 by Tony Smith.
 
 Controller is made available under the MIT licence.
