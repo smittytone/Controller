@@ -99,7 +99,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
             controlDisabler()
 
             // Load and set the 'device offline' indicator
-            if let image = UIImage.init(named: "offline") {
+            if let image = UIImage.init(named: "connecting") {
                 self.stateImage.setImage(image)
             }
 
