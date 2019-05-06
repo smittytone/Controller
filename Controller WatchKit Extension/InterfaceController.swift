@@ -3,7 +3,7 @@
 //  Controller WatchKit Extension
 //  Created by Tony Smith on 1/16/18.
 //
-//  Copyright 2018 Tony Smith
+//  Copyright 2018-19 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //
@@ -115,7 +115,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         // The app is going into the background or closing, so save the list of devices
         if self.myDevices.devices.count > 0 {
             let docsPath = self.docsDir[0] + "/devices"
-            let success = NSKeyedArchiver.archiveRootObject(self.myDevices, toFile:docsPath)
+            let success = NSKeyedArchiver.archiveRootObject(self.myDevices!, toFile:docsPath)
             listChanged = !success
         }
     }

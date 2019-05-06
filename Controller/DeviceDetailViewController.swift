@@ -2,7 +2,7 @@
 //  DeviceDetailViewController.swift
 //  Created by Tony Smith on 1/16/18.
 //
-//  Copyright 2017-18 Tony Smith
+//  Copyright 2018-19 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //

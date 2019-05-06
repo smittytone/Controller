@@ -2,7 +2,7 @@
 //  MatrixClockInterfaceController.swift
 //  Created by Tony Smith on 1/17/18.
 //
-//  Copyright 2018 Tony Smith
+//  Copyright 2018-19 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //
