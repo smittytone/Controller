@@ -1,4 +1,4 @@
-# Controller 1.0.1 #
+# Controller 1.0.2 #
 
 Control Electric Imp Platform-based Internet of Things devices from your Apple Watch.
 
@@ -55,11 +55,15 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 ## Release Notes ##
 
+- 1.0.2 &mdash; *unreleased*
+    - Show amber icon during connection attempts.
+    - Fix minor Swift issues identified by compiler.
+    - Remove images from repository.
 - 1.0.1 &mdash; *14 November 2018*
     - Enable 3D Touch shortcut to app's GitHub page.
     - Tidy repo and tweak code:
         - Remove auto-increment on build number.
-        - Remove iOS app, watchOS app and imp app icon art. 
+        - Remove iOS app, watchOS app and imp app icon art.
 - 1.0.0 &mdash; *3 October 2018*
     - Initial release.
 
@@ -67,6 +71,6 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 - Add support for multiple Watches.
 
-Copyright &copy; 2018 by Tony Smith.
+Copyright &copy; 2018-19 by Tony Smith.
 
 Controller is made available under the MIT licence.
