@@ -55,7 +55,7 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 ## Release Notes ##
 
-- 1.0.2 &mdash; *unreleased*
+- 1.0.2 &mdash; *8 May 2019*
     - Show amber icon during connection attempts.
     - Fix minor Swift issues identified by compiler.
     - Remove images from repository.
