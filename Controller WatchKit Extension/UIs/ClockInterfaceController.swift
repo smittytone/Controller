@@ -219,8 +219,8 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         // Switch the display on or off
         self.lightSwitch.setTitle(value ? "On" : "Off")
 
-        var dict = [String: String]()
-        dict["on"] = value ? "true" : "false"
+        var dict = [String: Any]()
+        dict["setlight"] = value
         let _ = makeConnection(dict, "/settings")
     }
 
@@ -229,8 +229,8 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         // Switch the display between 24 and 12 hour mode
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
 
-        var dict = [String: String]()
-        dict["mode"] = value ? "true" : "false"
+        var dict = [String: Any]()
+        dict["setmode"] = value
         let _ = makeConnection(dict, "/settings")
 
     }
@@ -239,7 +239,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
         
         // Send the brightness slider value to the servrer
         var dict = [String: String]()
-        dict["bright"] = "\(Int(value))"
+        dict["setbright"] = "\(Int(value))"
         let _ = makeConnection(dict, "/settings")
     }
 
@@ -268,7 +268,7 @@ class ClockInterfaceController: WKInterfaceController, URLSessionDataDelegate {
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
+    func makeConnection(_ data:[String:Any]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS

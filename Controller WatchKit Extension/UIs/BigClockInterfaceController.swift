@@ -208,8 +208,8 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     
     @IBAction func doSwitch(value: Bool) {
 
-        var dict = [String: String]()
-        dict["setlight"] = value ? "1" : "0"
+        var dict = [String: Any]()
+        dict["setlight"] = value
         self.lightSwitch.setTitle(value ? "On" : "Off")
         let _ = makeConnection(dict, nil)
     }
@@ -217,15 +217,15 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
     @IBAction func setMode(value: Bool) {
         
         // Switch the display between 24 and 12 hour mode
-        var dict = [String: String]()
-        dict["setmode"] = value ? "1" : "0"
+        var dict = [String: Any]()
+        dict["setmode"] = value
         self.modeSwitch.setTitle(value ? "Mode: 24" : "Mode: 12")
         let _ = makeConnection(dict, nil)
     }
     
     @IBAction func setBrightness(value: Float) {
         
-        var dict = [String: String]()
+        var dict = [String: Any]()
         dict["setbright"] = "\(Int(value))"
         let _ = makeConnection(dict, nil)
     }
@@ -241,7 +241,7 @@ class BigClockInterfaceController: WKInterfaceController, URLSessionDataDelegate
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = 0) -> Bool {
+    func makeConnection(_ data:[String:Any]?, _ path:String?, _ code:Int = 0) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS

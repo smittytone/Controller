@@ -214,7 +214,7 @@ class HomeWeatherInterfaceController: WKInterfaceController, URLSessionDataDeleg
 
     // MARK: - Generic Connection Functions
 
-    func makeConnection(_ data:[String:String]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
+    func makeConnection(_ data:[String:Any]?, _ path:String?, _ code:Int = Actions.Other) -> Bool {
 
         // Establish a connection to the device's agent
         // PARAMETERS
