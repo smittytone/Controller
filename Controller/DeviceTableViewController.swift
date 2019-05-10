@@ -160,6 +160,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                 } else {
                     // Activate the WCSession
                     session.activate()
+                    return
                 }
             }
         }
@@ -215,6 +216,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Re-display the table to add/remove the editing/moving widgets
         self.deviceTable.reloadData()
     }
+
 
     @objc func addDevice() {
 
@@ -305,11 +307,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.present(actionMenu, animated: true, completion: nil)
     }
 
+
     @objc func updateWatch() {
 
         // Send the app list
         sendDeviceList()
     }
+
 
     @objc func showInfo() {
 
@@ -331,7 +335,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                                       handler: nil))
         self.present(alert, animated: true)
     }
-    
+
+
     @objc func showAgentIDs() {
         
         // Switch the show/hide flag and update the table
@@ -342,7 +347,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         let defaults: UserDefaults = UserDefaults.standard
         defaults.set(self.tableShowIDsFlag, forKey: "com.bps.controller.show.agentids")
     }
-    
+
+
     @objc func reorderDevicelist() {
         
         // Switch off table editing if it is on
@@ -359,7 +365,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Re-display the table
         self.deviceTable.reloadData()
     }
-    
+
+
     @objc func clearList() {
         
         // Clear the device list - but only after checking
@@ -380,6 +387,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.present(alert, animated: true)
     }
 
+
     @objc func doInstall(_ note: Notification) {
 
         // Install or uninstall a single app when its row switch is flipped
@@ -394,6 +402,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Send the current data to the watch
         sendDeviceList()
     }
+
 
     func sendDeviceList() {
 
@@ -473,12 +482,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         }
     }
 
+
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
 
         return 1
     }
+
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
@@ -587,11 +598,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.navigationController?.pushViewController(self.ddvc, animated: true)
     }
 
+
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 
         // NOTE All table rows are editable, including the 'Add New Device' row
         return true
     }
+
 
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) ->UITableViewCell.EditingStyle {
 
@@ -633,11 +646,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         }
     }
 
+
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
 
         // NOTE Can move all rows except a the last line if it's 'Add New Device'
         return (indexPath.row == self.myDevices.devices.count ? false : self.tableOrderingFlag)
     }
+
 
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
@@ -676,6 +691,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         }
     }
 
+
     func sessionDidBecomeInactive(_ session: WCSession) {
 
         // NOP - Function required by delegate but not used
@@ -683,6 +699,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Update table to show any changes made
         self.deviceTable.reloadData()
     }
+
 
     func sessionDidDeactivate(_ session: WCSession) {
 
@@ -702,7 +719,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .`default`, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
-    
+
+
     func getAppImage(_ code: String) -> UIImage? {
         
         // Get the correct icon image for the app
@@ -714,13 +732,15 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             return UIImage(named: "unknown")
         }
     }
-    
+
+
     func getAppType(_ code:String) -> String {
         
         // Return the app's name as derived from its known UUID
         // The name is used to get the appropriate icon file
         return getAppName(code).lowercased()
     }
+
     
     func getAppName(_ code: String) -> String {
         
