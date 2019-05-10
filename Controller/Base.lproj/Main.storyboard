@@ -250,7 +250,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="header.cell" rowHeight="18" id="vdu-Sh-VsS">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="header.cell" rowHeight="18" id="vdu-Sh-VsS" customClass="DeviceTableHeaderViewCell" customModule="Controller" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="144" width="667" height="18"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="right" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vdu-Sh-VsS" id="dlf-xs-q0s">
@@ -258,9 +258,20 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="INSTALL" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gLV-nH-Hpz">
-                                            <rect key="frame" x="16" y="1.5" width="635" height="14.5"/>
+                                            <rect key="frame" x="548" y="1.5" width="99" height="15"/>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="14.5" id="eGF-XR-l4z"/>
+                                                <constraint firstAttribute="height" constant="15" id="hCJ-P0-TPu"/>
+                                                <constraint firstAttribute="width" constant="99" id="yUp-s3-pHB"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="WATCH" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcc-Xd-Ckr">
+                                            <rect key="frame" x="20" y="1.5" width="360" height="15"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="15" id="kYG-OU-FaI"/>
+                                                <constraint firstAttribute="width" constant="360" id="wEC-Yh-C8o"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <nil key="textColor"/>
@@ -268,12 +279,16 @@
                                         </label>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="gLV-nH-Hpz" secondAttribute="trailing" constant="16" id="VfZ-OR-dqd"/>
-                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="centerY" secondItem="dlf-xs-q0s" secondAttribute="centerY" id="weN-ib-A9P"/>
-                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="leading" secondItem="dlf-xs-q0s" secondAttribute="leading" constant="16" id="xSl-fX-5fC"/>
+                                        <constraint firstAttribute="trailing" secondItem="gLV-nH-Hpz" secondAttribute="trailing" constant="20" id="9oC-YW-9pp"/>
+                                        <constraint firstItem="dcc-Xd-Ckr" firstAttribute="leading" secondItem="dlf-xs-q0s" secondAttribute="leading" constant="20" id="f1n-F8-1AD"/>
+                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="centerY" secondItem="dlf-xs-q0s" secondAttribute="centerY" id="m55-TN-ivO"/>
+                                        <constraint firstItem="dcc-Xd-Ckr" firstAttribute="centerY" secondItem="dlf-xs-q0s" secondAttribute="centerY" id="xWX-4c-lBP"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="0.90036386986301364" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <outlet property="watchName" destination="dcc-Xd-Ckr" id="5as-qk-4N4"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -288,7 +303,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YmT-Bf-NFe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1450.4000000000001" y="-404.34782608695656"/>
+            <point key="canvasLocation" x="-1450.5247376311845" y="-405.60000000000002"/>
         </scene>
         <!--Nav-->
         <scene sceneID="xum-H7-VC0">
