@@ -273,7 +273,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         actionMenu.addAction(action)
         
         // Show/Hide Agent IDs item
-        action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs in List",
+        action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs in Device List",
                                     style: UIAlertAction.Style.default) { (_) in
                                             self.showAgentIDs()
                                     }
@@ -741,7 +741,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         return getAppName(code).lowercased()
     }
 
-    
+
     func getAppName(_ code: String) -> String {
         
         // Return the app's name as derived from its known UUID

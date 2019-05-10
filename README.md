@@ -1,4 +1,4 @@
-# Controller 1.0.2 #
+# Controller 1.1.0 #
 
 Control Electric Imp Platform-based Internet of Things devices from your Apple Watch.
 
@@ -55,6 +55,14 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 ## Release Notes ##
 
+- 1.1.0 &mdash; *Unreleased*
+    - Update the iOS app UI:
+        - Add a new device without editing the table by adding **Add** button to nav bar.
+        - Add **Edit Device List** option to **Actions** menu.
+        - Don't indent device list when re-ordering it.
+        - Hide installation switch during device list re-ordering and editing.
+        - Disable **Update Watch** action when watchOS app not yet installed.
+    - Device list's installation switch should now be correctly enabled at start-up.
 - 1.0.2 &mdash; *8 May 2019*
     - Show amber icon during connection attempts.
     - Fix minor Swift issues identified by compiler.
