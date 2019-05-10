@@ -12,7 +12,7 @@
 			<key>Title</key>
 			<string>Information</string>
 			<key>FooterText</key>
-			<string>Controller © 2018, Tony Smith (@smittytone)</string>
+			<string>Controller © 2018-19, Tony Smith (@smittytone)</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -44,16 +44,16 @@
 			<key>DefaultValue</key>
 			<string>0</string>
 		</dict>
-        <dict>
-            <key>Type</key>
-            <string>PSTitleValueSpecifier</string>
-            <key>Title</key>
-            <string>Listed Devices</string>
-            <key>Key</key>
-            <string>com.bps.controller.devices.listcount</string>
-            <key>Default Value</key>
-            <string>0</string>
-        </dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>Listed Devices</string>
+			<key>Key</key>
+			<string>com.bps.controller.devices.listcount</string>
+			<key>Default Value</key>
+			<string>0</string>
+		</dict>
 	</array>
 </dict>
 </plist>
