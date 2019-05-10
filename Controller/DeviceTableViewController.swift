@@ -63,9 +63,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.clearsSelectionOnViewWillAppear = false
 
         // Set up the Edit button
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
+        //self.navigationItem.rightBarButtonItem = self.editButtonItem
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "Add",
+                                                                      style: UIBarButtonItem.Style.plain,
+                                                                      target: self,
+                                                                      action: #selector(self.addDevice))
         self.navigationItem.rightBarButtonItem!.tintColor = UIColor.white
-        self.navigationItem.rightBarButtonItem!.action = #selector(self.editTouched)
+        //self.navigationItem.rightBarButtonItem!.action = #selector(self.editTouched)
 
         // Set up the Actions button
         actionButton = UIBarButtonItem.init(title: "Actions",
@@ -108,6 +112,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             showAlert("Error", "Apps list file damaged")
         }
     }
+
 
     override func viewWillAppear(_ animated: Bool) {
 
@@ -163,6 +168,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.deviceTable.reloadData()
     }
 
+
     override func didReceiveMemoryWarning() {
         
         super.didReceiveMemoryWarning()
@@ -191,7 +197,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                 self.navigationItem.leftBarButtonItem!.isEnabled = false
             } else {
                 self.tableEditingFlag = false
-                self.navigationItem.rightBarButtonItem!.title = "Edit"
+                self.navigationItem.rightBarButtonItem!.title = "Add"
                 self.navigationItem.leftBarButtonItem!.isEnabled = true
             }
         } else {
@@ -200,7 +206,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             self.tableOrderingFlag = false
             self.tableEditingFlag = false
             self.deviceTable.setEditing(false, animated: true)
-            self.navigationItem.rightBarButtonItem!.title = "Edit"
+            self.navigationItem.rightBarButtonItem!.title = "Add"
             self.navigationItem.leftBarButtonItem!.isEnabled = true
             
             // TODO Decide whether we should update the watch automatically here
@@ -210,10 +216,33 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         self.deviceTable.reloadData()
     }
 
+    @objc func addDevice() {
+
+        // Trap taps on the 'Done' button, only shown when editing or reordering
+        // the device list
+        if self.tableEditingFlag || self.tableOrderingFlag {
+            editTouched()
+            return
+        }
+
+        // Create a new imp with default name and code values
+        let device:Device = Device()
+
+        // Add new imp to the list
+        self.myDevices.devices.append(device)
+        device.name = "Device \(self.myDevices.devices.count)"
+
+        // And add it to the table
+        self.deviceTable.reloadData()
+    }
+
+
     @objc func actionsTouched() {
         
         // Build and show the Actions menu
-        let actionMenu = UIAlertController.init(title: "Select an Action from the List Below", message: nil, preferredStyle: UIAlertController.Style.actionSheet)
+        let actionMenu = UIAlertController.init(title: "Select an Action from the List Below",
+                                                message: nil,
+                                                preferredStyle: UIAlertController.Style.actionSheet)
         var action: UIAlertAction!
         
         // Update Watch item
@@ -222,13 +251,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                                         self.updateWatch()
                                     }
 
+        action.isEnabled = self.watchAppInstalled
         actionMenu.addAction(action)
         
-        // Show App Info item
-        action = UIAlertAction.init(title: "Show App Info",
+        // Edit Device List item
+        action = UIAlertAction.init(title: "Edit Device List",
                                     style: UIAlertAction.Style.default) { (_) in
-                                        self.showInfo()
-                                    }
+                                        self.editTouched()
+        }
 
         actionMenu.addAction(action)
 
@@ -241,7 +271,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         actionMenu.addAction(action)
         
         // Show/Hide Agent IDs item
-        action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs",
+        action = UIAlertAction.init(title: (self.tableShowIDsFlag ? "Hide" : "Show") + " Agent IDs in List",
                                     style: UIAlertAction.Style.default) { (_) in
                                             self.showAgentIDs()
                                     }
@@ -256,6 +286,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         
         actionMenu.addAction(action)
         
+        // Show App Info item
+        action = UIAlertAction.init(title: "Show App Info",
+                                    style: UIAlertAction.Style.default) { (_) in
+                                        self.showInfo()
+        }
+
+        actionMenu.addAction(action)
+
         // Cancel item
         action = UIAlertAction.init(title: "Cancel",
                                     style: UIAlertAction.Style.cancel,
@@ -452,12 +490,14 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             return self.myDevices.devices.count
         }
     }
-    
+
+
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
         let header: UITableViewCell = tableView.dequeueReusableCell(withIdentifier:"header.cell")!
         return header
     }
+
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
@@ -471,7 +511,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         } else {
             // Add a row to display device information
             // We use a custom UITableViewCell
-            let cell: DeviceTableViewCell = tableView.dequeueReusableCell(withIdentifier:"device.cell", for:indexPath) as! DeviceTableViewCell
+            let cell: DeviceTableViewCell = tableView.dequeueReusableCell(withIdentifier:"device.cell",
+                                                                          for:indexPath) as! DeviceTableViewCell
             
             // Fill the cell with device data
             let device: Device = self.myDevices.devices[indexPath.row]
@@ -493,16 +534,19 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             cell.appCode?.text = device.code.count > 0 ? codeString : "Code not yet set"
             cell.rowIndex = indexPath.row
             
-            // For the install switch, disable it if the device has no watch support
+            // For the install switch, disable it if the device has no watch support, and
+            // hide it if the celling is in editing mode (true when editing or reordering)
             cell.installSwitch.isOn = device.isInstalled
-            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled && !self.tableEditingFlag && !self.tableOrderingFlag
-            
-            // Do we show the re-order control?
+            cell.installSwitch.isEnabled = device.watchSupported && self.watchAppInstalled
+            cell.installSwitch.isHidden = self.tableEditingFlag
+
+            // Do we show the re-order control? If so, hide the switch
             cell.showsReorderControl = self.tableOrderingFlag
-            
+
             return cell
         }
     }
+
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
@@ -558,6 +602,13 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         }
     }
 
+
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+
+        return !self.tableOrderingFlag
+    }
+
+
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
 
         if editingStyle == .delete {
@@ -573,9 +624,11 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
 
             // Add new imp to the list
             self.myDevices.devices.append(device)
+            device.name = "Device \(self.myDevices.devices.count)"
 
             // And add it to the table
-            tableView.insertRows(at: [indexPath], with: UITableView.RowAnimation.none)
+            tableView.insertRows(at: [indexPath],
+                                 with: UITableView.RowAnimation.none)
             self.deviceTable.reloadData()
         }
     }
