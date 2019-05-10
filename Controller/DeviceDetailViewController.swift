@@ -60,6 +60,7 @@ class DeviceDetailViewController: UIViewController,
         self.appTypeField.isEnabled = false
     }
     
+    
     override func viewWillAppear(_ animated: Bool) {
 
         super.viewWillAppear(animated)
@@ -89,6 +90,7 @@ class DeviceDetailViewController: UIViewController,
             self.supportLabel.text = ""
         }
     }
+    
     
     @objc func appWillQuit(note:NSNotification) {
 
@@ -127,6 +129,7 @@ class DeviceDetailViewController: UIViewController,
         goBack()
     }
     
+    
     func saveData() {
         
         // The view is about to close so save the text fields' content
@@ -142,6 +145,7 @@ class DeviceDetailViewController: UIViewController,
         }
     }
     
+    
     func goBack() {
         
         // Stop listening for 'will enter foreground' notifications
@@ -150,6 +154,7 @@ class DeviceDetailViewController: UIViewController,
         // Jump back to the list of devices
         self.navigationController!.popViewController(animated: true)
     }
+    
     
     @IBAction func getProxy(_ sender: Any) {
         
@@ -167,6 +172,7 @@ class DeviceDetailViewController: UIViewController,
         }
     }
 
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
 
         textField.resignFirstResponder()
@@ -224,6 +230,7 @@ class DeviceDetailViewController: UIViewController,
         self.receivedData.append(data)
     }
 
+    
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
 
         let rps = response as! HTTPURLResponse
@@ -238,6 +245,7 @@ class DeviceDetailViewController: UIViewController,
         }
     }
 
+    
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 
         if error != nil {
@@ -282,6 +290,7 @@ class DeviceDetailViewController: UIViewController,
         self.present(alert, animated: true)
     }
 
+    
     func getAppName(_ code: String) -> String {
         
         // Return the app's name as derived from its known UUID

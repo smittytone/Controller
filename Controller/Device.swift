@@ -2,7 +2,7 @@
 //  Device.swift
 //  Created by Tony Smith on 06/12/2016.
 //
-//  Copyright 2016-18 Tony Smith
+//  Copyright 2016-19 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //
@@ -78,6 +78,7 @@ class Device: NSObject, NSCoding {
         self.autoBack = decoder.decodeBool(forKey: "device.autoback")
     }
 
+    
     func encode(with encoder: NSCoder) {
 
         encoder.encode(self.name, forKey: "device.name")

@@ -2,7 +2,7 @@
 //  DeviceList.swift
 //  Created by Tony Smith on 06/12/2016.
 //
-//  Copyright 2016-18 Tony Smith
+//  Copyright 2016-19 Tony Smith
 //
 //  SPDX-License-Identifier: MIT
 //
@@ -52,6 +52,7 @@ class DeviceList: NSObject, NSCoding {
         encoder.encode(self.devices, forKey: "controller.device.list")
     }
 
+    
     required init?(coder decoder: NSCoder) {
 
         self.devices = decoder.decodeObject(forKey: "controller.device.list") as! Array

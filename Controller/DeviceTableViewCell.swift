@@ -47,6 +47,7 @@ class DeviceTableViewCell: UITableViewCell {
                                      for: UIControl.Event.touchUpInside)
     }
 
+    
     @objc func flipSwitch() {
         
         // The user wants to install or un-install the device from the watch
