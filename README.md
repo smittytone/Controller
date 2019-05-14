@@ -14,7 +14,7 @@ Or simply take the code apart and use it as the foundation for a completely diff
 
 The Watch app’s iPhone-based companion collates your imp-enabled devices and syncs them with the Watch. Tap ‘Edit’ to add a new device and then select it in order to give it a convenient name and to enter its agent ID. Tap ‘Get Device Data’ to check what app the device is running and whether it is supported by Controller. Click ‘Devices’ to go back when you’re done.
 
-<img src="./Images/IMG_0634.PNG" width="562" />&nbsp;&nbsp;<img src="./Images/IMG_0637.PNG" width="562" />
+<img src="./Images/IMG_0634.PNG" width="281" />&nbsp;&nbsp;<img src="./Images/IMG_0637.PNG" width="281" />
 
 Typically, the iOS app will only be used to add devices. An end-user should not need to use it too often.
 
@@ -22,7 +22,7 @@ Each device is listed with a switch which can be used to sync that device with t
 
 You can update the Watch separately by tapping ‘Actions’ and then ‘Update Watch’. This is also useful if you re-order the list of devices. Re-ordering is activated by tapping ‘Actions’ and then ‘Re-order Device List’.
 
-<img src="./Images/IMG_0635.PNG" width="562" />&nbsp;&nbsp;<img src="./Images/IMG_0636.PNG" width="562" />
+<img src="./Images/IMG_0635.PNG" width="281" />&nbsp;&nbsp;<img src="./Images/IMG_0636.PNG" width="281" />
 
 The app stores the current list of devices across app restarts and relaunches.
 
