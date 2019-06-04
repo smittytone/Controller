@@ -685,7 +685,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                     self.watchAppInstalled = true
 
                     // Update table to show any changes made
-                    self.deviceTable.reloadData()
+                    DispatchQueue.main.async {
+                        self.deviceTable.reloadData()
+                    }
                     
                     // Re-send the device list to make sure watch is up to date
                     sendDeviceList()
@@ -693,13 +695,17 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                     // Watch app not installed, so warn user
                     //self.phoneSession = nil
                     self.watchAppInstalled = false
-                    showAlert("This app needs a companion Watch app", "Please install the companion app on your Watch")
+                    DispatchQueue.main.async {
+                        self.showAlert("This app needs a companion Watch app", "Please install the companion app on your Watch")
+                    }
                 }
             } else {
                 // iPhone is not paired with a watch, so warn user
                 //self.phoneSession = nil
                 self.watchAppInstalled = false
-                showAlert("This app requires an Apple Watch", "Please pair your Apple Watch with this iPhone")
+                DispatchQueue.main.async {
+                    self.showAlert("This app requires an Apple Watch", "Please pair your Apple Watch with this iPhone")
+                }
             }
         }
     }
@@ -710,7 +716,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // NOP - Function required by delegate but not used
 
         // Update table to show any changes made
-        self.deviceTable.reloadData()
+        DispatchQueue.main.async {
+            self.deviceTable.reloadData()
+        }
     }
 
 
@@ -719,7 +727,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         // Session has ended after watch A has disconnected, so connect to watch B
 
         // Update table to show any changes made
-        self.deviceTable.reloadData()
+        DispatchQueue.main.async {
+            self.deviceTable.reloadData()
+        }
         
         // Connect to alternative watch
         session.activate()
@@ -732,7 +742,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             self.watchAppInstalled = false
             
             // Update table to show any changes made
-            self.deviceTable.reloadData()
+            DispatchQueue.main.async {
+                self.deviceTable.reloadData()
+            }
         }
     }
     
