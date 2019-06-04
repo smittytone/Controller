@@ -304,7 +304,9 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
         actionMenu.addAction(action)
         
         // Present the menu
-        self.present(actionMenu, animated: true, completion: nil)
+        self.present(actionMenu,
+                     animated: true,
+                     completion: nil)
     }
 
 
