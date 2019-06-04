@@ -30,7 +30,7 @@ The list is sync’d with the Watch by sending a string of all the devices to ap
 
 The app contains a file, `apps.json`, which lists the apps’ UUIDs and human-readable names as an array of objects within the *apps* object:
 
-```
+```json
 { "apps": [
     { "code": "<UUID_1>",
       "name": "APP_NAME_1" },
@@ -59,7 +59,7 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 ## Release Notes ##
 
-- 1.1.0 &mdash; *Unreleased*
+- 1.1.0 &mdash; *4 June 2019*
     - Add support for multiple Apple Watches
     - Update the iOS app UI:
         - Add a new device without editing the table by adding **Add** button to nav bar.
