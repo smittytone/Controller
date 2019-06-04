@@ -169,8 +169,44 @@
                         <color key="separatorColor" red="0.83741801979999997" green="0.83743780850000005" blue="0.83742713930000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="header.cell" rowHeight="18" id="vdu-Sh-VsS" customClass="DeviceTableHeaderViewCell" customModule="Controller" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="667" height="18"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="right" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vdu-Sh-VsS" id="dlf-xs-q0s">
+                                    <rect key="frame" x="0.0" y="0.0" width="667" height="17.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="INSTALL" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gLV-nH-Hpz">
+                                            <rect key="frame" x="20" y="2" width="628" height="15"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="WATCH" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcc-Xd-Ckr">
+                                            <rect key="frame" x="20" y="2" width="627" height="15"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="dcc-Xd-Ckr" firstAttribute="leading" secondItem="dlf-xs-q0s" secondAttribute="leading" constant="20" id="1DC-gx-p5o"/>
+                                        <constraint firstAttribute="bottom" secondItem="dcc-Xd-Ckr" secondAttribute="bottom" constant="0.5" id="3aM-Df-7Wu"/>
+                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="leading" secondItem="dlf-xs-q0s" secondAttribute="leading" constant="20" id="IEJ-bP-9AI"/>
+                                        <constraint firstAttribute="bottom" secondItem="gLV-nH-Hpz" secondAttribute="bottom" constant="0.5" id="KgI-1m-OEl"/>
+                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="top" secondItem="dlf-xs-q0s" secondAttribute="top" constant="2" id="Sim-bo-u8u"/>
+                                        <constraint firstAttribute="trailing" secondItem="dcc-Xd-Ckr" secondAttribute="trailing" constant="20" id="hrS-GD-YbA"/>
+                                        <constraint firstAttribute="trailing" secondItem="gLV-nH-Hpz" secondAttribute="trailing" constant="19" id="pce-3G-pKY"/>
+                                        <constraint firstItem="dcc-Xd-Ckr" firstAttribute="top" secondItem="dlf-xs-q0s" secondAttribute="top" constant="2" id="vYD-bu-AHo"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="0.90036386986301364" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <outlet property="watchName" destination="dcc-Xd-Ckr" id="5as-qk-4N4"/>
+                                </connections>
+                            </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="0.0" shouldIndentWhileEditing="NO" reuseIdentifier="device.cell" rowHeight="58" id="afP-pk-GdH" customClass="DeviceTableViewCell" customModule="Controller" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="667" height="58"/>
+                                <rect key="frame" x="0.0" y="46" width="667" height="58"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="afP-pk-GdH" id="pFh-x3-gzi">
                                     <rect key="frame" x="0.0" y="0.0" width="667" height="57.5"/>
@@ -234,7 +270,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="new.cell" textLabel="mvu-rH-VuK" rowHeight="58" style="IBUITableViewCellStyleDefault" id="qfh-7e-1US">
-                                <rect key="frame" x="0.0" y="86" width="667" height="58"/>
+                                <rect key="frame" x="0.0" y="104" width="667" height="58"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="qfh-7e-1US" id="Cu0-1Q-bnH">
                                     <rect key="frame" x="0.0" y="0.0" width="667" height="57.5"/>
@@ -249,46 +285,6 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
-                            </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="header.cell" rowHeight="18" id="vdu-Sh-VsS" customClass="DeviceTableHeaderViewCell" customModule="Controller" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="144" width="667" height="18"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="right" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vdu-Sh-VsS" id="dlf-xs-q0s">
-                                    <rect key="frame" x="0.0" y="0.0" width="667" height="17.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="INSTALL" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gLV-nH-Hpz">
-                                            <rect key="frame" x="548" y="1.5" width="99" height="15"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="15" id="hCJ-P0-TPu"/>
-                                                <constraint firstAttribute="width" constant="99" id="yUp-s3-pHB"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="WATCH" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcc-Xd-Ckr">
-                                            <rect key="frame" x="20" y="1.5" width="360" height="15"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="15" id="kYG-OU-FaI"/>
-                                                <constraint firstAttribute="width" constant="360" id="wEC-Yh-C8o"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="gLV-nH-Hpz" secondAttribute="trailing" constant="20" id="9oC-YW-9pp"/>
-                                        <constraint firstItem="dcc-Xd-Ckr" firstAttribute="leading" secondItem="dlf-xs-q0s" secondAttribute="leading" constant="20" id="f1n-F8-1AD"/>
-                                        <constraint firstItem="gLV-nH-Hpz" firstAttribute="centerY" secondItem="dlf-xs-q0s" secondAttribute="centerY" id="m55-TN-ivO"/>
-                                        <constraint firstItem="dcc-Xd-Ckr" firstAttribute="centerY" secondItem="dlf-xs-q0s" secondAttribute="centerY" id="xWX-4c-lBP"/>
-                                    </constraints>
-                                </tableViewCellContentView>
-                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="0.90036386986301364" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <outlet property="watchName" destination="dcc-Xd-Ckr" id="5as-qk-4N4"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
