@@ -555,7 +555,7 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
             let device: Device = self.myDevices.devices[indexPath.row]
             cell.appName?.text = device.name.count > 0 ? device.name : "Device \(self.myDevices.devices.count)"
             cell.appIcon?.image = getAppImage(device.app)
-            
+
             // Show bullets or the agent ID according to user preference
             var codeString: String = ""
             if device.code.count > 0 {
