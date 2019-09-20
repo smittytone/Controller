@@ -27,7 +27,14 @@
 
 import Foundation
 
-class DeviceList: NSObject, NSCoding {
+class DeviceList: NSObject, NSSecureCoding {
+
+    
+    // FROM 1.2.0
+    // Support iOS 12 secure method for decoding objects
+    static var supportsSecureCoding: Bool {
+        return true
+    }
 
     static let sharedDevices: DeviceList = DeviceList()
 
@@ -48,14 +55,22 @@ class DeviceList: NSObject, NSCoding {
 
     func encode(with encoder:NSCoder) {
 
-        encoder.encode(self.currentDevice, forKey: "controller.current.index")
-        encoder.encode(self.devices, forKey: "controller.device.list")
+        // FROM 1.2.0
+        // Support iOS 12 secure method for decoding objects
+        encoder.encode(self.devices as NSArray, forKey: "controller.device.list")
+        encoder.encode(NSNumber(value: self.currentDevice), forKey: "controller.current.index")
     }
 
-    
+
     required init?(coder decoder: NSCoder) {
 
-        self.devices = decoder.decodeObject(forKey: "controller.device.list") as! Array
-        self.currentDevice = decoder.decodeInteger(forKey: "controller.current.index")
+        self.currentDevice = -1
+        self.devices = []
+
+        // FROM 1.2.0
+        // Support iOS 12 secure method for decoding objects
+        self.devices = decoder.decodeObject(of: NSArray.self, forKey: "controller.device.list") as! [Device]
+        self.currentDevice = decoder.decodeObject(of: NSNumber.self, forKey: "controller.current.index") as! Int
     }
+
 }

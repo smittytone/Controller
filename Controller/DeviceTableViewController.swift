@@ -26,7 +26,13 @@
 
 
 import UIKit
-import WatchKit
+
+// FROM 1.2.0
+// Add code to compile under Xcode 11
+#if !os(iOS)
+    import WatchKit
+#endif
+
 import WatchConnectivity
 
 
@@ -136,9 +142,8 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
                 device.changed = false
             }
             
-            // Clear 'editingDevice' and the Device Detail View Controller
+            // Clear 'editingDevice'
             self.editingDevice = nil
-            if self.ddvc != nil { self.ddvc = nil }
         }
         
         // Read the default for whether we show or hide Agent IDs
@@ -170,12 +175,21 @@ class DeviceTableViewController: UITableViewController, WCSessionDelegate {
     }
 
 
+    override func viewDidAppear(_ animated: Bool) {
+
+        super.viewDidAppear(animated)
+
+        // Zap the Device Detail View Controller if present
+        if self.ddvc != nil { self.ddvc = nil }
+    }
+
+
     override func didReceiveMemoryWarning() {
         
         super.didReceiveMemoryWarning()
         
         // Zap the device detail view controller if we have one
-        // NOTE We shouldn't have one
+        // NOTE We shouldn't have one!s
         if self.ddvc != nil { self.ddvc = nil }
     }
     

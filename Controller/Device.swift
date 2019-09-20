@@ -27,7 +27,13 @@
 
 import Foundation
 
-class Device: NSObject, NSCoding {
+class Device: NSObject, NSCoding, NSSecureCoding {
+
+    // FROM 1.2.0
+    // Support iOS 12 secure method for decoding objects
+    static var supportsSecureCoding: Bool {
+        return true
+    }
 
     var name: String = ""
     var code: String = ""
@@ -68,24 +74,28 @@ class Device: NSObject, NSCoding {
         self.isInstalled = false
         self.autoBack = true
         self.installState = self.STATE_NONE
-        
-        if let n = decoder.decodeObject(forKey: "device.name") { self.name = n as! String }
-        if let c = decoder.decodeObject(forKey: "device.code") { self.code = c as! String }
-        if let a = decoder.decodeObject(forKey: "device.app") { self.app = a as! String }
 
-        self.watchSupported = decoder.decodeBool(forKey: "device.watch")
-        self.isInstalled = decoder.decodeBool(forKey: "device.installed")
-        self.autoBack = decoder.decodeBool(forKey: "device.autoback")
+        // FROM 1.2.0
+        // Support iOS 12 secure method for decoding objects
+        self.name = decoder.decodeObject(of: NSString.self, forKey: "device.name") as String? ?? ""
+        self.code = decoder.decodeObject(of: NSString.self, forKey: "device.code") as String? ?? ""
+        self.app = decoder.decodeObject(of: NSString.self, forKey: "device.app") as String? ?? ""
+
+        self.watchSupported = decoder.decodeObject(of: NSNumber.self, forKey: "device.watch") as! Bool
+        self.isInstalled = decoder.decodeObject(of: NSNumber.self, forKey: "device.installed") as! Bool
+        self.autoBack = decoder.decodeObject(of: NSNumber.self, forKey: "device.autoback") as! Bool
     }
 
     
     func encode(with encoder: NSCoder) {
 
-        encoder.encode(self.name, forKey: "device.name")
-        encoder.encode(self.code, forKey: "device.code")
-        encoder.encode(self.app, forKey: "device.app")
-        encoder.encode(self.watchSupported, forKey: "device.watch")
-        encoder.encode(self.isInstalled, forKey: "device.installed")
-        encoder.encode(self.autoBack, forKey: "device.autoback")
+        // FROM 1.2.0
+        // Support iOS 12 secure method for decoding objects
+        encoder.encode(self.name as NSString, forKey: "device.name")
+        encoder.encode(self.code as NSString, forKey: "device.code")
+        encoder.encode(self.app as NSString, forKey: "device.app")
+        encoder.encode(NSNumber(value: self.watchSupported), forKey: "device.watch")
+        encoder.encode(NSNumber(value: self.isInstalled), forKey: "device.installed")
+        encoder.encode(NSNumber(value: self.autoBack), forKey: "device.autoback")
     }
 }

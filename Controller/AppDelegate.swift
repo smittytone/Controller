@@ -27,6 +27,7 @@
 
 import UIKit
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -46,12 +47,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Load in default device list if the file has already been saved
         let docsPath = self.docsDir[0] + "/devices"
-        if FileManager.default.fileExists(atPath: docsPath) {
-            // Devices file is present on the iDevice, so load it in
-            let load = NSKeyedUnarchiver.unarchiveObject(withFile:docsPath)
 
-            if load != nil {
-                let devices1 = load as! DeviceList
+        if FileManager.default.fileExists(atPath: docsPath) {
+            // FROM 1.2.0
+            // Support iOS 12 secure method for decoding objects
+            // Devices file is present on the iDevice, so load it in
+            var loadedDevices: DeviceList? = nil
+
+            do {
+                let data: Data = try Data(contentsOf: URL.init(fileURLWithPath: docsPath))
+                loadedDevices = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? DeviceList
+            } catch {
+                loadedDevices = nil
+                NSLog("Could not load devices file. Error: \(error.localizedDescription)")
+            }
+
+            if loadedDevices != nil {
+                let devices1 = loadedDevices!
                 let devices2 = devices1.devices as Array
                 self.myDevices.devices.removeAll()
                 self.myDevices.devices.append(contentsOf:devices2)
@@ -200,7 +212,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 i = i + 1
             } while (self.myDevices.devices.count > i)
             
-            let success = NSKeyedArchiver.archiveRootObject(self.myDevices!, toFile:docsPath)
+            // FROM 1.2.0
+            // Support iOS 12 secure method for decoding objects
+            var success: Bool = false
+
+            do {
+                // Encode the object to data
+                let data: Data = try NSKeyedArchiver.archivedData(withRootObject: self.myDevices!,
+                                                                  requiringSecureCoding: true)
+
+                try data.write(to: URL.init(fileURLWithPath: docsPath))
+            } catch {
+                success = false
+                print("Couldn't write to save file: " + error.localizedDescription)
+            }
+
             if success {
                 NSLog("Device list saved (%@)", docsPath)
             } else {
