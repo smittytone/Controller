@@ -68,7 +68,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
 
         // ********** DEBUG ONLY **********
         // Change the following line to clear old files
-        let debug: Bool = true
+        let debug: Bool = false
         if debug && FileManager.default.fileExists(atPath: docsPath) {
             do {
                 try FileManager.default.removeItem(atPath: docsPath)
