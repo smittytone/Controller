@@ -64,22 +64,24 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         super.willActivate()
 
         // Load in the device list if it's present
-        let docsPath = self.docsDir[0] + "/devices"
+        var docsPath = self.docsDir[0] + "/devices"
+        let fm: FileManager = FileManager.default
 
         // ********** DEBUG ONLY **********
         // Change the following line to clear old files
         let debug: Bool = false
-        if debug && FileManager.default.fileExists(atPath: docsPath) {
+        if debug && fm.fileExists(atPath: docsPath) {
             do {
-                try FileManager.default.removeItem(atPath: docsPath)
+                try fm.removeItem(atPath: docsPath)
                 NSLog("Deleted old devices file")
             } catch {
                 NSLog("Could not delete old devices file")
             }
         }
 
-        /*
-        if FileManager.default.fileExists(atPath: docsPath) {
+        // Load in an old file, using deprecated code
+        // We will convert it in due course
+        if fm.fileExists(atPath: docsPath) {
             // Devices file is present on the iDevice, so load it in
             let load = NSKeyedUnarchiver.unarchiveObject(withFile:docsPath)
 
@@ -89,30 +91,45 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 self.myDevices.devices.removeAll()
                 self.myDevices.devices.append(contentsOf: devices)
                 self.myDevices.currentDevice = devicesList.currentDevice
+
+                // Save the list in the new format...
+                saveDevices()
+
+                // ...and delete the old one, if we were successful
+                if !self.listChanged {
+                    do {
+                        try fm.removeItem(atPath: docsPath)
+                        NSLog("Deleted 1.x devices file")
+                    } catch {
+                        NSLog("Could not delete 1.x devices file")
+                    }
+                }
             }
-        }
-        */
+        } else {
+            // FROM 2.0.0
+            // Load in the 2.x devices list
+            docsPath = self.docsDir[0] + "/devices2"
 
-        if FileManager.default.fileExists(atPath: docsPath) {
-            // FROM 1.2.0
-            // Support iOS 12 secure method for decoding objects
-            // Devices file is present on the iDevice, so load it in
-            var loadedDevices: DeviceList? = nil
+            if fm.fileExists(atPath: docsPath) {
+                // Support iOS 12 secure method for decoding objects
+                // Devices file is present on the iDevice, so load it in
+                var loadedDevices: DeviceList? = nil
 
-            do {
-                let data: Data = try Data(contentsOf: URL.init(fileURLWithPath: docsPath))
-                loadedDevices = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? DeviceList
-            } catch {
-                loadedDevices = nil
-                NSLog("Could not load devices file. Error: \(error.localizedDescription)")
-            }
+                do {
+                    let data: Data = try Data(contentsOf: URL.init(fileURLWithPath: docsPath))
+                    loadedDevices = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? DeviceList
+                } catch {
+                    loadedDevices = nil
+                    NSLog("Could not load devices file. Error: \(error.localizedDescription)")
+                }
 
-            if loadedDevices != nil {
-                let devicesList = loadedDevices!
-                let devices: [Device] = devicesList.devices as Array
-                self.myDevices.devices.removeAll()
-                self.myDevices.devices.append(contentsOf:devices)
-                self.myDevices.currentDevice = devicesList.currentDevice
+                if loadedDevices != nil {
+                    let devicesList = loadedDevices!
+                    let devices: [Device] = devicesList.devices as Array
+                    self.myDevices.devices.removeAll()
+                    self.myDevices.devices.append(contentsOf:devices)
+                    self.myDevices.currentDevice = devicesList.currentDevice
+                }
             }
         }
         
@@ -154,9 +171,9 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
         
         // The app is going into the background or closing, so save the list of devices
         if self.myDevices.devices.count > 0 {
-            let docsPath = self.docsDir[0] + "/devices"
+            let docsPath = self.docsDir[0] + "/devices2s"
 
-            // FROM 1.2.0
+            // FROM 2.0.0
             // Support iOS 12 secure method for decoding objects
             var success: Bool = false
 
@@ -171,8 +188,7 @@ class InterfaceController: WKInterfaceController, WCSessionDelegate {
                 NSLog("Couldn't write to save file: " + error.localizedDescription)
             }
 
-            // let success = NSKeyedArchiver.archiveRootObject(self.myDevices!, toFile:docsPath)
-            listChanged = !success
+            self.listChanged = !success
         }
     }
 
