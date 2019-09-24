@@ -59,9 +59,9 @@ The Electric Imp application component of the design makes use of the [Rocky lib
 
 ## Release Notes ##
 
-- 1.2.3 &mdash; *unreleased*
+- 1.2.0 &mdash; *unreleased*
     - Update device-list saving and loading code: removed deprecated functions.
-    - Update or Xcode 11.s
+    - Update or Xcode 11.
 - 1.1.0 &mdash; *4 June 2019*
     - Add support for multiple Apple Watches
     - Update the iOS app UI:
